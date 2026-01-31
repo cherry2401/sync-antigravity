@@ -1,0 +1,33 @@
+# Walkthrough: Hệ thống Địa chỉ Việt Nam
+
+## Tổng quan
+Đã triển khai thành công hệ thống địa chỉ Việt Nam với **63 tỉnh/thành** từ API thực.
+
+## Các file đã tạo/sửa
+
+### [NEW] [vietnamAddress.ts](file:///i:/Website/BDS/src/lib/vietnamAddress.ts)
+- API helper kết nối `provinces.open-api.vn`
+- Functions: [getProvinces()](file:///i:/Website/BDS/src/lib/vietnamAddress.ts#34-51), [getDistricts()](file:///i:/Website/BDS/src/lib/vietnamAddress.ts#52-72), [getWards()](file:///i:/Website/BDS/src/lib/vietnamAddress.ts#73-93)
+- Có caching để tối ưu performance
+
+### [NEW] [useVietnamAddress.ts](file:///i:/Website/BDS/src/hooks/useVietnamAddress.ts)  
+- Custom hook quản lý cascading address
+- Loading states cho UX tốt hơn
+
+### [MODIFY] [PostingForm.tsx](file:///i:/Website/BDS/src/components/property/PostingForm.tsx)
+- Xóa mock data cũ (PROVINCES, MOCK_WARDS, MOCK_STREETS)
+- Tích hợp useVietnamAddress hook
+- Đường/Phố: text input thay vì dropdown
+
+## Kết quả test
+
+![Modal with 63 provinces](provinces_loaded_modal_1768213135832.png)
+
+- ✅ 63 tỉnh/thành load từ API
+- ✅ Cascading Quận/Huyện hoạt động
+- ✅ Cascading Phường/Xã hoạt động
+- ✅ Geocoding bản đồ tự động
+
+## Demo
+
+![Address modal demo](final_address_test_1768213087722.webp)

@@ -1,0 +1,21 @@
+# OmoCaptcha Integration - Implementation Progress
+
+## Setup ✅
+- [x] Đăng ký OmoCaptcha account
+- [x] Lấy API key
+- [ ] Thêm API key vào Data Table (column: `OmoCaptcha_API_Key`)
+- [x] Lấy reCAPTCHA site key: `6LdsFiUsAAAAAIjVDZcuLhaHiDn5nnHVXVRQGeMV`
+
+## Workflow Implementation  
+- [ ] Update node Create VEO3: Bật "Continue On Fail"
+- [ ] Thêm IF node: Check Captcha Error
+- [ ] Thêm node: Solve Captcha (OmoCaptcha API)
+- [ ] Thêm node: Wait 15s
+- [ ] Thêm node: Get Captcha Result
+- [ ] Thêm IF node: Check Result Ready
+- [ ] Thêm node: Retry Create VEO3 (with token)
+
+## Testing
+- [ ] Test request không có captcha
+- [ ] Test request có captcha
+- [ ] Verify OmoCaptcha usage

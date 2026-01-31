@@ -1,0 +1,15 @@
+# Configure Claude Code with cliproxy
+
+Claude Code allows routing API requests through a proxy server by modifying the base URL environment variable.
+
+## Proposed Changes
+
+1. **Environment Variable**: Set `CLAUDE_BASE_URL` to the address of your `cliproxy` instance.
+2. **Terminal Session**: Export the variable in the current terminal session.
+3. **Persistence**: (Optional) Add the variable to system environment variables for permanent use.
+
+## Verification Plan
+
+### Manual Verification
+- Run `claude` and check if it connects via the proxy.
+- Use `claude --debug api` to verify requests are being sent to the correct endpoint.

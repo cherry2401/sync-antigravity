@@ -1,0 +1,87 @@
+# Triển khai Hệ thống Địa chỉ Việt Nam thực tế
+
+## Mô tả vấn đề
+Hiện tại form Đăng tin ([PostingForm.tsx](file:///i:/Website/BDS/src/components/property/PostingForm.tsx)) đang sử dụng dữ liệu giả lập (mock data) với chỉ 3 tỉnh/thành và một số quận/huyện, phường/xã. Cần thay thế bằng dữ liệu thực tế đầy đủ 63 tỉnh/thành của Việt Nam.
+
+## Giải pháp đề xuất
+
+### Phương án: Sử dụng API `provinces.open-api.vn`
+
+API này cung cấp:
+- Danh sách 63 tỉnh/thành
+- Quận/huyện theo `province_code`
+- Phường/xã theo `district_code`
+- Miễn phí, có CORS support
+
+---
+
+## Proposed Changes
+
+### lib/vietnamAddress.ts
+#### [NEW] [vietnamAddress.ts](file:///i:/Website/BDS/src/lib/vietnamAddress.ts)
+
+Tạo module API helper:
+```typescript
+interface Province { code: number; name: string; }
+interface District { code: number; name: string; }
+interface Ward { code: number; name: string; }
+
+export async function getProvinces(): Promise<Province[]>
+export async function getDistricts(provinceCode: number): Promise<District[]>
+export async function getWards(districtCode: number): Promise<Ward[]>
+```
+
+---
+
+### hooks/useVietnamAddress.ts
+#### [NEW] [useVietnamAddress.ts](file:///i:/Website/BDS/src/hooks/useVietnamAddress.ts)
+
+Custom hook để quản lý state địa chỉ cascading:
+```typescript
+export function useVietnamAddress() {
+  // Fetch provinces on mount
+  // Fetch districts when province changes
+  // Fetch wards when district changes
+  return { provinces, districts, wards, loading, ... }
+}
+```
+
+---
+
+### components/property/PostingForm.tsx
+#### [MODIFY] [PostingForm.tsx](file:///i:/Website/BDS/src/components/property/PostingForm.tsx)
+
+- Xóa các constants `PROVINCES`, `MOCK_WARDS`, `MOCK_STREETS` (dòng 30-60)
+- Cập nhật [AddressConfirmModal](file:///i:/Website/BDS/src/components/property/PostingForm.tsx#177-372) để sử dụng `useVietnamAddress` hook
+- Thêm loading states cho các dropdown
+- Lưu cả `code` và `name` của địa chỉ để có thể query cascading
+
+---
+
+## Verification Plan
+
+### Manual Verification
+
+1. **Mở trang Đăng tin** tại `http://localhost:3000/dang-tin`
+2. **Click vào ô "Chọn địa chỉ..."** để mở modal xác nhận địa chỉ
+3. **Kiểm tra dropdown Tỉnh/Thành**: 
+   - Phải hiển thị đầy đủ 63 tỉnh/thành phố
+   - Có loading indicator khi đang tải
+4. **Chọn một tỉnh (ví dụ: Hà Nội)**:
+   - Dropdown Quận/Huyện phải load danh sách quận/huyện của Hà Nội
+5. **Chọn một quận (ví dụ: Ba Đình)**:
+   - Dropdown Phường/Xã phải load danh sách phường/xã của Ba Đình
+6. **Kiểm tra Đường/Phố**: Input text để nhập thủ công (API không có dữ liệu đường)
+7. **Xác nhận địa chỉ**: Địa chỉ được lưu đúng và hiển thị trên form
+
+> [!IMPORTANT]
+> Cần người dùng kiểm tra trực tiếp trên giao diện để đảm bảo trải nghiệm tốt.
+
+---
+
+## Rủi ro và Lưu ý
+
+> [!WARNING]
+> - API `provinces.open-api.vn` là bên thứ ba, có thể thay đổi hoặc gián đoạn
+> - Nên cache dữ liệu tỉnh/thành (ít thay đổi) để giảm request
+> - Đường/Phố không có trong API, chỉ có thể nhập thủ công

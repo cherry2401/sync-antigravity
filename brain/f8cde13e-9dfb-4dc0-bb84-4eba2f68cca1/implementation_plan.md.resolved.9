@@ -1,0 +1,123 @@
+# Extension Capture recaptchaToken - Implementation Plan
+
+## Overview
+
+Update Chrome Extension để capture `recaptchaToken` từ browser và gửi vào Data Table.
+
+**Ưu điểm**:
+- ✅ Token từ browser/account thật của user
+- ✅ Không cần Puppeteer service
+- ✅ Token 100% hợp lệ cho workflow
+- ✅ Tự động refresh khi tạo video mới
+
+---
+
+## Changes Needed
+
+### 1. Update Extension background.js
+
+**Capture recaptchaToken từ request**:
+
+```javascript
+// Trong listener intercepting VEO3 requests
+chrome.webRequest.onBeforeRequest.addListener(
+  function(details) {
+    if (details.url.includes('batchAsyncGenerateVideoText') || 
+        details.url.includes('batchAsyncGenerateVideoStartAndEndImage')) {
+      
+      if (details.requestBody && details.requestBody.raw) {
+        const decoder = new TextDecoder('utf-8');
+        const bodyString = decoder.decode(details.requestBody.raw[0].bytes);
+        const body = JSON.parse(bodyString);
+        
+        // Capture data
+        const capturedData = {
+          recaptchaToken: body.clientContext?.recaptchaToken || '',
+          projectId: body.clientContext.projectId,
+          // ... existing captures
+        };
+        
+        // Send to webhook/Data Table
+        sendToWebhook(capturedData);
+      }
+    }
+  },
+  {urls: ["https://aisandbox-pa.googleapis.com/*"]},
+  ["requestBody"]
+);
+```
+
+### 2. Update Data Table Schema
+
+**Thêm column**: `recaptchaToken` (Text)
+
+### 3. Update Webhook Endpoint (n8n)
+
+Webhook nhận data từ extension → Upsert vào Data Table:
+
+```javascript
+{
+  "Access_Token": "{{ $json.token }}",
+  "projectId": "{{ $json.projectId }}",
+  "recaptchaToken": "{{ $json.recaptchaToken }}"
+}
+```
+
+### 4. Update Workflow
+
+**Read Data** node sẽ đọc thêm `recaptchaToken`:
+
+```javascript
+{
+  token: $json.Access_Token,
+  projectId: $json.projectId,
+  recaptchaToken: $json.recaptchaToken
+}
+```
+
+**Create VEO3** dùng token:
+```javascript
+"recaptchaToken": $('Read Data').first().json.recaptchaToken
+```
+
+---
+
+## User Workflow
+
+1. **Mở VEO3 web** (thỉnh thoảng, khi token hết hạn)
+2. **Tạo 1 video test** (prompt bất kỳ)
+3. Extension auto-capture token → Update Data Table
+4. **Gửi Telegram** tạo videos → Workflow dùng token từ Data Table
+5. Token hết hạn (~3-5 phút) → Workflow lỗi → **Lặp lại bước 1-2**
+
+---
+
+## Error Handling
+
+### IF Token Expired (Workflow)
+
+Khi Create VEO3 return captcha error:
+```javascript
+if ($json.error?.message?.includes('reCAPTCHA')) {
+  // Send Telegram notification
+  "⚠️ Token hết hạn! Mở VEO3 web và tạo 1 video test."
+}
+```
+
+---
+
+## Implementation Steps
+
+1. [ ] Update extension [background.js](file:///d:/EXTENTIONS/Extension_Chrome_Veo-OK_v2/background.js) - Capture recaptchaToken
+2. [ ] Update Data Table - Thêm column `recaptchaToken`
+3. [ ] Test extension - Tạo video trên VEO3, verify token captured
+4. [ ] Update workflow - Đọc token từ Data Table
+5. [ ] Test end-to-end - Tạo video qua Telegram
+
+---
+
+## Estimate
+
+- Extension update: 15-30 phút
+- Test & verification: 10 phút
+- **Total**: < 1 giờ

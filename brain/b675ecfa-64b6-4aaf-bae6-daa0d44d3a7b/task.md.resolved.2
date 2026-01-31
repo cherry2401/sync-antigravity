@@ -1,0 +1,18 @@
+# Task: Cải thiện lấy Cookies - Chrome DevTools Protocol
+
+## Mục tiêu
+Tự động lấy chính xác 100% cookies như DevTools Request Headers
+
+## Các bước thực hiện
+
+- [x] Phân tích vấn đề - chrome.cookies API không đủ
+- [x] Implement Chrome DevTools Protocol
+  - [x] Sử dụng chrome.debugger API
+  - [x] Gọi Network.getAllCookies command
+  - [x] Tự động detach debugger
+  - [x] Thêm fallback nếu lỗi
+- [x] Cập nhật UI và hướng dẫn
+  - [x] Đơn giản hóa instructions
+  - [x] Giải thích debugger warning
+- [x] Tạo documentation
+- [ ] User testing và verification

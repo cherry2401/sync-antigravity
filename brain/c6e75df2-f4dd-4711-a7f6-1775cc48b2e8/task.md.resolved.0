@@ -1,0 +1,24 @@
+# Task: Debug Custom TikTok n8n Nodes
+
+## Goal
+Fix errors in the custom n8n nodes for TikTok operations (Get Products, Upload Video)
+
+## Checklist
+
+### Investigation
+- [ ] Review project structure and package.json
+- [ ] Examine TikTokProducts node code
+- [ ] Examine TikTokUpload node code
+- [ ] Examine credential configuration
+- [ ] Identify all errors and issues
+
+### Fix Errors
+- [ ] Fix TypeScript/compilation errors
+- [ ] Fix node implementation issues
+- [ ] Fix credential authentication issues
+- [ ] Update dependencies if needed
+
+### Testing & Verification
+- [ ] Build the project successfully
+- [ ] Test node installation
+- [ ] Verify nodes work in n8n workflow

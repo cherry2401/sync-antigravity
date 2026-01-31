@@ -1,0 +1,29 @@
+# Walkthrough - Fixing Map Display and Preview
+
+## Goal
+The objective was to resolve a "white screen" crash in the Address Confirmation Modal caused by React Hook violations and ensuring the Map in the Preview Modal correctly updates to show the selected location.
+
+## Changes
+
+### 1. AddressConfirmModal Crash Fix
+- **File**: [src/components/property/PostingForm.tsx](file:///i:/Website/BDS/src/components/property/PostingForm.tsx)
+- **Issue**: Converting the component to use `useState` and `useEffect` introduced a violation of React's "Rules of Hooks" because `if (!isOpen) return null;` was placed *before* the hooks. This caused the hook execution order to change between renders.
+- **Fix**: Moved all `useState` and `useEffect` definitions to the top of the component, ensuring they always execute regardless of the `isOpen` state. The conditional return was moved to *after* the hooks.
+
+### 2. Preview Modal Map Update
+- **File**: [src/components/property/PreviewModal.tsx](file:///i:/Website/BDS/src/components/property/PreviewModal.tsx) & [src/components/property/PostingForm.tsx](file:///i:/Website/BDS/src/components/property/PostingForm.tsx)
+- **Issue**: The Preview Modal used a static image for the map, which didn't reflect the user's selected location. Additionally, React Leaflet maps don't automatically re-center when props change without a specific component to handle the view update.
+- **Fix**:
+    - capturing the geocoded `coordinates` in [PostingForm.tsx](file:///i:/Website/BDS/PostingForm.tsx)'s [handleConfirm](file:///i:/Website/BDS/src/components/property/PostingForm.tsx#245-250) and storing them in the `postData` state.
+    - Replaced the static image in [PreviewModal.tsx](file:///i:/Website/BDS/PreviewModal.tsx) with a dynamic `MapContainer`.
+    - Created a helper [LocationUpdater](file:///i:/Website/BDS/src/components/property/PreviewModal.tsx#26-35) component inside [PreviewModal](file:///i:/Website/BDS/src/components/property/PreviewModal.tsx#43-267) that uses `map.flyTo()` to animate the map to the new coordinates whenever they change.
+
+## Verification Results
+
+### Automated Tests
+- N/A
+
+### Manual Verification
+1.  **Address Crash**: Confirmed that clicking "Chọn địa chỉ" no longer crashes the page and opens the modal correctly.
+2.  **Geocoding**: Verified that typing an address updates the map marker in the Address Modal.
+3.  **Preview Map**: Verified that after selecting an address (e.g., Ho Chi Minh City), clicking "Xem trước" displays the map centered on the correct location instead of the default/static location.

@@ -1,0 +1,40 @@
+# Homepage Sections Implementation
+
+## 1. Featured Products (Nổi bật nhất) ✅
+- [x] Tạo [products.json](file:///i:/Website/MyphamHaKi/app-src/data/products.json) và Server Actions ([products.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts))
+- [x] Refactor FeaturedProducts → Server + Client component
+- [x] Thêm **FeaturedProductsSettings** trong Page Builder
+- [x] **Kết nối real data**: Page.tsx fetch + pass to BlockRenderer
+
+## 2. Promotional Products (Ưu đãi đặc biệt) ✅
+- [x] Sử dụng [getPromotionalProducts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts#103-125) Server Action
+- [x] Refactor PromotionalProducts → Server + Client component  
+- [x] Thêm **PromotionalProductsSettings** trong Page Builder
+- [x] **Kết nối real data**: Page.tsx fetch + pass to BlockRenderer
+
+## 3. Categories Grid (Danh mục nổi bật) ✅
+- [x] Tạo [categories.json](file:///i:/Website/MyphamHaKi/app-src/data/categories.json) và Server Actions ([categories.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/categories.ts))
+- [x] Refactor CategoriesGrid với product count
+- [x] Đã có **CategoryGridSettings** trong Page Builder
+- [x] **Kết nối real data**: Page.tsx fetch + pass to BlockRenderer
+
+## 4. Promo Banner (Banner khuyến mãi) ✅
+- [x] Thêm **PromoBannerSettings** trong Page Builder
+  - Tiêu đề, mô tả, CTA, màu nền
+
+## 5. Brand Carousel (Thương hiệu) ✅
+- [x] Tạo [brands.json](file:///i:/Website/MyphamHaKi/app-src/data/brands.json) và Server Actions ([brands.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/brands.ts))
+- [x] Refactor BrandCarousel → Server + Client component
+- [x] Tạo trang admin `/admin/thuong-hieu`
+- [x] Thêm link trong sidebar menu admin
+- [x] Thêm **BrandCarouselSettings** trong Page Builder
+- [x] **Kết nối real data**: Page.tsx fetch + pass to BlockRenderer
+
+## Data Flow
+```
+Page.tsx (Server) → fetch products/brands/categories
+    ↓
+BlockRenderer (Client) → receives initialData prop
+    ↓
+merges block.props + initialData → passes to Client Components
+```

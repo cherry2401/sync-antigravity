@@ -1,0 +1,6 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary":  "Kế hoạch triển khai dropdown đường phố với 2 phương án: Overpass API (OSM) hoặc searchable combobox không dữ liệu sẵn",
+  "updatedAt":  "2026-01-12T10:45:01.842618400Z",
+  "version":  "15"
+}

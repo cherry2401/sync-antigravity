@@ -1,0 +1,147 @@
+# Image-to-Video Integration for n8n Veo3 Workflow
+
+Add Image-to-Video capability to the existing Telegram bot workflow, allowing users to generate videos from uploaded images using Google Veo3 API.
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Bot Token Security:** The workflow will need to hardcode the Telegram bot token in URLs for downloading images. Ensure this token is kept secure or consider using environment variables.
+
+> [!WARNING]
+> **Image Size Limits:** Large images may cause timeout or memory issues. Consider adding validation for image file size (recommend max 5MB).
+
+## Proposed Changes
+
+### n8n Workflow Modifications
+
+#### [MODIFY] Main Telegram Workflow
+
+**Add Photo Detection:**
+- Insert new IF node after Telegram Trigger
+- Condition: Check if `message.photo` exists
+- True branch: Route to Image-to-Video flow
+- False branch: Route to existing Text-to-Video flow (via existing `/` command check)
+
+**Image-to-Video Flow (New Branch):**
+
+1. **Node: Get Telegram File Info**
+   - HTTP Request (GET)
+   - URL: `https://api.telegram.org/bot<TOKEN>/getFile?file_id={{ $json.message.photo[-1].file_id }}`
+   - Gets file path for highest quality photo
+
+2. **Node: Download Photo Binary**
+   - HTTP Request (GET)
+   - URL: `https://api.telegram.org/file/bot<TOKEN>/{{ $('Get Telegram File Info').item.json.result.file_path }}`
+   - Response Format: `File`
+   - Stores image in `$binary.data`
+
+3. **Node: Convert to Base64**
+   - Code node with JavaScript:
+   ```javascript
+   const buffer = $input.item.binary.data;
+   return [{
+     json: {
+       base64: buffer.toString('base64'),
+       mimeType: 'image/jpeg'
+     }
+   }];
+   ```
+
+4. **Node: Read Token from DB**
+   - Reuse existing Read Data node (read token from Data Table)
+
+5. **Node: Upload Image to Google**
+   - HTTP Request (POST)
+   - URL: `https://aisandbox-pa.googleapis.com/v1:uploadUserImage`
+   - Headers:
+     - `Authorization`: `Bearer {{ $('Read Data').item.json.token }}`
+     - `Content-Type`: `application/json`
+   - Body:
+   ```json
+   {
+     "imageInput": {
+       "aspectRatio": "IMAGE_ASPECT_RATIO_PORTRAIT",
+       "isUserUploaded": true,
+       "mimeType": "{{ $json.mimeType }}",
+       "rawImageBytes": "{{ $json.base64 }}"
+     },
+     "clientContext": {
+       "sessionId": "{{ ';' + new Date().getTime() }}",
+       "tool": "ASSET_MANAGER"
+     }
+   }
+   ```
+   - Response contains: `mediaGenerationId.mediaGenerationId`
+
+6. **Node: Edit Fields for I2V**
+   - Extract values:
+     - `mediaId`: `{{ $('Upload Image to Google').item.json.mediaGenerationId.mediaGenerationId }}`
+     - `prompt`: `{{ $('Telegram Trigger').item.json.message.caption || 'Generate video from this image' }}`
+     - `sceneId`: UUID generation (same as Text-to-Video)
+     - `sessionId`: Timestamp (same as Text-to-Video)
+     - `aspectRatio`: Check caption for `#doc` keyword
+     - `videoModelKey`: `veo_3_1_i2v_s_fast_portrait_fl` or `veo_3_1_i2v_s_fast_fl`
+
+7. **Node: Create Video from Image**
+   - HTTP Request (POST)
+   - URL: `https://aisandbox-pa.googleapis.com/v1/video:batchAsyncGenerateVideoStartAndEndImage`
+   - Headers: Same as Text-to-Video
+   - Body:
+   ```json
+   {
+     "clientContext": {
+       "sessionId": "{{ $json.sessionId }}",
+       "projectId": "{{ $json.projectId }}",
+       "tool": "PINHOLE",
+       "userPaygateTier": "PAYGATE_TIER_ONE"
+     },
+     "requests": [{
+       "aspectRatio": "{{ $json.aspectRatio }}",
+       "seed": {{ Math.floor(Math.random() * 10000) }},
+       "startImage": {
+         "mediaId": "{{ $json.mediaId }}"
+       },
+       "textInput": {
+         "prompt": "{{ $json.prompt }}"
+       },
+       "videoModelKey": "{{ $json.videoModelKey }}",
+       "metadata": {
+         "sceneId": "{{ $json.sceneId }}"
+       }
+     }]
+   }
+   ```
+
+8. **Merge with existing Wait → Check Status → Send Video flow**
+   - Both Image-to-Video and Text-to-Video routes merge here
+   - Reuse existing nodes
+
+---
+
+### Configuration Values
+
+**Telegram Bot Token:** Will be needed in step 1 & 2 URLs
+
+**Video Model Keys:**
+- Portrait: `veo_3_1_i2v_s_fast_portrait_fl`
+- Landscape: `veo_3_1_i2v_s_fast_fl`
+
+**Aspect Ratios:**
+- Image upload: `IMAGE_ASPECT_RATIO_PORTRAIT` or `IMAGE_ASPECT_RATIO_LANDSCAPE`
+- Video creation: `VIDEO_ASPECT_RATIO_PORTRAIT` or `VIDEO_ASPECT_RATIO_LANDSCAPE`
+
+## Verification Plan
+
+### Automated Tests
+- Test with portrait image + caption with `#doc`
+- Test with portrait image + caption without keyword (should default to portrait)
+- Test with image + no caption (should use default prompt)
+- Test with text message (should route to Text-to-Video, not Image-to-Video)
+
+### Manual Verification
+1. Send image to Telegram bot with caption "A cat playing piano #doc"
+2. Verify workflow routes to Image-to-Video branch
+3. Verify image upload returns `mediaGenerationId`
+4. Verify video creation request succeeds
+5. Wait ~120s and confirm video is sent back to Telegram
+6. Test text message still works (Text-to-Video flow)

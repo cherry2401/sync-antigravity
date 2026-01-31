@@ -1,0 +1,16 @@
+# Công Việc: Quản Lý Nội Dung Trang Chủ
+
+## Giai đoạn 1: Database
+- [x] Tạo bảng `locations` (địa điểm + ảnh bìa)
+- [x] Tạo bảng `site_settings` (banner, cấu hình)
+- [x] Thêm cột `is_featured` vào listings
+
+## Giai đoạn 2: Admin UI
+- [x] Trang quản lý địa điểm (AdminLocations)
+- [x] Trang quản lý banner (AdminSettings)
+- [ ] Thêm toggle featured vào listings (tuỳ chọn)
+
+## Giai đoạn 3: Frontend
+- [x] Tạo hook useHomeSettings
+- [x] HomePage fetch locations từ DB
+- [x] Sử dụng banner từ settings

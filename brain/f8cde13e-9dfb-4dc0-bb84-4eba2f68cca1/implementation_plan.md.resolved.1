@@ -1,0 +1,98 @@
+# Fix VEO3_V2 Telegram Image Upload Error
+
+## 🎯 Vấn Đề Đã Xác Định
+
+Sau khi phân tích, **nguyên nhân chính** là:
+
+> [!IMPORTANT]
+> **VEO3_V2** xử lý ảnh từ **Telegram binary data**, trong khi **VEO3_ImageUpload_Fixed_V3** download ảnh từ **URL**. 
+> 
+> Khi Telegram trả về binary data, n8n tự động encode sang base64 **VỚI data URI prefix** (`data:image/jpeg;base64,...`), nhưng Google AI API chỉ chấp nhận **raw base64** (không có prefix).
+
+### Screenshots Minh Họa
+
+````carousel
+![Upload Image lỗi Bad Request trong VEO3_V2](C:/Users/Cherry/.gemini/antigravity/brain/f8cde13e-9dfb-4dc0-bb84-4eba2f68cca1/uploaded_image_1_1765131168267.png)
+<!-- slide -->
+![Convert to Base64 output với base64 rất dài (có data URI prefix)](C:/Users/Cherry/.gemini/antigravity/brain/f8cde13e-9dfb-4dc0-bb84-4eba2f68cca1/uploaded_image_0_1765131168267.png)
+````
+
+## 🔍 So Sánh Code
+
+### ❌ VEO3_V2 - Convert to Base64 (Hiện tại - Lỗi)
+
+[Convert to Base64](file:///i:/Workflow/n8n/Test/VEO3/VEO3_V2.json#L500-L501)
+
+```javascript
+const binaryData = $input.item.binary.data;
+const base64 = binaryData.data;  // ← Không làm sạch!
+
+return {
+  json: {
+    base64: base64,  // ← Có thể chứa: data:image/jpeg;base64,iVBORw0...
+    length: base64.length
+  }
+};
+```
+
+### ✅ VEO3_ImageUpload_Fixed_V3 - Convert to Base64 (Thành công)
+
+[Convert to Base64](file:///i:/Workflow/n8n/Test/VEO3/VEO3_ImageUpload_Fixed_V3.json#L26)
+
+```javascript
+const binaryData = items[0].binary.data;
+const base64String = binaryData.data;
+// Ensure no data prefix
+const cleanBase64 = base64String.replace(/^data:image\/\w+;base64,/, ""); // ← Làm sạch!
+
+return [{
+  json: {
+    base64: cleanBase64,  // ← Chỉ chứa: iVBORw0...
+    token: $('Mock Input1').item.json.token
+  }
+}];
+```
+
+## 📋 Proposed Changes
+
+### [MODIFY] [VEO3_V2.json](file:///i:/Workflow/n8n/Test/VEO3/VEO3_V2.json)
+
+#### Node: Convert to Base64 (lines 500-501)
+
+**Thay đổi code từ:**
+```javascript
+const binaryData = $input.item.binary.data;
+const base64 = binaryData.data;
+
+return {
+  json: {
+    base64: base64,
+    length: base64.length
+  }
+};
+```
+
+**Sang:**
+```javascript
+const binaryData = $input.item.binary.data;
+const base64String = binaryData.data;
+
+// Remove data URI prefix if present (e.g., data:image/jpeg;base64,)
+const cleanBase64 = base64String.replace(/^data:image\/\w+;base64,/, "");
+
+return {
+  json: {
+    base64: cleanBase64,
+    length: cleanBase64.length
+  }
+};
+```
+
+## ✅ Verification Plan
+
+### Manual Verification
+1. Gửi 1 ảnh qua Telegram bot
+2. Kiểm tra output của node **Convert to Base64** - base64 phải không có prefix `data:image/...`
+3. Kiểm tra node **Upload Image** - phải trả về `mediaGenerationId` thành công
+4. Kiểm tra video được tạo và gửi về Telegram
+

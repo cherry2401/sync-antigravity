@@ -1,0 +1,54 @@
+# Wishlist Feature Implementation Plan
+
+## Goal Description
+Implement a "Wishlist" (Favorites) feature allowing users to save products they are interested in. This includes database storage, toggle functionality with optimistic UI updates, and a dedicated management page for the user.
+
+## Proposed Changes
+
+### Database Schema
+#### [MODIFY] [schema.prisma](file:///i:/Website/MyphamHaKi/app-src/prisma/schema.prisma)
+- Add [Wishlist](file:///i:/Website/MyphamHaKi/app-src/src/app/yeu-thich/page.tsx#17-210) model with:
+    - [id](file:///i:/Website/MyphamHaKi/app-src/src/components/shop/ProductGrid.tsx#32-209): Unique identifier
+    - `userId`: Relation to User
+    - `productId`: String (assuming product ID from external source or simplified relation if Product is not a Prisma model yet, based on previous context Product is likely not fully in Prisma or is hybrid. Wait, `prisma.order` uses `items` with `productId`. I should check if [Product](file:///i:/Website/MyphamHaKi/app-src/src/components/product/ProductCard.tsx#14-29) is a model. In previous turns, [actions/products.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts) seemed to use a hardcoded list or external source, but [Order](file:///i:/Website/MyphamHaKi/app-src/src/components/account/OrderListClient.tsx#13-21) has `items`. Let's assume `productId` is a string reference for now as requested by user).
+    - `createdAt`: Timestamp
+    - Unique constraint on `[userId, productId]`.
+
+### Server Actions
+#### [NEW] [src/actions/wishlist.ts](file:///i:/Website/MyphamHaKi/app-src/src/actions/wishlist.ts)
+- `toggleWishlist(productId: string)`:
+    - Check auth.
+    - If exists -> delete.
+    - If not exists -> create.
+    - Revalidate paths.
+- `getWishlist()`:
+    - Fetch user's wishlist items.
+    - Likely need to fetch product details for these IDs (might need to call [getProducts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts#58-69) or similar helper).
+
+### Components
+#### [NEW] [src/components/product/WishlistButton.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/product/WishlistButton.tsx)
+- Client component.
+- Props: `productId`, `initialIsLiked`.
+- Local state for optimistic update.
+- Calls `toggleWishlist`.
+
+#### [MODIFY] [src/components/product/ProductCard.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/product/ProductCard.tsx)
+- Integrate `WishlistButton`.
+- Needs to know if the product is already in wishlist (might be tricky for listing pages efficiently, might load initially as false or accept a prop).
+
+### Pages
+#### [NEW] [src/app/tai-khoan/yeu-thich/page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/tai-khoan/yeu-thich/page.tsx)
+- Server Component.
+- Fetches wishlist.
+- Renders grid of liked products.
+- Handles empty state.
+
+## Verification Plan
+### Automated Tests
+- None planned for this iteration.
+
+### Manual Verification
+1.  **Toggle**: Click heart icon on a product card. Verify it turns red immediately. Reload to verify persistence.
+2.  **Unauth**: Try clicking heart while logged out -> Verify toast error/warning.
+3.  **Wishlist Page**: Go to `/tai-khoan/yeu-thich`. Verify liked products appear there.
+4.  **Remove**: Click heart again in Wishlist page -> Product should be removed (optimistically).

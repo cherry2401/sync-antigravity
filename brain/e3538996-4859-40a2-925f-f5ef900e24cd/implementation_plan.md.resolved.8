@@ -1,0 +1,37 @@
+# Implement Xvideos Tool
+
+## Goal
+Add a comprehensive Xvideos tool containing "Download" (from URL) and "Search" (by keyword) functionalities.
+
+## Architecture
+`Frontend` -> `Cloudflare Function` -> `n8n Webhook` -> `External API (api.satoru.click)`
+
+## Components
+
+### 1. n8n Workflow (`Xvideos API.json`)
+- **Trigger**: Webhook POST `/xvideos`
+- **Logic**: Switch node based on `body.action`:
+    - Case [download](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/ShortenForm.tsx#58-85): GET `https://api.satoru.click/api/xvideos/download?url={url}`
+    - Case `search`: GET `https://api.satoru.click/api/xvideos?q={query}`
+- **Response**: JSON result.
+
+### 2. Cloudflare Function (`functions/api/xvideos.ts`)
+- Proxy to n8n webhook defined in `N8N_XVIDEOS_WEBHOOK_URL`.
+
+### 3. Frontend Component (`src/components/XvideosDownload.tsx`)
+- **State**: `mode` ('download' | 'search').
+- **UI - Download Mode**:
+    - Input URL.
+    - Result: Title, Thumbnail, Video Player (if possible), Download Buttons (Low/High).
+- **UI - Search Mode**:
+    - Input Keyword.
+    - Grid Result: Thumbnails, Titles, Duration.
+    - Interaction: Clicking a result switches to Download mode or directly fetches download links.
+
+### 4. App Integration ([src/App.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/App.tsx))
+- Add "Xvideos" to the Tool Switcher.
+
+## Dependencies
+- `react-player` (optional, or just use native `<video>`).
+- Existing `lucide-react` icons.
+

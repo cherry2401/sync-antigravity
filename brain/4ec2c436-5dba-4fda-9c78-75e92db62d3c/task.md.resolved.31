@@ -1,0 +1,7 @@
+# Browser Relay Proxy Implementation
+
+- [x] Create [electron/services/browserRelay.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/browserRelay.ts) - Relay Server & Gateway Bridge
+- [x] Modify [electron/main.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/main.ts) - Initialize BrowserRelay service
+- [x] Add IPC handler for relay status
+- [x] Update [src/components/StatusBar.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/StatusBar.tsx) - Add Browser Relay status indicator
+- [x] Test end-to-end: Extension → App → Gateway (Ready for testing with wscat)

@@ -1,0 +1,137 @@
+# OmoCaptcha Setup - Quick Guide
+
+## Prerequisites
+- ✅ Site Key: `6LdsFiUsAAAAAIjVDZcuLhaHiDn5nnHVXVRQGeMV`
+- ✅ OmoCaptcha API Key (you have)
+
+---
+
+## Step 1: Add API Key to Data Table
+
+Column: `OmoCaptcha_API_Key` = YOUR_API_KEY
+
+---
+
+## Step 2: Enable Continue On Fail
+
+Node **"Create VEO3"**:
+- Settings → **Continue On Fail** = ✅
+- Node now has 2 outputs (green + red)
+
+---
+
+## Step 3: Add Nodes
+
+### Node: IF Check Captcha Error
+**Connect**: Create VEO3 (red output) → IF
+
+**Condition**:
+```
+{{ $json.error.message }}
+contains
+reCAPTCHA
+```
+
+---
+
+### Node: Solve Captcha
+**Connect**: IF (true) → Solve Captcha
+
+**Type**: HTTP Request  
+**Method**: POST  
+**URL**: `https://api.omocaptcha.com/v2/createTask`
+
+**Headers**: Content-Type = `application/json`
+
+**Body** (JSON):
+```json
+{
+  "clientKey": "{{ $('Read Data').first().json.OmoCaptcha_API_Key }}",
+  "task": {
+    "type": "RecaptchaV2TokenTask",
+    "websiteURL": "https://aisandbox-pa.googleapis.com",
+    "websiteKey": "6LdsFiUsAAAAAIjVDZcuLhaHiDn5nnHVXVRQGeMV"
+  }
+}
+```
+
+---
+
+### Node: Wait 15s
+**Type**: Wait → 15 seconds
+
+---
+
+### Node: Get Result
+**Type**: HTTP Request  
+**Method**: POST  
+**URL**: `https://api.omocaptcha.com/v2/getTaskResult`
+
+**Body**:
+```json
+{
+  "clientKey": "{{ $('Read Data').first().json.OmoCaptcha_API_Key }}",
+  "taskId": "{{ $('Solve Captcha').first().json.taskId }}"
+}
+```
+
+---
+
+### Node: IF Result Ready
+**Condition**:
+```
+{{ $json.status }}
+equals
+ready
+```
+
+---
+
+### Node: Retry Create VEO3
+**Duplicate** node "Create VEO3"
+
+**JSON Body** THÊM:
+```javascript
+"recaptchaToken": $('Get Result').first().json.solution.recaptchaResponse
+```
+
+**Full body**:
+```javascript
+{{
+  JSON.stringify({
+    "clientContext": {
+      "sessionId": ";" + $json.sessionId,
+      "projectId": $json.projectId,
+      "tool": "PINHOLE",
+      "userPaygateTier": "PAYGATE_TIER_TWO",
+      "recaptchaToken": $('Get Result').first().json.solution.recaptchaResponse
+    },
+    "requests": [{
+      "aspectRatio": $json.aspectRatio,
+      "seed": Math.floor(Math.random() * 10000),
+      "textInput": { "prompt": $json.prompt },
+      "videoModelKey": $json.videoModelKey,
+      "metadata": { "sceneId": $json.sceneId }
+    }]
+  })
+}}
+```
+
+---
+
+## Flow Connections
+
+```
+Edit Fields → Create VEO3 [Continue On Fail]
+                ├─ Success (green) → Continue normal flow
+                └─ Error (red) → IF Check Captcha
+                                 ├─ Yes → Solve → Wait → Get Result → IF Ready
+                                 │                                    └─ Yes → Retry → Continue
+                                 └─ No → Error handling
+```
+
+---
+
+## Test
+
+Send Telegram message → If captcha triggered → Auto-solve → Success!

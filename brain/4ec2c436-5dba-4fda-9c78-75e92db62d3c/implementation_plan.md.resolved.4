@@ -1,0 +1,56 @@
+# File Explorer UI & IPC Debugging Plan
+
+## Goal
+Simplify File Explorer UI by removing manual path input and "Go" button, relying on Drive selector. Resolving persistent `listDir is not a function` error.
+
+## User Review Required
+- [ ] Confirm if removing manual path input is acceptable (based on "Why is Go button still here?" comment).
+
+## Proposed Changes
+
+### UI Changes
+#### [MODIFY] [FileExplorer.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/FileExplorer.tsx)
+- Remove `input` field and "Go" button.
+- Remove `inputPath` state if redundant (or keep simpler state for internal logic).
+- Make Drive selector the primary header element.
+- Add debug logging: `console.log('Renderer electronAPI keys:', Object.keys(window.electronAPI))` inside [FileExplorer](file:///f:/Python/OpenSSH/clawdbot-client/src/components/FileExplorer.tsx#66-145).
+
+### IPC Debugging
+#### [MODIFY] [preload.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/preload.ts)
+- Add `console.log('Preload API keys:', Object.keys(api))` before exposing.
+
+## Dynamic Drive Detection Implementation
+### Backend Changes
+#### [MODIFY] [main.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/main.ts)
+- Import `systeminformation` as [si](file:///f:/Python/OpenSSH/clawdbot-client/electron/preload.ts#105-111).
+- Add `fs:getDrives` IPC handler that returns `si.fsSize()`.
+
+### API Exposure
+#### [MODIFY] [preload.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/preload.ts)
+- Expose `getDrives` method in `electronAPI`.
+#### [MODIFY] [vite-env.d.ts](file:///f:/Python/OpenSSH/clawdbot-client/src/vite-env.d.ts)
+- Update [ElectronAPI](file:///f:/Python/OpenSSH/clawdbot-client/electron/preload.ts#65-85) interface with `getDrives`.
+
+### Frontend Logic
+#### [MODIFY] [fileStore.ts](file:///f:/Python/OpenSSH/clawdbot-client/src/stores/fileStore.ts)
+- Add `drives` to state `FileDrive[]`.
+- Add `loadDrives` async action.
+
+### UI Updates
+#### [MODIFY] [FileExplorer.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/FileExplorer.tsx)
+- Use `useFileStore`'s `drives` instead of hardcoded list.
+- Call `loadDrives` on mount.
+- Render `<option>` as `${drive.label || 'Local Disk'} (${drive.mount})`.
+
+### Automated Tests
+- None.
+
+### Manual Verification
+1.  **Restart App**: Run `npm run electron:dev`.
+2.  **Check Console**:
+    - Look for "Preload API keys:" in terminal/console. Verify [listDir](file:///f:/Python/OpenSSH/clawdbot-client/dist-electron/electron/preload.js#36-38) is present.
+    - Look for "Renderer electronAPI keys:" in DevTools console. Verify [listDir](file:///f:/Python/OpenSSH/clawdbot-client/dist-electron/electron/preload.js#36-38) is present.
+3.  **UI Check**:
+    - Verify "Go" button and Input field are gone.
+    - Select a Drive (e.g., D:).
+    - Verify "Loading..." appears and then file tree populates.

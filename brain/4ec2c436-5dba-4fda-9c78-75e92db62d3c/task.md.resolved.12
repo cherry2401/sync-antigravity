@@ -1,0 +1,42 @@
+# Clawdbot Desktop - System Monitor Implementation
+
+## Phase 1: Dependencies & Setup
+- [x] Install required packages (systeminformation, screenshot-desktop, axios)
+- [x] Create .env file with gateway URL config
+- [x] Update tsconfig for new modules
+
+## Phase 2: Monitor Module
+- [x] Create electron/monitor.ts
+- [x] Implement getSystemInfo() - CPU, RAM, Disk
+- [x] Implement captureScreen() - Screenshot with JPEG compression
+- [x] Add machine-id generation
+
+## Phase 3: Client Module  
+- [x] Create electron/client.ts
+- [x] Setup Axios instance with gateway config
+- [x] Implement pollCommands() - GET /api/client/commands
+- [x] Implement sendSystemTelemetry() - POST /api/client/telemetry/system
+- [x] Implement sendScreenCapture() - POST /api/client/telemetry/screen
+- [x] Implement handleCommand() for new commands
+
+## Phase 4: Integration
+- [x] Update executor.ts to handle new commands
+- [x] Add command types: getSystemInfo, streamScreen
+- [x] Integrate telemetry sender into main.ts
+- [x] Add screen streaming start/stop logic
+
+## Phase 5: UI Updates
+- [x] Add connection indicator to StatusBar
+- [x] Show telemetry status (system/screen)
+- [x] Add toggle for screen streaming in Settings
+
+## Bug Fixes
+- [x] Fix Settings Save button failing due to undefined window.electronAPI (Sandboxing issue)
+- [x] Fix Electron launch path in package.json
+- [x] Fix Preload script loading by enabling Node Integration
+- [x] Fix Zombie Processes: Killed stale electron.exe preventing main process updates
+- [x] Fix "crypto is not defined" in database.ts (Added import)
+- [x] Fix Duplicate API Path (Strip /api/client from baseUrl)
+- [x] Fix Frontend CORS by proxying requests through Main Process (API exposed)
+- [x] Debug Cloudflare Tunnel 530 Error (Determined as Backend Issue)
+- [x] Clean up Debug Overlay

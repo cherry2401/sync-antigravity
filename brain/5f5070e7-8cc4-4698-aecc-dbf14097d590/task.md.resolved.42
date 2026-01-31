@@ -1,0 +1,7 @@
+# Công Việc: Sửa Tiện Ích
+
+## Đã hoàn thành
+- [x] ScrollToTop - cuộn lên đầu khi chuyển trang
+- [x] FengShuiTool - không tự tính, placeholder "VD: 1991"
+- [x] BuildingAgeTool - không có giá trị mặc định
+- [x] InterestRateTool - dropdown trống mặc định

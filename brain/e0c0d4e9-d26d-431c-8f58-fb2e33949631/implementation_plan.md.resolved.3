@@ -1,0 +1,70 @@
+# Claude Manager App - Technical Specification
+
+## 1. Executive Summary
+Xây dựng ứng dụng Desktop (Electron) để quản lý `claude-ws` server. Ứng dụng đóng vai trò "Control Panel", thay thế việc sử dụng dòng lệnh (CLI) thủ công.
+
+**Mục tiêu:**
+- Giao diện trực quan (GUI) thay vì cửa sổ đen (CMD).
+- Quản lý trạng thái (Start/Stop/Logs) thời gian thực.
+- Tự động hóa các tác vụ bảo trì (Fix lock, Clear cache).
+
+## 2. Architecture: "The Sidecar Pattern"
+Ứng dụng Manager chạy độc lập với `claude-ws` server. Nó "monitor" (giám sát) và "control" (điều khiển) server thông qua PID và các lệnh hệ thống.
+
+- **Frontend:** React 18, TypeScript, TailwindCSS, Shadcn UI.
+- **Backend (Main Process):** Electron (Node.js) để truy cập hệ thống file và process.
+- **IPC Bridge:** Giao tiếp an toàn giữa UI và System logic.
+
+## 3. Core Features & Logic
+
+### 3.1. Dashboard (Home)
+- **Status Monitor:**
+  - Kiểm tra cổng 8556 (HTTP Check).
+  - Kiểm tra PID của process Node.js.
+  - Hiển thị: 🟢 Running | 🔴 Stopped | 🟡 Starting.
+- **Actions:**
+  - **Start:** Chạy lệnh `npm run start` (hoặc file bat) dưới dạng child process (detached).
+  - **Stop:** Gửi tín hiệu SIGTERM/SIGKILL tới PID.
+  - **Restart:** Stop -> Wait -> Start.
+
+### 3.2. Logs Viewer
+- **Cơ chế:** Đọc real-time `stdout` và `stderr` từ process con.
+- **UI:** Cửa sổ phụ (Collapsible) ở dưới đáy hoặc Modal.
+- **Tính năng:** Auto-scroll, nút Copy, nút Clear.
+
+### 3.3. Configuration Editor
+- Đọc file [.env](file:///I:/AIHub/claude-ws/.env) và [pm2.config.js](file:///i:/AIHub/claude-ws/pm2.config.js) -> Parse thành Form.
+- Cho phép sửa:
+  - Model (Dropdown chọn list chuẩn).
+  - Port (Input number).
+  - API Key (Password input).
+- Lưu: Ghi đè lại file config.
+
+### 3.4. Troubleshoot (Hộp cứu thương)
+- **Fix Lock:** Thực hiện logic của [fix_lock.bat](file:///I:/AIHub/claude-ws/fix_lock.bat) (Kill node, del .next folder).
+- **Auto-Startup:** Toggle để thêm/xóa Shortcut trong folder Startup của Windows.
+
+## 4. Trả lời câu hỏi Auto-start
+- **Cơ chế:** Việc khởi động cùng Windows (qua thư mục Startup) hoạt động ĐỘC LẬP.
+- **Tương tác:**
+  - Khi máy bật -> Windows tự chạy Server ngầm.
+  - Khi bật Manager App -> App kiểm tra thấy cổng 8556 đang có người dùng -> Hiển thị trạng thái **Online**.
+  - Người dùng bấm Stop trên App -> App giết process ngầm đó -> Server tắt.
+  -> **Kết luận:** Hoàn toàn tương thích. App chỉ là cái "Remote TV", Server là cái "TV".
+
+## 5. Directory Structure (`I:\AIHub\claude-manager`)
+```
+/src
+  /main        # Electron Main Process (System logic)
+  /preload     # IPC Bridge
+  /renderer    # React UI
+    /components
+    /hooks     # useServerStatus, useLogs
+    /lib       # utils
+```
+
+## 6. Tech Stack
+- Electron + Vite (Build tool nhanh nhất).
+- React + TypeScript.
+- `ps-list` / `tree-kill`: Quản lý process.
+- `fs-extra`: Quản lý file.

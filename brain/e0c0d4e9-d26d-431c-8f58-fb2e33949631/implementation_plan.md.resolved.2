@@ -1,0 +1,19 @@
+# Cài đặt claude-ws trên Alpine Linux với Docker
+
+Tài liệu này hướng dẫn cách triển khai `claude-ws` dưới dạng container để quản lý từ xa, hỗ trợ Alpine Linux và cấu hình qua cliproxy.
+
+## Thay đổi đề xuất
+
+1. **Dockerfile**: Tạo tệp build dựa trên `node:20-alpine`, cài đặt sẵn `@anthropic-ai/claude-code`.
+2. **Docker Compose**: Cấu hình tệp để chạy ứng dụng và truyền các biến môi trường proxy.
+3. **Persistance**: Đảm bảo tệp cấu hình của Claude Code được lưu trữ vĩnh viễn qua Docker Volumes.
+
+## Kế hoạch xác minh
+
+### Xác minh tự động
+- Chạy `docker build` để kiểm tra lỗi cú pháp.
+- Kiểm tra logs của container để xác nhận kết nối tới proxy.
+
+### Xác minh thủ công
+- Truy cập vào giao diện web của `claude-ws` từ trình duyệt.
+- Thử gửi một lệnh chat để xác nhận Claude hoạt động qua proxy.

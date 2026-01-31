@@ -1,0 +1,60 @@
+# Implementation Plan - TikTok to Facebook Reels Workflow
+
+## Goal Description
+The goal is to create a robust n8n workflow that:
+1.  Reads TikTok video links from a Google Sheet.
+2.  Downloads the video (without watermark if possible).
+3.  Uploads the video to Facebook Reels using the Graph API (Session -> Upload -> Publish).
+4.  Checks the publication status to ensure success.
+5.  Updates the Google Sheet with the status and other data.
+
+## User Review Required
+> [!IMPORTANT]
+> **Video Download Service**: The current workflow uses `api.satoru.site`. I need to confirm if this API is reliable and if it provides the direct video URL or binary data.
+> **Facebook Credentials**: The workflow uses specific credentials. Ensure these are correctly set up in your n8n instance.
+> **Sheet Structure**: I need to see the sheet columns (from the pending images) to map data correctly (e.g., Page ID, Caption, Status column).
+
+## Proposed Changes
+
+### Workflow Structure
+I will modify [Tiktok.json](file:///c:/Users/Cherry/Clone_facebook/Test%20WF/Tiktok/Tiktok.json) to match the reference logic:
+
+#### 1. Trigger & Read
+-   **Schedule Trigger**: Add/Configure to run periodically.
+-   **Google Sheets**: Ensure it reads "Video TikTok" and other necessary columns.
+
+#### 2. Video Processing
+-   **Get Video**: Verify the response from `api.satoru.site`. If it returns a URL, we might need another HTTP Request to download the binary data for the Facebook upload.
+
+#### 3. Facebook Upload Flow
+-   **Upload Session**: Ensure `file_size` is passed if required by the API (usually required for `rupload`).
+-   **Upload Video**:
+    -   Target: `rupload.facebook.com`
+    -   Headers: `Authorization`, `file_url` (if remote) or binary data.
+    -   **Correction**: The reference image shows `file_url` header. If using a public URL, we might not need to download the binary first, but `rupload` often works best with binary or a specific `file_url` support. I will check the node settings.
+-   **Publish**:
+    -   `video_state`: `PUBLISHED`
+    -   `description`: From sheet.
+
+#### 4. Status Check Loop (New)
+-   **Wait Node**: Add a wait (e.g., 1-2 minutes) to allow processing.
+-   **Get Status**: Call Facebook API to check video status.
+-   **If Node**:
+    -   If `status == published` (or ready): Proceed.
+    -   If `processing`: Loop back to Wait.
+    -   If `error`: Handle error (update sheet with error).
+
+#### 5. Finalize
+-   **Get Page ID**: If dynamic, fetch from sheet or API.
+-   **Update Sheet**: Write back "Done" or the Video ID/Url.
+
+## Verification Plan
+
+### Manual Verification
+1.  **Mock Run**: I will run the workflow with a test row in the sheet.
+2.  **Check Facebook**: Verify the Reel appears on the target page.
+3.  **Check Sheet**: Verify the status column updates correctly.
+4.  **Loop Test**: Verify the "Wait -> Get Status" loop works for processing videos.
+
+### Automated Tests
+-   N/A (n8n workflows are best tested by execution).

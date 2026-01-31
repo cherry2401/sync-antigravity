@@ -1,0 +1,68 @@
+# HaKi Beauty - Development Walkthrough
+
+## ✅ Phase 1: Core Features
+
+| Component | File |
+|-----------|------|
+| Footer | [Footer.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/layout/Footer.tsx) |
+| Product Detail | [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/san-pham/%5Bslug%5D/page.tsx) |
+
+---
+
+## ✅ Phase 2: Shopping Features
+
+| Component | File |
+|-----------|------|
+| Cart Store | [cartStore.ts](file:///i:/Website/MyphamHaKi/app-src/src/store/cartStore.ts) |
+| Cart Drawer | [CartDrawer.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/cart/CartDrawer.tsx) |
+| Product Listing | [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/san-pham/page.tsx) |
+
+---
+
+## ✅ Phase 3: Checkout & Auth
+
+### Checkout Page (`/thanh-toan`)
+[page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/thanh-toan/page.tsx)
+
+**Features:**
+- Customer form with validation (name, phone, email, address)
+- Payment methods: COD, Bank, MoMo, VNPay
+- Order summary with cart items
+- Free shipping for orders ≥500K
+
+![Checkout with Cart Drawer](C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/checkout_page.png)
+
+---
+
+### Authentication (`/tai-khoan`)
+[page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/tai-khoan/page.tsx)
+
+**Features:**
+- Login/Register forms with animated switching
+- Social login (Google, Facebook)
+- Form validation
+- Split layout design
+
+![Login Page](C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/auth_page.png)
+
+---
+
+## 🎬 Recordings
+
+````carousel
+![Phase 2 - Cart Test](C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/phase2_cart_test_1768237164999.webp)
+<!-- slide -->
+![Phase 3 - Checkout & Auth](C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/phase3_verification_1768237705556.webp)
+````
+
+---
+
+## 📂 All Pages
+
+| Route | Description |
+|-------|-------------|
+| `/` | Homepage |
+| `/san-pham` | Product Listing with filters |
+| `/san-pham/[slug]` | Product Detail |
+| `/thanh-toan` | Checkout |
+| `/tai-khoan` | Login/Register |

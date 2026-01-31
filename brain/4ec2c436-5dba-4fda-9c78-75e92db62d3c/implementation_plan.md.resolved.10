@@ -1,0 +1,103 @@
+# Browser Relay Proxy Implementation
+
+Upgrade App Client to act as a CDP (Chrome DevTools Protocol) proxy, enabling remote browser control from Gateway.
+
+## Proposed Changes
+
+### Backend (Electron)
+
+---
+
+#### [NEW] [browserRelay.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/browserRelay.ts)
+
+Create a new service that:
+1. **Starts a local WebSocket server** on port `18792` to receive connections from Chrome Extension (Clawdbot Browser Relay Extension)
+2. **Connects to Gateway** via WebSocket at `${gatewayUrl}/api/client/bridge`
+3. **Bi-directional message forwarding**:
+   - CDP commands from Gateway → Local Extension
+   - Extension responses → Gateway
+
+```typescript
+// Key interfaces
+interface BrowserRelayConfig {
+    localPort: number;        // 18792
+    gatewayUrl: string;       // From config
+    authToken: string;        // From config
+}
+
+interface RelayMessage {
+    type: 'cdp' | 'control' | 'status';
+    sessionId?: string;
+    payload: any;
+}
+```
+
+---
+
+#### [MODIFY] [main.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/main.ts)
+
+- Import and initialize `BrowserRelay` service
+- Add IPC handler `relay:getStatus` to expose connection state to renderer
+- Start relay after Gateway client is configured
+
+---
+
+### Frontend (React)
+
+---
+
+#### [MODIFY] [StatusBar.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/StatusBar.tsx)
+
+- Add new status indicator for Browser Relay:
+  - 🟢 Connected (Extension connected + Gateway bridge active)
+  - 🟡 Partial (Only one side connected)
+  - ⚫ Disconnected
+
+---
+
+## Architecture Flow
+
+```mermaid
+sequenceDiagram
+    participant Ext as Chrome Extension
+    participant App as Clawdbot App<br/>(Port 18792)
+    participant GW as Gateway<br/>(/api/client/bridge)
+    participant Chopper as Chopper Server
+
+    Ext->>App: Connect WS (localhost:18792)
+    App->>GW: Connect WS (/api/client/bridge)
+    GW->>Chopper: Bridge established
+    
+    Chopper->>GW: CDP Command (navigate, click, etc)
+    GW->>App: Forward command
+    App->>Ext: Forward to Extension
+    Ext->>App: Response/Result
+    App->>GW: Forward response
+    GW->>Chopper: Deliver result
+```
+
+---
+
+## Verification Plan
+
+### Manual Verification
+
+1. **Start App** and confirm console shows:
+   ```
+   🌐 [BrowserRelay] Local server listening on port 18792
+   🌐 [BrowserRelay] Connecting to Gateway bridge...
+   🌐 [BrowserRelay] Gateway bridge connected!
+   ```
+
+2. **Check StatusBar** shows "Browser Relay: Disconnected" (no extension yet)
+
+3. **Connect test client** (using wscat or simple WS client):
+   ```bash
+   wscat -c ws://localhost:18792
+   ```
+   - StatusBar should update to show partial connection
+
+4. **Verify Gateway endpoint** receives the connection (check Gateway logs)
+
+> [!IMPORTANT]
+> Full E2E test requires the Chrome Extension to be built and installed. This plan only implements the App side. The Gateway `/api/client/bridge` endpoint must also exist.

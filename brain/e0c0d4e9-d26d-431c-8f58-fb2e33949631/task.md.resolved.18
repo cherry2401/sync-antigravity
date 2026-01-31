@@ -1,0 +1,14 @@
+# Nhiệm vụ: Cấu hình và Cài đặt Claude-ws
+
+## Cấu hình đã hoàn tất
+- [x] Cấu hình Claude Code CLI & VS Code Extension <!-- id: 0 -->
+- [x] Chạy claude-ws tại Local (Windows) <!-- id: 1 -->
+- [x] Thiết lập Cloudflare Tunnel truy cập từ xa <!-- id: 2 -->
+- [x] Sửa lỗi 502 và thông khớp cổng 8556 <!-- id: 3 -->
+- [x] Chạy ngầm vĩnh viễn (Persistence) thành công <!-- id: 4 -->
+
+## Ghi chú cuối cùng
+- Ứng dụng chạy tại: `https://claude.myphamhaki.id.vn`
+- Cổng nội bộ: `8556`
+- Phương thức bảo mật: Cloudflare Zero Trust (Google OAuth)
+

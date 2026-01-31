@@ -1,0 +1,13 @@
+# Task: BrowserView Integration
+
+## Progress
+
+- [ ] Create [electron/services/browserViewManager.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/browserViewManager.ts) (ROLLED BACK)
+- [ ] Update [electron/main.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/main.ts) with IPC handlers + resize listener (REVERTED)
+- [ ] Update [electron/preload.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/preload.ts) with browser API methods (REVERTED)
+- [ ] Update [src/App.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/App.tsx) with tab state and toggle logic (REVERTED)
+- [ ] Update [src/components/FileExplorer.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/FileExplorer.tsx) with tab switch UI (REVERTED)
+- [ ] Create [src/components/BrowserControls.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/BrowserControls.tsx) toolbar (DELETED)
+- [ ] Update [src/vite-env.d.ts](file:///f:/Python/OpenSSH/clawdbot-client/src/vite-env.d.ts) with browser API types (REVERTED)
+
+## Status: ⏪ ROLLED BACK

@@ -1,0 +1,25 @@
+# Hướng dẫn chọn Model cho Claude Code
+
+Để chọn model khi sử dụng Claude Code, bạn có 3 cách chính:
+
+## 1. Dùng lệnh trực tiếp (Tạm thời)
+Khi bắt đầu một phiên làm việc, bạn có thể chỉ định model ngay lập tức:
+```powershell
+claude --model "ten-model-cua-ban"
+```
+*Ví dụ: `claude --model "claude-3-5-sonnet-20241022"` hoặc các alias như `sonnet`, `opus`.*
+
+## 2. Dùng lệnh trong phiên làm việc (Interactive)
+Nếu bạn đã đang ở trong giao diện chat của `claude`, bạn có thể gõ lệnh slash:
+```text
+/model [tên-model]
+```
+
+## 3. Thiết lập vĩnh viễn qua Biến môi trường
+Cũng giống như `CLAUDE_BASE_URL`, bạn có thể thiết lập model mặc định để không phải gõ lại nhiều lần:
+```powershell
+setx CLAUDE_MODEL "ten-model-cua-ban"
+```
+
+> [!TIP]
+> Do bạn đang dùng **cliproxy**, bạn cần chắc chắn rằng tên model bạn nhập vào khớp với tên model mà proxy của bạn hỗ trợ (ví dụ: `gemini-1.5-pro`, `gpt-4o`, v.v. tùy vào cấu hình cliproxy).

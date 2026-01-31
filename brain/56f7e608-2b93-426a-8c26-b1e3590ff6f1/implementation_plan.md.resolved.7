@@ -1,0 +1,63 @@
+# Implementation Plan - NextAuth Authentication
+
+## Goal
+Implement a full authentication system using **NextAuth v5 (Auth.js)**, allowing users to Register, Login, and have their Orders linked to their account.
+
+## User Review Required
+> [!IMPORTANT]
+> This will involve a database schema change (adding `User` table).
+> We will use `Credentials` provider (Email/Password) for simplicity first. Social logins (Google/Facebook) require API Keys which are not provided yet.
+
+## Proposed Changes
+
+### 1. Dependencies [NEW]
+- `next-auth@beta`
+- `bcryptjs` (for password hashing)
+- `@types/bcryptjs`
+
+### 2. Database Schema [MODIFY]
+- **File:** [schema.prisma](file:///i:/Website/MyphamHaKi/app-src/prisma/schema.prisma)
+- **Changes:**
+    - Add `User` model:
+        - [id](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/HeroBanner.tsx#14-30), [name](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts#94-103), `email`, `password`, `phone`, `role` (default: USER)
+        - Relation to [Order](file:///i:/Website/MyphamHaKi/app-src/src/components/admin/OrderDetailSheet.tsx#39-59)
+    - Update [Order](file:///i:/Website/MyphamHaKi/app-src/src/components/admin/OrderDetailSheet.tsx#39-59) model:
+        - Add `user User? @relation(...)`
+
+### 3. Auth Configuration [NEW]
+- **File:** [auth.ts](file:///i:/Website/MyphamHaKi/app-src/src/auth.ts)
+    - Configure `NextAuth` with `Credentials` provider.
+    - Validate password with `bcryptjs`.
+- **File:** [auth.config.ts](file:///i:/Website/MyphamHaKi/app-src/src/auth.config.ts)
+    - Separate config for edge compatibility (middleware).
+
+### 4. API Routes [NEW]
+- **File:** [route.ts](file:///i:/Website/MyphamHaKi/app-src/src/app/api/auth/[...nextauth]/route.ts)
+    - Export GET/POST handlers from `auth`.
+
+### 5. Server Actions [NEW]
+- **File:** [auth-actions.ts](file:///i:/Website/MyphamHaKi/app-src/src/actions/auth-actions.ts)
+    - `register(formData)`: Hash password, create user in DB.
+    - `login(formData)`: Call `signIn` from NextAuth.
+
+### 6. UI Implementation [MODIFY]
+- **File:** [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/tai-khoan/page.tsx)
+    - Replace mock [handleSubmit](file:///i:/Website/MyphamHaKi/app-src/src/app/thanh-toan/page.tsx#137-217) with calls to `login` and `register` actions.
+    - Handle success/error states.
+
+### 7. Linking Orders [MODIFY]
+- **File:** [create-order.ts](file:///i:/Website/MyphamHaKi/app-src/src/actions/create-order.ts)
+    - Get session using `auth()`.
+    - `userId: session.user.id`.
+
+### 8. Order History [MODIFY]
+- **File:** [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/tai-khoan/don-hang/page.tsx)
+    - Fetch orders using server component + `prisma.order.findMany({ where: { userId } })`.
+
+## Verification Plan
+1. **Manual Test:**
+    - Register a new account.
+    - Login with that account.
+    - Place an order.
+    - Check `/tai-khoan/don-hang` -> Order should appear.
+    - Check Database -> Order record should have `userId`.

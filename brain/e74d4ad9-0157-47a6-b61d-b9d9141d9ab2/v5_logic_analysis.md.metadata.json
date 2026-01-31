@@ -1,0 +1,5 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_OTHER",
+  "summary":  "Analysis of workflow v5 logic error where routing incorrectly mixes text/media branches with Page/Group branches, causing Page posts to loop back into Group processing",
+  "updatedAt":  "2026-01-02T03:57:32.822730200Z"
+}

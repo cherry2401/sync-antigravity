@@ -1,0 +1,206 @@
+# OmoCaptcha Implementation - Step by Step
+
+## Bước 1: Setup OmoCaptcha
+
+### 1.1 Đăng ký
+- Truy cập: https://omocaptcha.com
+- Sign up → Nạp tiền ($1 = ~300 captchas)
+- Copy **API Key**
+
+### 1.2 Lấy reCAPTCHA Site Key
+1. Mở VEO3: https://labs.google/fx/tools/veo3
+2. F12 → Console
+3. Paste code:
+```javascript
+// Method 1: Tìm element
+document.querySelector('[data-sitekey]')?.getAttribute('data-sitekey')
+
+// Method 2: Tìm trong scripts
+[...document.scripts].map(s => s.innerHTML).join('').match(/[0-9A-Za-z_-]{40}/)?.[0]
+
+// Method 3: Network tab
+// Filter: recaptcha → Xem request params
+```
+4. Copy **site key** (dạng: `6Lf...`)
+
+### 1.3 Update Data Table
+Thêm column: `OmoCaptcha_API_Key` = `YOUR_API_KEY`
+
+---
+
+## Bước 2: Update Node "Create VEO3"
+
+### 2.1 Bật Continue On Fail
+- Click node "Create VEO3"
+- Settings → **Continue On Fail** = ✅ `true`
+- **→ Node sẽ có 2 outputs!**
+
+---
+
+## Bước 3: Thêm Nodes Mới
+
+### Node 1: IF - Check Captcha Error
+
+**Kết nối**: Create VEO3 (output 2 - red) → IF
+
+**Type**: IF  
+**Conditions**:
+- Field: `{{ $json.error.message }}`
+- Operation: `contains`
+- Value: `reCAPTCHA`
+
+---
+
+### Node 2: Solve Captcha
+
+**Kết nối**: IF (true) → Solve Captcha
+
+**Type**: HTTP Request  
+**Method**: POST  
+**URL**: `https://api.omocaptcha.com/v2/createTask`
+
+**Authentication**: None
+
+**Send Headers**: ✅
+- Name: `Content-Type`
+- Value: `application/json`
+
+**Body Content Type**: JSON  
+**Specify Body**: Using JSON
+
+**JSON**:
+```json
+{
+  "clientKey": "{{ $('Read Data').first().json.OmoCaptcha_API_Key }}",
+  "task": {
+    "type": "RecaptchaV2TokenTask",
+    "websiteURL": "https://aisandbox-pa.googleapis.com",
+    "websiteKey": "YOUR_SITE_KEY_HERE"
+  }
+}
+```
+
+---
+
+### Node 3: Wait 15s
+
+**Type**: Wait  
+**Amount**: 15  
+**Unit**: Seconds
+
+---
+
+### Node 4: Get Captcha Result
+
+**Type**: HTTP Request  
+**Method**: POST  
+**URL**: `https://api.omocaptcha.com/v2/getTaskResult`
+
+**JSON**:
+```json
+{
+  "clientKey": "{{ $('Read Data').first().json.OmoCaptcha_API_Key }}",
+  "taskId": "{{ $('Solve Captcha').first().json.taskId }}"
+}
+```
+
+---
+
+### Node 5: IF - Check Ready
+
+**Conditions**:
+- Field: `{{ $json.status }}`
+- Operation: `equals`
+- Value: `ready`
+
+**True**: Continue  
+**False**: Wait thêm (loop back to Wait 10s)
+
+---
+
+### Node 6: Retry Create VEO3
+
+**Type**: HTTP Request (duplicate từ Create VEO3)
+
+**JSON Body** - THÊM recaptchaToken:
+```javascript
+{{
+  JSON.stringify({
+    "clientContext": {
+      "sessionId": ";" + $json.sessionId,
+      "projectId": $json.projectId,
+      "tool": "PINHOLE",
+      "userPaygateTier": "PAYGATE_TIER_TWO",
+      "recaptchaToken": $('Get Captcha Result').first().json.solution.recaptchaResponse
+    },
+    "requests": [{
+      "aspectRatio": $json.aspectRatio,
+      "seed": Math.floor(Math.random() * 10000),
+      "textInput": {
+        "prompt": $json.prompt
+      },
+      "videoModelKey": $json.videoModelKey,
+      "metadata": {
+        "sceneId": $json.sceneId
+      }
+    }]
+  })
+}}
+```
+
+**Note**: `$json` ở đây vẫn là Edit Fields context, cần reference đúng!
+
+---
+
+## Flow Diagram
+
+```
+Edit Fields
+  ↓
+Create VEO3 [Continue On Fail]
+├─ Success (green) → Wait → Check Status → Send Video ✅
+└─ Error (red) → IF Captcha?
+                 ├─ No → Notify Error
+                 └─ Yes → Solve Captcha
+                          ↓
+                        Wait 15s
+                          ↓
+                        Get Result
+                          ↓
+                        IF Ready?
+                          ├─ No → Wait 10s → Get Result
+                          └─ Yes → Retry Create VEO3
+                                   ↓
+                                 Success → Continue ✅
+```
+
+---
+
+## Testing
+
+### Test 1: No Captcha
+1. Gửi Telegram: `"test"`
+2. Workflow → Create VEO3 → Success ngay ✅
+3. Check execution time: ~5s
+
+### Test 2: With Captcha
+1. Tạo nhiều videos liên tiếp (trigger captcha)
+2. Workflow → Error → Auto solve → Retry → Success ✅
+3. Check execution time: ~20-25s
+4. Check OmoCaptcha dashboard: -1 captcha
+
+---
+
+## Troubleshooting
+
+### Lỗi: "Task creation failed"
+→ Sai API key hoặc hết tiền
+
+### Lỗi: "Invalid site key"  
+→ Site key sai, lấy lại từ VEO3
+
+### Status = "processing" mãi
+→ Tăng wait time hoặc add retry loop
+
+### Token không work
+→ Check context `$json` trong Retry node

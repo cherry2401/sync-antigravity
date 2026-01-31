@@ -1,0 +1,248 @@
+# Walkthrough - Skills System Creation
+
+## Tổng quan
+
+Đã tạo thành công **Skills System** - một bộ Skill chuẩn cho Clawdbot Agent, triển khai **Beads Task Management** và **Memory V2 Knowledge Distillation**.
+
+---
+
+## 📦 Cấu trúc đã tạo
+
+```
+i:/Skills/skills_system/
+├── SKILL.md                    # 🎯 File chính - Commander Protocol
+├── SOUL.md                     # 👤 Template personality cho Agent  
+├── README.md                   # 📖 Hướng dẫn cài đặt & sử dụng
+└── templates/
+    └── .gitignore             # ⚙️ Git config tối ưu cho workspace
+```
+
+---
+
+## 🎯 File SKILL.md - Trái tim của hệ thống
+
+### Cấu trúc chính
+
+#### 1. **Beads Protocol** - Quản lý Task
+Triển khai đầy đủ các lệnh:
+
+| Lệnh | Chức năng | Ví dụ |
+|------|-----------|-------|
+| `#plan` | Tạo kế hoạch task | `#plan Viết tool lấy mã giảm giá` |
+| `#do` | Thực hiện task tiếp theo | `#do` |
+| `#status` | Xem tiến độ | `#status` |
+| `#add` | Thêm task mới | `#add Validation cho input` |
+
+**Đặc điểm nổi bật:**
+- ✅ Atomic operations: Mỗi Bead là một đơn vị hoàn chỉnh
+- ✅ Source of truth: File `BEADS.md` là nguồn sự thật duy nhất
+- ✅ State management: `[ ]` → `[/]` → `[x]`
+- ✅ Session-proof: Sau compact/reset vẫn recover được tiến độ
+
+#### 2. **Memory V2 Protocol** - Quản lý Tri thức
+
+**3 loại Memory:**
+- `[W]` World/Facts - Sự thật kỹ thuật
+- `[B]` Biographical/Experience - Kinh nghiệm
+- `[O]` Opinions/Preferences - Sở thích
+
+**Quy trình Retain - Recall - Reflect:**
+```
+#memory → Chưng cất kiến thức → Lưu vào ~/clawd/bank/
+                                        ├─ world.md
+                                        ├─ experience.md  
+                                        └─ opinions.md
+```
+
+**Ví dụ thực tế:**
+```markdown
+[W] @DellWyse5070 | Insight: Server Alpine Linux, 8GB RAM, Docker + n8n | Evidence: /etc/os-release
+
+[B] @Clawdbot | Insight: Fix lỗi 'consecutive turns' bằng xóa sessions/ và restart | Evidence: Log 2026-01-18
+
+[O] @ZaloMarketing | Insight: Linh Vũ thích văn phong có icon 🩺💊 | Confidence: 1.0
+```
+
+#### 3. **System Commands**
+
+| Lệnh | Mục đích |
+|------|----------|
+| `#switch [role]` | Chuyển đổi context (coder/sale/sysadmin) |
+| `#fix` | Phân tích log → Root cause → Code sửa |
+| `#backup [msg]` | Git add/commit/push tự động |
+| `#list` | Hiển thị tất cả lệnh |
+
+---
+
+## 👤 File SOUL.md - Template Personality
+
+### Điểm đặc biệt
+
+**Section "Loaded Skills":**
+```markdown
+### Commander Protocol (Beads & Memory V2)
+File: i:/Skills/skills_system/SKILL.md
+
+Cách kích hoạt:
+view_file("i:/Skills/skills_system/SKILL.md")
+```
+
+→ Agent tự đọc SKILL.md khi khởi động session
+
+**Section "Session Startup Routine":**
+```markdown
+1. Load Skill
+2. Check BEADS.md  
+3. Review opinions.md
+4. Báo cáo tiến độ
+```
+
+→ Agent biết chính xác phải làm gì khi bắt đầu
+
+---
+
+## 📖 File README.md - Hướng dẫn đầy đủ
+
+### Nội dung chính
+
+1. **Cài đặt nhanh** (3 bước)
+2. **Hướng dẫn sử dụng** từng lệnh
+3. **Cấu trúc Workspace** mẫu
+4. **Customization** (thêm @Entity, đổi Persona)
+5. **Troubleshooting** các lỗi thường gặp
+
+---
+
+## ⚙️ File templates/.gitignore
+
+### Tối ưu hóa cho Commander Protocol
+
+**Ignore:**
+- ❌ `sessions/` - Tránh conflict khi compact
+- ❌ `clawdbot.json` - Chứa API keys
+- ❌ `node_modules/`
+
+**Whitelist:**
+- ✅ `!BEADS.md` - Giữ tiến độ task
+- ✅ `!bank/` - Giữ Memory V2
+- ✅ `!SOUL.md` - Giữ personality
+
+→ Lệnh `#backup` sẽ chỉ đẩy những gì quan trọng
+
+---
+
+## 🎬 Demo Usage (Kịch bản thực tế)
+
+### Kịch bản 1: Bắt đầu Task mới
+
+```
+User: #plan Viết tool lấy mã giảm giá Shopee
+
+Agent: Ok sếp, đã lên kế hoạch:
+- [ ] 1. Phân tích API Shopee
+- [ ] 2. Viết script Playwright login  
+- [ ] 3. Viết hàm lấy coupon
+- [ ] 4. Test và export CSV
+
+Gõ #do để bắt đầu bước 1?
+
+User: #do
+
+Agent: [Thực hiện bước 1...]
+✅ Đã hoàn thành: Phân tích API Shopee
+→ Endpoint: /api/v4/voucher/list
+→ Cần headers: Cookie, X-API-VERSION
+
+Chuyển sang bước 2? Gõ #do tiếp.
+```
+
+### Kịch bản 2: Lưu kiến thức
+
+```
+User: #memory Lưu lại cách fix lỗi session kẹt
+
+Agent: Đã lưu vào Bank:
+
+[B] @Clawdbot | Insight: Fix lỗi "consecutive user turns" 
+bằng cách xóa folder sessions/ và restart container | 
+Evidence: Terminal log 2026-01-18
+
+Lưu tại: ~/clawd/bank/experience.md
+```
+
+### Kịch bản 3: Backup trước khi reset
+
+```
+User: #backup Hoàn thành tool Shopee coupon
+
+Agent: 
+✅ git add .
+✅ git commit -m "Hoàn thành tool Shopee coupon - Automated by Clawdbot"
+✅ git push origin main
+
+Link commit: https://github.com/user/repo/commit/abc123
+```
+
+---
+
+## ✨ Điểm mạnh của Skills System
+
+### 1. **Tái sử dụng tuyệt đối**
+- Copy 1 dòng reference vào `SOUL.md` → Agent mới tự động có đầy đủ protocol
+- Update SKILL.md 1 lần → Tất cả Agent đều được cập nhật
+
+### 2. **Session-proof**
+- Sau compact/reset, Agent đọc lại `BEADS.md` → Nhớ ngay tiến độ
+- Memory V2 lưu vào file → Không bao giờ mất
+
+### 3. **Tuân thủ chuẩn Clawdbot**
+- YAML frontmatter trong SKILL.md
+- Cấu trúc folder theo Skills System
+- Tương thích với `view_file` tool
+
+### 4. **Dễ maintain**
+- Văn bản rõ ràng, có ví dụ cụ thể
+- Phân tách rõ Skill (reusable) vs Personality (custom)
+- Git-friendly (có .gitignore chuẩn)
+
+---
+
+## 🚀 Next Steps cho User
+
+### Để sử dụng Skill này:
+
+1. **Tạo Agent mới** hoặc dùng Agent hiện có
+
+2. **Setup workspace:**
+   ```bash
+   mkdir -p ~/clawd/bank
+   mkdir -p ~/clawd/memory
+   cp i:/Skills/skills_system/SOUL.md ~/clawd/SOUL.md
+   cp i:/Skills/skills_system/templates/.gitignore ~/clawd/.gitignore
+   ```
+
+3. **Khởi động Agent với prompt:**
+   ```
+   Hãy đọc file: i:/Skills/skills_system/SKILL.md
+   ```
+
+4. **Test thử:**
+   ```
+   #plan Test thử Beads Protocol
+   ```
+
+---
+
+## 📊 Kết quả đạt được
+
+✅ Tạo xong bộ Skills System hoàn chỉnh  
+✅ 4 file chính: SKILL.md, SOUL.md, README.md, .gitignore  
+✅ Tuân thủ chuẩn Clawdbot Skills  
+✅ Có documentation đầy đủ  
+✅ Sẵn sàng sử dụng cho nhiều Agent  
+
+---
+
+**Hoàn thành**: 2026-01-18  
+**Tổng thời gian**: ~30 phút  
+**Files created**: 4 files

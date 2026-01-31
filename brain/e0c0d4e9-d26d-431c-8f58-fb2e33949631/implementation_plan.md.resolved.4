@@ -1,0 +1,52 @@
+# Auto-Update Feature - Claude Manager
+
+## Mục tiêu
+Cho phép app tự động kiểm tra và cài đặt bản cập nhật mới mà không cần build lại thủ công.
+
+## Cơ chế hoạt động
+1. Khi mở app → Tự động check update từ server (GitHub Releases hoặc local)
+2. Nếu có bản mới → Hiển thị thông báo cho user
+3. User bấm "Update" → Download và cài đặt tự động
+4. Sau khi cài xong → Khởi động lại app với version mới
+
+## Các thành phần cần triển khai
+
+### 1. Main Process (Backend)
+- [x] `electron-updater` đã được cài sẵn
+- [ ] Cấu hình autoUpdater trong [src/main/index.ts](file:///I:/AIHub/claude-manager/src/main/index.ts)
+- [ ] Gửi events về trạng thái update qua IPC
+
+### 2. Renderer Process (UI)
+- [ ] Thêm component `UpdateNotification` hiển thị khi có bản mới
+- [ ] Nút "Check for Updates" trong Settings hoặc sidebar
+- [ ] Progress bar khi đang download
+
+### 3. Build & Release
+- [ ] Cấu hình `electron-builder.yml` cho auto-update
+- [ ] Setup GitHub Releases hoặc local update server
+
+## Lựa chọn Update Server
+
+| Option | Ưu điểm | Nhược điểm |
+|--------|---------|------------|
+| **GitHub Releases** | Miễn phí, dễ setup | Cần public repo hoặc token |
+| **Local Server** | Kiểm soát hoàn toàn | Cần host server |
+
+> [!IMPORTANT]
+> Bạn muốn dùng **GitHub Releases** hay **Local folder** làm nguồn update?
+
+## Workflow đề xuất
+
+```mermaid
+sequenceDiagram
+  participant App
+  participant Server
+  App->>Server: Check latest version
+  Server-->>App: Return version info
+  alt New version available
+    App->>User: Show update notification
+    User->>App: Click "Update Now"
+    App->>Server: Download update
+    App->>App: Install & Restart
+  end
+```

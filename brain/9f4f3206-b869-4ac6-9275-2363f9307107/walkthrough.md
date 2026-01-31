@@ -1,0 +1,52 @@
+# Vortex Terminal - Walkthrough
+
+Dự án **Vortex Terminal** đã hoàn thành! Dưới đây là tóm tắt các tính năng và cách chạy ứng dụng.
+
+## 🚀 Tính năng nổi bật
+
+- **Backend Go & ConPTY**: Sử dụng Windows Pseudo Console (ConPTY) API để xử lý I/O chuẩn xác, hỗ trợ đầy đủ màu sắc và font chữ của Windows.
+- **Frontend Hiện đại**: Render bằng xterm.js với hỗ trợ WebGL/Canvas, giao diện React + Tailwind CSS v4 cực kỳ mượt mà.
+- **Frameless UI**: Thiết kế không viền với Titlebar tùy chỉnh, hỗ trợ Mica hiệu ứng và độ trong suốt (transparency).
+- **Multi-Tab**: Quản lý nhiều phiên làm việc (Local PowerShell hoặc SSH) trong cùng một cửa sổ.
+- **SSH Client tích hợp**: Kết nối đến server từ xa trực tiếp từ ứng dụng.
+- **Unicode/Vietnamese Support**: Hiển thị tiếng Việt có dấu hoàn hảo.
+
+---
+
+## 🏗️ Cấu trúc dự án
+
+- **Backend**: `internal/pty` (ConPTY wrapper) và `internal/ssh` (SSH client).
+- **Frontend**: Component `TerminalView` xử lý logic xterm.js và binding với Go.
+- **Build**: Output nằm tại `build/bin/vortex-terminal.exe`.
+
+---
+
+## 🛠️ Cách chạy & Kiểm tra
+
+### 1. Chạy ứng dụng
+Anh có thể tìm thấy file .exe tại:
+`C:\Users\Cherry\.gemini\antigravity\scratch\vortex-terminal\build\bin\vortex-terminal.exe`
+
+### 2. Kiểm tra tiếng Việt
+Gõ lệnh sau trong terminal:
+```powershell
+echo "Xin chào Việt Nam 🇻🇳"
+```
+
+### 3. Thêm tab mới & SSH
+- Click nút `+` để mở PowerShell mới.
+- Click nút `SSH` để mở form kết nối server từ xa.
+
+---
+
+## 🎨 UI Mockups
+Dưới đây là thiết kế ban đầu đã được triển khai:
+
+![Main UI](file:///C:/Users/Cherry/.gemini/antigravity/brain/9f4f3206-b869-4ac6-9275-2363v9f4f3206-b869-4ac6-9275-2363f9307107/vortex_terminal_main_1769428208630.png)
+*(Hình ảnh thiết kế chính - App thực tế đã được xây dựng giống hệt)*
+
+---
+
+## ✅ Kết quả Build
+Binary đã được build thành công:
+`vortex-terminal.exe` (Production Build)

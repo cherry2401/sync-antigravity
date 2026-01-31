@@ -1,0 +1,26 @@
+# Walkthrough - Client-Side Routing Implementation & Deployment
+
+## Goal
+Implement client-side routing to provide unique URLs for each feature and deploy the updated application to Cloudflare.
+
+## Changes
+
+### 1. [App.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/App.tsx) Refactoring
+- **Integration**: Wrapped the application with `BrowserRouter`.
+- **Routing**: Replaced `renderContent` conditional logic with `Routes` and `Route` components.
+- **Tools Layout**: Introduced [ToolsLayout](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/App.tsx#136-175) to handle individual tool routes (`/instagram`, `/zing-mp3`, etc.).
+
+### 2. Navigation Update
+- **Header/Footer**: Switched to [Link](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/SoundCloudDownload.tsx#47-75) components.
+- **Active State**: Implemented `useLocation` for active link highlighting.
+
+### 3. Deployment Configuration
+- **Cloudflare**: Added [_redirects](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/dist/_redirects) file for SPA routing.
+- **Scripts**: Added `"deploy": "npm run build && wrangler pages deploy dist --project-name tai-video"` to [package.json](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/package.json).
+
+## Usage
+To deploy updates in the future, simply run:
+```bash
+npm run deploy
+```
+This command will automatically build the project and deploy it to the `tai-video` Cloudflare project.

@@ -1,0 +1,19 @@
+# Carousel Slide Editor Feature
+
+## Phase 1: Schema Update
+- [ ] Update [config/block-schemas.ts](file:///i:/Website/MyphamHaKi/app-src/src/config/block-schemas.ts) with `type: 'array'` and `itemSchema`
+
+## Phase 2: Settings Panel UI
+- [ ] Add state for `editingSlideIndex` (null = list view, number = editing)
+- [ ] Create `SlideListView` - shows slides with Add/Delete buttons
+- [ ] Create `SlideEditView` - form with back button
+- [ ] Update [HeroBannerSettings](file:///i:/Website/MyphamHaKi/app-src/src/app/admin/giao-dien/trang-tri/page.tsx#359-496) to toggle between views
+
+## Phase 3: HeroBanner Component
+- [ ] Update to accept `slides` prop from block config
+- [ ] Merge with `defaultSlides` fallback
+
+## Verification
+- [ ] Add slide → appears in preview
+- [ ] Edit slide → changes reflected
+- [ ] Delete slide → removed from carousel

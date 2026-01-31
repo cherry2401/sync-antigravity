@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary": "Implemented NextAuth v5 authentication system, including database schema updates, server actions for login/register, and linking orders to user accounts. Refactored the Order History page to display real user orders.",
+  "updatedAt": "2026-01-15T06:02:06.739928100Z",
+  "version": "15"
+}

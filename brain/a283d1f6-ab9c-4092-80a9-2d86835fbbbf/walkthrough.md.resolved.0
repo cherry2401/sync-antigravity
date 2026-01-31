@@ -1,0 +1,43 @@
+# Hướng dẫn sử dụng Workflow TikTok to Facebook Reels
+
+Tôi đã hoàn thiện workflow n8n của bạn để tự động hóa việc reup video từ TikTok sang Facebook Reels với các tính năng nâng cao.
+
+## Các thay đổi chính
+
+1.  **Token Động (Dynamic Token)**:
+    -   Workflow giờ đây sẽ đọc thông tin `Page đích` từ sheet `Public Reel` và tìm `Access Token` tương ứng trong sheet `Quản Lý Pages`.
+    -   Điều này cho phép bạn đăng lên nhiều page khác nhau mà không cần sửa workflow.
+
+2.  **Vòng lặp kiểm tra trạng thái (Status Loop)**:
+    -   Sau khi đăng, workflow sẽ đợi 1 phút và kiểm tra trạng thái video.
+    -   Nếu video chưa sẵn sàng (`ready`), nó sẽ đợi tiếp.
+    -   Khi video đã sẵn sàng, nó mới cập nhật trạng thái vào sheet.
+
+3.  **Cấu trúc HTTP Request**:
+    -   Thay thế các node Facebook cũ bằng `HTTP Request` để linh hoạt hơn trong việc sử dụng Token động.
+
+## Cấu hình cần thiết
+
+### 1. Google Sheets
+Đảm bảo bạn có 2 sheet với tên chính xác:
+-   **Public Reel**: Chứa link TikTok và cột `Page đích`.
+-   **Quản Lý Pages**: Chứa `Tên Page`, `ID Page`, `Access Token`.
+    -   *Lưu ý*: `Tên Page` trong sheet này phải khớp chính xác với `Page đích` trong sheet `Public Reel`.
+
+### 2. n8n Credentials
+-   Workflow sử dụng credential `Google Sheets account` (đã có sẵn trong file cũ của bạn).
+-   Không cần cấu hình credential Facebook trong n8n nữa vì chúng ta dùng Token từ sheet.
+
+### 3. Kiểm tra API TikTok
+-   Node `Get Video TikTok` đang sử dụng `api.satoru.site`.
+-   Output được mong đợi là JSON có trường `data.play` (link video không logo). Nếu API này thay đổi cấu trúc, bạn cần cập nhật lại expression trong node `Upload Video`.
+
+## Cách chạy thử
+1.  Mở n8n và import lại file [Tiktok.json](file:///c:/Users/Cherry/Clone_facebook/Test%20WF/Tiktok/Tiktok.json).
+2.  Điền 1 dòng dữ liệu mẫu vào sheet `Public Reel` (để trống cột `Trạng thái`).
+3.  Bấm **Execute Workflow**.
+4.  Theo dõi quá trình chạy. Nếu thấy node `Wait` chạy lặp lại vài lần, đó là bình thường (đang đợi Facebook xử lý video).
+
+## Xử lý lỗi thường gặp
+-   **Lỗi 400/401 tại node Upload**: Kiểm tra lại `Access Token` và `ID Page` trong sheet.
+-   **Lỗi không tìm thấy file**: Kiểm tra lại link TikTok hoặc API `satoru.site`.

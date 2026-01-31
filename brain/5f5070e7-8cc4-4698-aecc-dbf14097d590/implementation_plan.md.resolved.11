@@ -1,0 +1,50 @@
+# Triển Khai Trang Tài Khoản Người Dùng
+
+## Mục tiêu
+Tạo trang cá nhân/dashboard cho người dùng tương tự batdongsan.vn/sellernet/dashboard, bỏ qua các tính năng thanh toán (miễn phí ban đầu).
+
+## Tính năng triển khai
+
+### Trang Tổng Quan (Dashboard)
+Lưới các ô tính năng:
+1. **Đăng tin mới** - Link tới form đăng tin
+2. **Quản lý tin đăng** - Danh sách tin của người dùng
+3. **Thông báo** - Thông báo hệ thống
+4. **Tin đã lưu** - Tin yêu thích đã lưu
+5. **Trang cá nhân** - Xem/sửa thông tin
+6. **Đổi mật khẩu** - Thay đổi mật khẩu
+
+### Menu Sidebar
+- Avatar & Tên người dùng
+- Tổng quan | Tất cả tin đăng | Chờ duyệt | Đã duyệt | Không duyệt
+- Thông tin cá nhân | Đăng xuất
+
+### Đã bỏ qua (tính năng thanh toán)
+- ❌ Nạp tiền, Lịch sử nạp/thanh toán, Bảng giá
+
+---
+
+## Thay đổi cần thực hiện
+
+### Components mới
+
+#### [NEW] `src/components/user/UserDashboardLayout.tsx`
+Layout chung cho trang tài khoản (sidebar + nội dung)
+
+#### [NEW] `src/pages/UserDashboardPage.tsx`
+Dashboard với lưới các ô tính năng
+
+#### [NEW] `src/pages/UserListingsPage.tsx`
+Quản lý tin đăng của người dùng
+
+#### [NEW] `src/pages/UserProfilePage.tsx`
+Form chỉnh sửa thông tin cá nhân
+
+---
+
+### Cập nhật Routes
+
+#### [MODIFY] [src/App.tsx](file:///i:/Website/BDS/src/App.tsx)
+- `/tai-khoan` → UserDashboardPage
+- `/tai-khoan/tin-dang` → UserListingsPage
+- `/tai-khoan/thong-tin` → UserProfilePage

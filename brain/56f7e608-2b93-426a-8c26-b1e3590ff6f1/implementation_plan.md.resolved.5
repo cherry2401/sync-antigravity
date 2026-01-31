@@ -1,0 +1,114 @@
+# Homepage Sections Implementation Plan
+
+## Mục tiêu
+Kết nối các section trên trang chủ với dữ liệu thực từ database và cho phép admin customize qua Page Builder.
+
+---
+
+## Phân tích hiện trạng
+
+| Section | Component | Data Source | Page Builder | Trạng thái |
+|---------|-----------|-------------|--------------|------------|
+| Nổi bật nhất | [FeaturedProducts.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/FeaturedProducts.tsx) | Hardcoded mẫu | ❌ Chưa có | Cần kết nối DB |
+| Thương hiệu | [BrandCarousel.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/BrandCarousel.tsx) | Hardcoded mẫu | ❌ Chưa có | Cần kết nối DB |
+| Banner khuyến mãi | [PromoBanner.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/PromoBanner.tsx) | Hardcoded mẫu | ❌ Chưa có | Cần Page Builder |
+| Ưu đãi đặc biệt | [PromotionalProducts.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/PromotionalProducts.tsx) | Hardcoded mẫu | ❌ Chưa có | Cần kết nối DB |
+| Danh mục nổi bật | [CategoriesGrid.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/CategoriesGrid.tsx) | Hardcoded mẫu | ❌ Chưa có | Cần kết nối DB |
+
+---
+
+## Proposed Changes
+
+### 1. Featured Products (Nổi bật nhất)
+
+#### [MODIFY] [FeaturedProducts.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/FeaturedProducts.tsx)
+- Thêm Server Action để fetch sản phẩm nổi bật từ DB
+- Hỗ trợ props: `productIds`, `limit`, `sortBy`
+- Ưu tiên hiển thị sản phẩm có `isFeatured: true` hoặc nhiều reviews
+
+#### [MODIFY] [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/admin/giao-dien/trang-tri/page.tsx)
+- Thêm `FeaturedProductsSettings` component cho Page Builder
+- Cho phép chọn: tiêu đề, số lượng, danh mục
+
+---
+
+### 2. Brand Carousel (Thương hiệu)
+
+#### [NEW] Prisma Schema
+```prisma
+model Brand {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  logo      String?
+  isActive  Boolean  @default(true)
+  products  Product[]
+}
+```
+
+#### [MODIFY] [BrandCarousel.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/BrandCarousel.tsx)
+- Fetch brands từ DB thay vì hardcoded
+- Hỗ trợ upload logo trong admin
+
+#### [NEW] Admin Brand Management
+- Trang quản lý thương hiệu: `/admin/thuong-hieu`
+
+---
+
+### 3. Promo Banner (Banner khuyến mãi)
+
+#### [MODIFY] [PromoBanner.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/PromoBanner.tsx)
+- Nhận props từ Page Builder: `title`, `subtitle`, `ctaText`, `ctaLink`, `bgImage`, `bgColor`
+
+#### [MODIFY] Page Builder Settings
+- Thêm `PromoBannerSettings` component
+- Cho phép chọn: tiêu đề, mô tả, nút CTA, màu nền, ảnh nền
+
+---
+
+### 4. Promotional Products (Ưu đãi đặc biệt)
+
+#### [MODIFY] [PromotionalProducts.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/PromotionalProducts.tsx)
+- Fetch sản phẩm đang giảm giá từ DB (có `discountPrice`)
+- Lọc theo: `discountPercent > 0` hoặc `saleEndDate > now`
+
+---
+
+### 5. Categories Grid (Danh mục nổi bật)
+
+#### [MODIFY] [CategoriesGrid.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/CategoriesGrid.tsx)
+- Fetch categories từ DB với count sản phẩm
+- Hỗ trợ upload ảnh danh mục
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> Cần user xác nhận các điểm sau:
+> 
+> 1. **Thứ tự ưu tiên** - Bạn muốn implement section nào trước?
+> 2. **Brand Management** - Có cần trang admin quản lý thương hiệu không?
+> 3. **Image Upload** - Các section có cần upload ảnh riêng (logo brand, ảnh category) không?
+
+---
+
+## Verification Plan
+
+### Manual Testing
+1. Mở homepage và kiểm tra các section hiển thị đúng dữ liệu từ DB
+2. Mở Page Builder, thay đổi settings và xác nhận Live Preview cập nhật
+3. Kiểm tra responsive trên mobile/tablet
+
+---
+
+## Đề xuất thứ tự triển khai
+
+| Ưu tiên | Section | Độ phức tạp | Lý do |
+|---------|---------|-------------|-------|
+| 1️⃣ | Featured Products | ⭐⭐ | Đã có products trong DB |
+| 2️⃣ | Promotional Products | ⭐⭐ | Tương tự, lọc sản phẩm giảm giá |
+| 3️⃣ | Categories Grid | ⭐⭐ | Đã có categories trong DB |
+| 4️⃣ | Promo Banner | ⭐ | Chỉ cần Page Builder settings |
+| 5️⃣ | Brand Carousel | ⭐⭐⭐ | Cần thêm Brand model mới |
+

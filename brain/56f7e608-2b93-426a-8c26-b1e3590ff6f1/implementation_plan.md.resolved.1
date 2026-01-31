@@ -1,0 +1,65 @@
+# Product Detail Page (PDP) Upgrade
+
+## Goal
+Upgrade the Product Detail Page with advanced e-commerce features:
+1. Accordion-style product information
+2. Sticky bottom bar for mobile
+3. Improved reviews pagination and layout
+
+---
+
+## Proposed Changes
+
+### Component 1: Product Accordion
+
+#### [NEW] `ProductAccordion.tsx`
+Create new accordion component for product information with 3 sections:
+- **Mô tả chi tiết** (default open)
+- **Thành phần (Ingredients)**
+- **Hướng dẫn sử dụng**
+
+Style: Minimalist with subtle dividers, (+) icon on the right that rotates to (×) when open.
+
+---
+
+### Component 2: Product Detail Page
+
+#### [MODIFY] `app/san-pham/[slug]/page.tsx`
+
+1. **Replace description paragraph** (line 269-274) with `<ProductAccordion />` component
+2. **Reorder sections**: Move Related Products above Reviews
+3. **Add Sticky Bottom Bar**: Mobile-only fixed bar with Chat + Buy buttons
+4. **Import new icons**: `MessageCircle` for chat icon
+
+---
+
+### Component 3: Product Reviews with Pagination
+
+#### [MODIFY] [components/product/ProductReviews.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/product/ProductReviews.tsx)
+
+1. **Add pagination** instead of "Show All" button
+2. **Limit to 3 reviews per page** with page numbers (1, 2, 3...)
+3. **Reduce section padding** to bring it closer to main content
+
+---
+
+## Verification Plan
+
+### Manual Testing (Browser)
+1. Navigate to `http://localhost:3006/san-pham/serum-vitamin-c-20-pure-brightening`
+2. Verify:
+   - [ ] Accordion with 3 sections is visible
+   - [ ] First section (Mô tả chi tiết) is open by default
+   - [ ] Clicking sections opens/closes them with animation
+   - [ ] (+) icon rotates when section is opened
+3. Resize to mobile viewport (< 768px):
+   - [ ] Sticky bottom bar appears at bottom
+   - [ ] Bar has Chat icon + "Mua Ngay" button
+   - [ ] Bar slides up when user scrolls
+4. Scroll to Reviews:
+   - [ ] Only 3 reviews visible initially
+   - [ ] Pagination (1, 2, 3...) visible below reviews
+   - [ ] Clicking page numbers changes reviews
+5. Related Products:
+   - [ ] Section appears above Reviews
+

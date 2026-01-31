@@ -1,0 +1,130 @@
+# Hướng Dẫn Sửa Lỗi Upload Image Trên n8n Canvas
+
+## 🎯 Bạn Cần Sửa 2 Điểm
+
+### ✅ Fix 1: Thêm mimeType vào Convert to Base64 Node
+
+1. **Mở workflow VEO3_V2** trong n8n
+2. **Click vào node "Convert to Base64"** (node sau Download Photo)
+3. **Trong tab Parameters**, tìm đến code JavaScript
+4. **Sửa code** từ:
+
+```javascript
+const binaryData = $input.item.binary.data;
+const base64String = binaryData.data;
+// Loại bỏ data prefix nếu có
+const cleanBase64 = base64String.replace(/^data:image\/\w+;base64,/, "");
+
+return {
+  json: {
+    base64: cleanBase64,
+    length: cleanBase64.length
+  }
+};
+```
+
+**Thành:**
+
+```javascript
+const binaryData = $input.item.binary.data;
+const base64String = binaryData.data;
+// Loại bỏ data prefix nếu có
+const cleanBase64 = base64String.replace(/^data:image\/\w+;base64,/, "");
+
+// Lấy mimeType từ binary data
+const mimeType = binaryData.mimeType || 'image/png';
+
+return {
+  json: {
+    base64: cleanBase64,
+    mimeType: mimeType,
+    length: cleanBase64.length
+  }
+};
+```
+
+5. **Click "Execute Node"** để test
+6. Kiểm tra Output phải có 3 fields: `base64`, `mimeType`, `length`
+
+---
+
+### ✅ Fix 2: Sửa Upload Image Node (Downgrade typeVersion)
+
+> [!IMPORTANT]
+> Fix này **KHÔNG THỂ** làm trực tiếp trên canvas UI vì n8n không cho phép thay đổi `typeVersion` qua giao diện.
+
+#### Cách 1: Xóa và Tạo Lại Node (Khuyến nghị)
+
+1. **Copy cấu hình hiện tại** của node Upload Image:
+   - URL: `https://aisandbox-pa.googleapis.com/v1:uploadUserImage`
+   - Method: `POST`
+   - Headers:
+     ```json
+     {
+       "Authorization": $json.token,
+       "Content-Type": "text/plain;charset=UTF-8"
+     }
+     ```
+   - Body: `{{ $json.payload }}`
+
+2. **Xóa node Upload Image** hiện tại
+
+3. **Thêm node HTTP Request mới**:
+   - Kéo từ toolbar vào canvas
+   - n8n sẽ tự động tạo node với typeVersion mới nhất
+
+4. **Cấu hình lại** theo thông tin đã copy ở bước 1
+
+5. **Nối lại connections**:
+   - Input: từ "Prepare Upload Payload"
+   - Output: đến "Extract Media ID"
+
+#### Cách 2: Sửa Trực Tiếp File JSON (Nhanh hơn)
+
+1. **Đóng workflow** trong n8n (để tránh conflict)
+
+2. **Mở file** [VEO3_V2.json](file:///i:/Workflow/n8n/Test/VEO3/VEO3_V2.json) trong VS Code
+
+3. **Tìm dòng 644**:
+   ```json
+   "typeVersion": 4.2,
+   ```
+
+4. **Sửa thành**:
+   ```json
+   "typeVersion": 3,
+   ```
+
+5. **Lưu file** (Ctrl + S)
+
+6. **Quay lại n8n và reload workflow**
+
+---
+
+## 🧪 Kiểm Tra Sau Khi Sửa
+
+### Test Workflow
+
+1. **Gửi 1 ảnh** qua Telegram bot
+2. **Kiểm tra node Convert to Base64**:
+   - Output phải có `mimeType` (vd: `image/jpeg`)
+   - `base64` phải không có prefix `data:image/...`
+3. **Kiểm tra node Upload Image**:
+   - Không còn lỗi "Bad request"
+   - Output phải có `mediaGenerationId`
+4. **Xem video được tạo** gửi về Telegram
+
+### Nếu Vẫn Lỗi
+
+- Kiểm tra token có còn valid không
+- Kiểm tra base64 có bị cắt/sai format không
+- Check browser console trong n8n để xem error chi tiết
+
+---
+
+## 📌 Tóm Tắt
+
+| Sửa | Nơi | Cách |
+|-----|-----|------|
+| **Thêm mimeType** | Convert to Base64 node | Sửa code trên canvas |
+| **Hạ typeVersion** | Upload Image node | Sửa file JSON hoặc xóa/tạo lại node |

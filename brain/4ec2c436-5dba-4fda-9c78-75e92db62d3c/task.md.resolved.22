@@ -1,0 +1,23 @@
+# File Explorer Refinement & IPC Debugging
+
+## UI Refinement
+- [ ] Remove separate "Go" button and text input from [FileExplorer.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/FileExplorer.tsx).
+- [ ] Ensure Drive dropdown is the primary navigation control.
+- [ ] Verify auto-load functionality.
+
+## IPC Debugging
+- [x] Investigate why `window.electronAPI.listDir` is undefined despite `preload.js` having it. (Fixed via compilation)
+- [x] Add debug logging to Renderer to inspect `window.electronAPI` keys.
+- [x] Verify [main.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/main.ts) IPC handlers are registered.
+- [x] Ensure clean build/restart cycle.
+
+## Dynamic Drive Detection
+- [x] Add `fs:getDrives` IPC handler in [main.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/main.ts) using `systeminformation`.
+- [x] Expose [getDrives](file:///f:/Python/OpenSSH/clawdbot-client/electron/preload.ts#49-50) in [preload.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/preload.ts) and [vite-env.d.ts](file:///f:/Python/OpenSSH/clawdbot-client/src/vite-env.d.ts).
+- [x] Update `fileStore.ts` to include `drives` state and `loadDrives` action.
+- [x] Update [FileExplorer.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/FileExplorer.tsx) to display real drives with labels.
+- [x] Refine Drive Label format (User request: "I:\ Label").
+- [x] Fix incorrect drive content listing (force root path with trailing slash).
+- [x] Enhance File Icons (use `react-icons` for IDE-like experience).
+- [x] Implement Context Menu (Right-click actions for files/folders).
+- [x] Upgrade File Viewer to Editable Editor (IDE-like capabilities using Monaco).

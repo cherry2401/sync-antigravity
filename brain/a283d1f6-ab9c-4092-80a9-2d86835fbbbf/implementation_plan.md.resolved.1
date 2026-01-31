@@ -1,0 +1,52 @@
+# Kế hoạch Triển khai - Workflow TikTok sang Facebook Reels
+
+## Mục tiêu
+Tạo một workflow n8n tự động:
+1.  Lấy link video TikTok từ Google Sheet (`Public Reel`).
+2.  Lấy thông tin Page (ID, Token) từ sheet `Quản Lý Pages` tương ứng với `Page đích`.
+3.  Tải video từ TikTok (sử dụng `api.satoru.site`).
+4.  Upload video lên Facebook Reels sử dụng Token động (từ sheet).
+5.  Kiểm tra trạng thái xử lý video.
+6.  Cập nhật lại trạng thái và link bài đăng vào sheet `Public Reel`.
+
+## Yêu cầu người dùng xem xét
+> [!IMPORTANT]
+> **Token Động**: Tôi sẽ chuyển các node Facebook sang **HTTP Request** để có thể sử dụng `Access Token` từ file sheet của bạn (thay vì cấu hình cứng trong n8n). Điều này cho phép bạn đăng lên nhiều page khác nhau chỉ bằng cách chọn `Page đích` trong sheet.
+> **API Download**: Workflow sẽ tiếp tục sử dụng `api.satoru.site`. Nếu API này trả về link download trực tiếp, chúng ta sẽ dùng link đó để upload sang Facebook.
+
+## Các thay đổi đề xuất
+
+### Cấu trúc Workflow
+
+#### 1. Trigger & Lấy dữ liệu
+-   **Schedule Trigger**: Chạy định kỳ (ví dụ: 15 phút/lần).
+-   **Read Public Reel**: Đọc sheet `Public Reel`. Lọc các dòng có `Trạng thái` là trống.
+-   **Read Page Config**: Đọc sheet `Quản Lý Pages`.
+-   **Merge Data**: Ghép dữ liệu từ 2 sheet dựa trên `Page đích` (Public Reel) = `Tên Page` (Quản Lý Pages) để lấy `ID Page` và `Access Token`.
+
+#### 2. Xử lý Video
+-   **Get Video TikTok**: Gọi `api.satoru.site` để lấy link download (no watermark).
+
+#### 3. Upload lên Facebook (Dùng HTTP Request)
+Thay thế các node Facebook hiện tại bằng chuỗi HTTP Request để dùng Token động:
+-   **Start Session**: `POST /{page_id}/video_reels` (upload_phase=start).
+-   **Upload Video**: `POST` binary data hoặc URL tới `upload_url` nhận được từ bước trước.
+-   **Publish**: `POST /{page_id}/video_reels` (upload_phase=finish, video_state=PUBLISHED, description=Nội dung).
+
+#### 4. Vòng lặp kiểm tra trạng thái (Status Check)
+-   **Wait**: Đợi 1 phút.
+-   **Check Status**: Gọi API kiểm tra trạng thái video (`status`).
+-   **If**:
+    -   Nếu `status.video_status` == `ready` (hoặc `published`): Đi tiếp.
+    -   Nếu `processing`: Quay lại node **Wait**.
+    -   Nếu `error`: Ghi lỗi vào sheet.
+
+#### 5. Cập nhật Sheet
+-   **Update Row**: Cập nhật sheet `Public Reel` với:
+    -   `Trạng thái`: "Done"
+    -   `Link bài đăng`: Link video trên Facebook.
+    -   `Thời gian đăng`: Thời gian hiện tại.
+
+## Kế hoạch kiểm thử
+1.  **Chạy thử**: Điền 1 dòng dữ liệu mẫu vào `Public Reel`.
+2.  **Kiểm tra**: Xem video có lên đúng Page không, và sheet có được cập nhật trạng thái "Done" không.

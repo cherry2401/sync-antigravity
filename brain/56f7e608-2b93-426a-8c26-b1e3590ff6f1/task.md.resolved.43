@@ -1,0 +1,21 @@
+# Image Upload for Carousel Slides
+
+## Phase 1: API Route
+- [ ] Create `/api/upload` route for file handling
+- [ ] Save to `/public/uploads/slides/`
+- [ ] Return URL path
+
+## Phase 2: Upload UI Component
+- [ ] Create reusable `ImageUploader` component
+- [ ] Handle file input + drag-drop
+- [ ] Show upload progress + preview
+
+## Phase 3: Integrate into Slide Editor
+- [ ] Replace placeholder with `ImageUploader`
+- [ ] Update slide data on upload success
+- [ ] Show existing image with delete option
+
+## Verification
+- [ ] Upload image → appears in slide list
+- [ ] Save config → image persists
+- [ ] Banner preview shows uploaded image

@@ -1,0 +1,12 @@
+# Task: Triển khai Dropdown Đường/Phố
+
+## Implementation
+- [/] Tạo `lib/streetApi.ts` - API helper cho Overpass
+- [ ] Tạo `StreetCombobox.tsx` - Searchable dropdown component
+- [ ] Tích hợp vào [PostingForm.tsx](file:///i:/Website/BDS/src/components/property/PostingForm.tsx)
+- [ ] Test với các quận khác nhau
+
+## Verification
+- [ ] Test dropdown có data từ OSM
+- [ ] Test fallback khi không có data
+- [ ] Test tìm kiếm đường

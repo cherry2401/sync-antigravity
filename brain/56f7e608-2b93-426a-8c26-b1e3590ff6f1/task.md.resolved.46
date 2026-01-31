@@ -1,0 +1,27 @@
+# Homepage Sections Implementation
+
+## 1. Featured Products (Nổi bật nhất)
+- [x] Tạo Server Action fetch sản phẩm từ DB
+- [x] Cập nhật component nhận data từ props
+- [ ] Thêm FeaturedProductsSettings trong Page Builder
+- [ ] Thêm FeaturedProductsSettings trong Page Builder
+
+## 2. Promotional Products (Ưu đãi đặc biệt)
+- [ ] Tạo Server Action fetch sản phẩm giảm giá
+- [ ] Cập nhật component với data thực
+
+## 3. Categories Grid (Danh mục nổi bật)
+- [ ] Thêm field `image` cho Category trong Prisma
+- [ ] Tạo Server Action fetch categories với count
+- [ ] Cập nhật component với upload ảnh
+- [ ] Thêm CategoriesGridSettings trong Page Builder
+
+## 4. Promo Banner (Banner khuyến mãi)
+- [ ] Thêm PromoBannerSettings trong Page Builder
+- [ ] Cập nhật component nhận props từ Page Builder
+
+## 5. Brand Carousel (Thương hiệu)
+- [ ] Thêm Brand model vào Prisma schema
+- [ ] Migrate database
+- [ ] Tạo trang admin `/admin/thuong-hieu`
+- [ ] Cập nhật BrandCarousel fetch từ DB

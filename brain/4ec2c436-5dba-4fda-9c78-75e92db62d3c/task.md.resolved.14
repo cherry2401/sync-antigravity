@@ -1,0 +1,21 @@
+# Clawdbot Desktop - IDE Layout Implementation
+
+## Phase 1: Setup
+- [x] Install react-resizable-panels
+- [x] Create store for file explorer state (fileStore.ts)
+
+## Phase 2: Components
+- [x] Create FileExplorer.tsx (Tree View)
+- [x] Create Viewer.tsx (Tabs + Preview)
+- [x] Create ChatPanel.tsx (Messages + Actions)
+- [x] Create ChatMenu.tsx (Rename/Delete/Export dropdown)
+
+## Phase 3: Integration
+- [x] Refactor App.tsx to 3-column layout
+- [x] Wire up file selection → Viewer
+- [x] Wire up chat actions
+
+## Phase 4: Polish
+- [x] Make panels resizable
+- [x] Style consistency with Antigravity theme
+- [x] Test all interactions (Code deployed)

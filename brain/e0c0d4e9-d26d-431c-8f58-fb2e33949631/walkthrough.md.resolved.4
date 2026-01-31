@@ -1,0 +1,69 @@
+# Walkthrough - Claude Manager Refinements
+
+Dự án đã đạt được các bước tiến lớn về cả thẩm mỹ giao diện và độ ổn định khi vận hành. Dưới đây là các thay đổi chính:
+
+## 1. Giao diện Sidebar hiện đại (Modern UI)
+Thay thế Top Navigation cũ bằng Sidebar có thể thu gọn/mở rộng, mang lại không gian làm việc chuyên nghiệp và rộng rãi hơn.
+
+- **Sidebar thông minh**: Tự động chuyển đổi giữa chế độ Full (icon + text) và Compact (chỉ icon) để tối ưu không gian.
+- **Title Bar đồng bộ**: Thanh tiêu đề của Windows hiện đã có màu xanh đen (`#0f172a`) trùng khớp hoàn toàn với ứng dụng, tạo cảm giác liền mạch.
+- **Visual Feedback**: Các trạng thái Server (Online/Offline/Starting) được hiển thị trực quan bằng màu sắc và hiệu ứng pulse.
+
+## 2. Server vận hành ẩn (Silent Run)
+Giải quyết dứt điểm vấn đề cửa sổ Terminal hoặc Node tự động hiện lên gây phiền hà.
+
+- **VBScript Wrapper**: Sử dụng [start_hidden.vbs](file:///I:/AIHub/claude-ws/start_hidden.vbs) để kích hoạt server. Cơ chế này của Windows cho phép chạy các lệnh command line mà hoàn toàn không tạo ra cửa sổ giao diện.
+- **Quản lý quy trình**: Server chạy độc lập với ứng dụng Electron, cho phép log vẫn được thu thập và hiển thị trong tab "Logs".
+
+## 3. Tự động khởi động cùng Windows (Auto-start)
+Đảm bảo server luôn sẵn sàng mà không cần thao tác thủ công.
+
+- **Startup Shortcut**: Đã thiết lập shortcut gọi lệnh VBS trong thư mục `AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup`.
+- **Kết quả**: Khi bạn bật máy tính, server Claude (cliproxy) sẽ tự động chạy ngầm.
+
+## Hình ảnh thực tế
+![Giao diện Sidebar mới](file:///C:/Users/Cherry/.gemini/antigravity/brain/e0c0d4e9-d26d-431c-8f58-fb2e33949631/uploaded_media_1769244244939.png)
+> Giao diện Sidebar gọn gàng và chuyên nghiệp.
+
+## Hướng dẫn bảo trì
+- **Sửa lỗi treo**: Nếu server không khởi động được, hãy dùng nút **"Emergency Kill"** để dọn dẹp các tiến trình node cũ.
+- **Cấu hình**: Mọi thay đổi về Model hay API Key trong tab Settings sẽ được lưu trực tiếp vào file [.env](file:///I:/AIHub/claude-ws/.env) của server.
+
+---
+
+## 4. Watchdog - Tự động khởi động lại server
+
+Đảm bảo server luôn hoạt động, ngay cả khi bị crash hoặc máy tính vừa wake up từ sleep.
+
+- **Script**: [watchdog.vbs](file:///I:/AIHub/claude-ws/watchdog.vbs) kiểm tra trạng thái server mỗi 30 giây.
+- **Hoạt động**: Nếu không tìm thấy process `node.exe` chạy [server.ts](file:///I:/AIHub/claude-ws/server.ts), watchdog sẽ tự động gọi [start_hidden.vbs](file:///I:/AIHub/claude-ws/start_hidden.vbs).
+- **Startup**: [vinh-vien.vbs](file:///I:/AIHub/claude-ws/vinh-vien.vbs) khởi động watchdog thay vì server trực tiếp.
+
+---
+
+## 5. Dual-Update System (Mới)
+
+Hệ thống cập nhật kép cho phép cập nhật cả **Server** và **App Manager** ngay trong giao diện.
+
+### Server Update (claude-ws)
+- Kiểm tra phiên bản mới nhất từ [GitHub Releases](https://github.com/Claude-Workspace/claude-ws/releases).
+- Thực hiện `git pull` để cập nhật mã nguồn.
+- Rebuild server với `npm run build`.
+
+### Các files đã thay đổi
+| Component | File | Mô tả |
+|-----------|------|-------|
+| Main Process | [index.ts](file:///I:/AIHub/claude-manager/src/main/index.ts) | IPC handlers cho update |
+| Preload | [index.ts](file:///I:/AIHub/claude-manager/src/preload/index.ts) | Expose methods ra renderer |
+| Types | [env.d.ts](file:///I:/AIHub/claude-manager/src/renderer/src/env.d.ts) | TypeScript definitions |
+| UI Component | [UpdatePanel.tsx](file:///I:/AIHub/claude-manager/src/renderer/src/components/UpdatePanel.tsx) | Update panel UI |
+| App Layout | [App.tsx](file:///I:/AIHub/claude-manager/src/renderer/src/App.tsx) | Tích hợp UpdatePanel vào Settings |
+
+### Cách sử dụng
+1. Mở tab **Settings** trong Claude Manager.
+2. Xem phiên bản hiện tại của App và Server.
+3. Nhấn **Check Update** để kiểm tra phiên bản mới.
+4. Nếu có bản mới, nhấn **Update Now** để cập nhật server.
+
+---
+Dự án đã sẵn sàng để sử dụng hàng ngày!

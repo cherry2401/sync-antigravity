@@ -1,0 +1,5 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_OTHER",
+  "summary":  "Documentation of the fix applied to the 'Combine Post + Groups Data' node to resolve the 'No active groups found' error. Shows the before/after code comparison and provides testing steps.",
+  "updatedAt":  "2026-01-02T03:38:36.348272200Z"
+}

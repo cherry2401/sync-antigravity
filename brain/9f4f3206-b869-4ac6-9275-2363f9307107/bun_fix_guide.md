@@ -1,0 +1,58 @@
+# Fix: Bun.exe Auto-spawning in Wails Dev Mode
+
+## 🔍 Vấn đề
+Khi chạy `wails dev`, cửa sổ `bun.exe` cứ popup liên tục vì Wails tự động phát hiện bun trong global npm packages.
+
+## ✅ Nguyên nhân
+- Anh đã cài `bun@1.3.6` globally qua npm
+- Wails v2 auto-detect package manager theo thứ tự: **Bun** → pnpm → yarn → npm
+- Vì thế nó ưu tiên dùng bun thay vì npm
+
+## 🛠️ Giải pháp đã áp dụng
+
+### 1. Update `wails.json` (✅ Permanent Fix)
+Đã thêm field `"packagemanager": "npm"` và đổi commands thành `npm.cmd`:
+
+```json
+{
+  "packagemanager": "npm",
+  "frontend:install": "npm.cmd install --legacy-peer-deps",
+  "frontend:build": "npm.cmd run build",
+  "frontend:dev:watcher": "npm.cmd run dev"
+}
+```
+
+### 2. Created `run-dev.bat` (Alternative)
+Nếu vẫn gặp vấn đề, chạy file này thay vì `wails dev`:
+```batch
+set WAILS_PACKAGE_MANAGER=npm
+wails dev
+```
+
+### 3. Created `.env` file
+Đã tạo file `.env` trong project root:
+```env
+WAILS_PACKAGE_MANAGER=npm
+```
+
+## 🧪 Test
+Chạy lại:
+```bash
+cd I:\.app\Terminal
+wails dev
+```
+
+Hoặc:
+```bash
+.\run-dev.bat
+```
+
+## 💡 Bonus: Uninstall Bun (Optional)
+Nếu anh không dùng bun, có thể gỡ global package:
+```bash
+npm uninstall -g bun
+```
+
+---
+
+**Kết quả mong đợi:** Không còn cửa sổ bun.exe popup nữa! ✨

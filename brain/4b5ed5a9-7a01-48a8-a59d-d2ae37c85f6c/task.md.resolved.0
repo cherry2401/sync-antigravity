@@ -1,0 +1,21 @@
+# SORA Video Generation Workflow - Task List
+
+## Phase 1: Image to Video Workflow
+- [ ] Analyze API endpoints (Upload & Create)
+- [ ] Design workflow structure
+- [ ] Create implementation plan
+- [ ] Get user approval on plan
+- [ ] Implement Image to Video workflow
+- [ ] Test Image to Video workflow
+
+## Phase 2: Text to Video Workflow
+- [ ] Implement Text to Video workflow
+- [ ] Test Text to Video workflow
+
+## Phase 3: Remove Watermark (Future)
+- [ ] Wait for user to provide watermark removal method
+- [ ] Implement watermark removal for both workflows
+
+## Phase 4: Storage Integration
+- [ ] Determine storage solution (Drive or Local)
+- [ ] Implement storage integration

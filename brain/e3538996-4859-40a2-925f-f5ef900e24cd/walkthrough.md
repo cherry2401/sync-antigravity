@@ -1,0 +1,48 @@
+# Walkthrough - Client-Side Routing, Deployment, Security & Analytics
+
+## Goal
+Implement a complete web application with secure API endpoints, client-side routing, and a comprehensive analytics dashboard.
+
+## Changes
+
+### 1. Analytics & Reporting (New)
+To provide realistic and accurate data on user behavior:
+- **Database**: Created `analytics_events` table in Supabase.
+- **Service**: Implemented `analyticsService.ts` to log events (Download, Shopee Redirect, AI Usage).
+- **Dashboard**: Built a protected `/admin` page with:
+    - Comparison Charts (Downloads vs Shopee Clicks).
+    - Real-time event log.
+    - Summary metrics.
+- **Tracking**: Integrated hooks into `HomeVideoDownloader`, `ShopeeAffiliate`, and `AiWriter`.
+
+### 2. Security (Strict CORS)
+- **Middleware**: `functions/api/_middleware.ts` restricts API access to allowed domains only.
+- **Protection**: Blocks unauthorized websites from using the API.
+
+### 3. Application Structure
+- **Routing**: Client-side routing with `react-router-dom`.
+- **Deployment**: Automated `npm run deploy` script for Cloudflare Pages.
+
+## Admin Access
+To view reports, visit:
+`https://your-domain.com/admin`
+*(Password: `Linhvu@2401`)*
+
+**New Features:**
+- **Eye Icon**: Toggle password visibility.
+- **Remember Me**: Saves login session.
+- **Filters**: Show/Hide specific metrics (Downloads, Shopee, AI, Shortener).
+- **Tool Pie Chart**: Visual breakdown of which tools are being used (TikTok vs Insta vs Zing vs Xvideos).
+- **Full Tracking**: Now tracks Instagram, Zing, SoundCloud, XVideos, and Link Shortener.
+
+### 4. Admin Enhancements & Fixes
+- **Floating Admin Button**: A persistent shield icon 🛡️ for admins to quickly access the dashboard from anywhere.
+- **Xvideos Privacy**: Thumbnails are hidden/censored for guests but fully visible for Admins (Uncensored Mode).
+- **Mobile Download Fix**: Implemented a **Download Proxy** server to bypass Referer checks, ensuring video files download correctly on mobile devices effectively resolving HTML error pages.
+
+## Environment Setup
+Ensure your `.env` and Cloudflare Environment Variables include:
+```
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_ANON_KEY=...
+```

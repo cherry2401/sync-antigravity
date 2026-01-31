@@ -1,0 +1,15 @@
+# Nhiệm vụ: Cấu hình và Cài đặt Claude-ws
+
+## Cấu hình đã hoàn tất
+- [x] Cấu hình Claude Code CLI & VS Code Extension <!-- id: 0 -->
+- [x] Chạy claude-ws tại Local (Windows) <!-- id: 1 -->
+- [x] Thiết lập Cloudflare Tunnel truy cập từ xa <!-- id: 2 -->
+
+## Thiết lập chạy ngầm vĩnh viễn (Persistence)
+- [x] Đã dọn dẹp (Reset) tiến trình treo và lỗi EPERM <!-- id: 3 -->
+## Debug lỗi 502 & PM2
+- [/] Khắc phục lỗi EPERM của PM2 daemon <!-- id: 4 -->
+- [ ] Kiểm tra logs ứng dụng qua PM2 <!-- id: 5 -->
+- [ ] Xác minh cổng 8556 hoạt động <!-- id: 6 -->
+- [ ] Thiết lập chạy ẩn (Hidden) thành công <!-- id: 7 -->
+

@@ -1,0 +1,16 @@
+# Task: Tạo Workflow Đăng Bài Theo Lịch Vào Nhóm Facebook
+
+## Phân tích và lập kế hoạch
+- [/] Phân tích cấu trúc workflow hiện có
+- [ ] Thiết kế workflow mới dựa trên patterns đã tìm hiểu
+- [ ] Tạo implementation plan chi tiết
+- [ ] Trình bày kế hoạch cho USER review
+
+## Triển khai workflow
+- [ ] Tạo file JSON workflow mới
+- [ ] Cấu hình các nodes cần thiết
+- [ ] Tích hợp node custom "Create Group Post using Page"
+- [ ] Kiểm tra và validate cấu trúc
+
+## Hướng dẫn sử dụng
+- [ ] Tạo hướng dẫn cho USER về cách sử dụng workflow

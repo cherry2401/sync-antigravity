@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Implementation plan to fix custom n8n TikTok nodes including adding missing index files, improving error handling, updating package structure, and adding proper API endpoint capturing instructions",
+  "updatedAt": "2025-12-19T15:47:30.712580500Z"
+}

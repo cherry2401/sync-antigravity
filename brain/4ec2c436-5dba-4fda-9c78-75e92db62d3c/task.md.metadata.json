@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_TASK",
+  "summary": "Finalized the Extreme HMR fix by migrating all communication files to the system AppData folder. This completely isolates the app from Vite's HMR reloads. Updated all components to use dynamic paths and fixed the chat message race condition.",
+  "updatedAt": "2026-01-20T05:44:45.079697500Z",
+  "version": "48"
+}

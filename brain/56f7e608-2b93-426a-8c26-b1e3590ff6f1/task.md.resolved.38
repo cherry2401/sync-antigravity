@@ -1,0 +1,24 @@
+# Phase 2: Connect Admin Builder to Database
+
+## Task Checklist
+
+### Step 1: Server Actions
+- [ ] Create `lib/actions/storefront.ts`
+- [ ] Implement `savePageConfig()` with file storage
+- [ ] Implement `getPageConfig()` with default fallback
+- [ ] Create `data/storefront.json` placeholder
+
+### Step 2: Admin Preview Integration
+- [ ] Import BlockRenderer into Admin Builder
+- [ ] Replace canvas with scaled real preview
+- [ ] Add CSS transformation for desktop simulation
+- [ ] Wire up load on mount (`useEffect`)
+- [ ] Wire up save button to `savePageConfig()`
+
+### Step 3: Homepage Dynamic Loading
+- [ ] Convert [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/page.tsx) to async server component
+- [ ] Call `getPageConfig()` instead of hardcoded blocks
+
+### Step 4: Verification
+- [ ] Test save/load cycle
+- [ ] Verify homepage updates on save

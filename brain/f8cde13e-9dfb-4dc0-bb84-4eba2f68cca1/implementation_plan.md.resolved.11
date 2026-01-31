@@ -1,0 +1,168 @@
+# Extension Token Capture - Implementation Plan
+
+## Overview
+
+Replace OmoCaptcha approach with Chrome Extension auto-capture of reCAPTCHA tokens directly from VEO3 browser page.
+
+**Why This Works**:
+- Token generated from **real browser session** = 100% valid
+- No cost (free)
+- No captcha solving delay
+- Token automatically refreshed
+
+---
+
+## Extension Code
+
+### Add to `content.js` or create new file
+
+```javascript
+// token-capture.js
+
+const DATA_TABLE_WEBHOOK = 'YOUR_N8N_WEBHOOK_URL_HERE';
+
+// Function to capture and send token
+async function captureRecaptchaToken() {
+  // Only run on VEO3 page
+  if (!window.location.href.includes('labs.google/fx/tools/veo3')) {
+    return;
+  }
+  
+  const tokenInput = document.getElementById('recaptcha-token');
+  
+  if (tokenInput && tokenInput.value) {
+    const token = tokenInput.value;
+    
+    try {
+      await fetch(DATA_TABLE_WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recaptchaToken: token,
+          timestamp: new Date().toISOString()
+        })
+      });
+      
+      console.log('[VEO3] Token captured and sent:', token.substring(0, 20) + '...');
+    } catch (error) {
+      console.error('[VEO3] Failed to send token:', error);
+    }
+  }
+}
+
+// Auto-refresh token every 10 seconds
+if (window.location.href.includes('labs.google/fx/tools/veo3')) {
+  console.log('[VEO3] Token auto-capture started');
+  
+  // Capture immediately
+  setTimeout(captureRecaptchaToken, 2000);
+  
+  // Then every 10 seconds
+  setInterval(captureRecaptchaToken, 10000);
+}
+```
+
+---
+
+## Data Table Setup
+
+### Create Webhook in n8n
+
+1. **Add Webhook node** to workflow
+2. **Method**: POST
+3. **Path**: `/veo3-token` (or any path)
+4. **Response**: Return success
+5. **Copy webhook URL** → Paste vào extension code
+
+### Update Data Table
+
+Add/update row with columns:
+- `VEO3_RecaptchaToken`: Token value from webhook
+- `TokenTimestamp`: When token was captured
+
+---
+
+## Workflow Simplification
+
+### Remove Nodes:
+- ❌ IF Check Captcha Error
+- ❌ Solve Captcha
+- ❌ Wait 15s
+- ❌ Get Result
+- ❌ All counter/retry logic
+
+### New Flow:
+
+```
+Telegram Trigger
+  ↓
+Read Data (get token from table)
+  ↓
+Edit Fields (add recaptchaToken to fields)
+  ↓
+Create VEO3 (with token from table)
+  ↓
+Continue normal flow
+```
+
+### Update "Edit Fields" Node
+
+Add field:
+```json
+{
+  "recaptchaToken": "{{ $('Read Data').first().json.VEO3_RecaptchaToken }}"
+}
+```
+
+### Update "Create VEO3" JSON Body
+
+```javascript
+{{
+  JSON.stringify({
+    "clientContext": {
+      "sessionId": ";" + $json.sessionId,
+      "projectId": $json.projectId,
+      "tool": "PINHOLE",
+      "userPaygateTier": "PAYGATE_TIER_TWO",
+      "recaptchaToken": $json.recaptchaToken
+    },
+    "requests": [{
+      "aspectRatio": $json.aspectRatio,
+      "seed": Math.floor(Math.random() * 10000),
+      "textInput": { "prompt": $json.prompt },
+      "videoModelKey": $json.videoModelKey,
+      "metadata": { "sceneId": $json.sceneId }
+    }]
+  })
+}}
+```
+
+---
+
+## Testing Steps
+
+1. **Load extension** với code mới
+2. **Mở VEO3**: https://labs.google/fx/tools/veo3
+3. **Check console**: Xem log "Token captured"
+4. **Check Data Table**: Token đã được update
+5. **Test workflow**: Gửi Telegram message
+6. **Verify**: Video generation success
+
+---
+
+## Benefits
+
+✅ **100% token validity** - From real browser  
+✅ **No cost** - No OmoCaptcha fees  
+✅ **Fast** - No solving delay  
+✅ **Auto-refresh** - Token always fresh  
+✅ **Simple workflow** - Much fewer nodes
+
+---
+
+## Next Steps
+
+1. Get n8n webhook URL
+2. Update extension code
+3. Remove OmoCaptcha nodes
+4. Test!

@@ -1,0 +1,5 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_OTHER",
+  "summary":  "Solution to fix the missing loop structure for processing multiple groups sequentially in the Group posting flow",
+  "updatedAt":  "2026-01-03T06:56:56.575800800Z"
+}

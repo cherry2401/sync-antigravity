@@ -1,0 +1,32 @@
+# Triển khai Hệ thống Địa chỉ Việt Nam
+
+## Giải pháp
+- **Tỉnh/Quận/Phường**: `provinces.open-api.vn` (FREE, đầy đủ 63 tỉnh)
+- **Đường/Phố**: Google Places Autocomplete (FREE tier $200/tháng)
+
+---
+
+## Proposed Changes
+
+### lib/vietnamAddress.ts
+#### [NEW] [vietnamAddress.ts](file:///i:/Website/BDS/src/lib/vietnamAddress.ts)
+API helper cho provinces.open-api.vn
+
+---
+
+### hooks/useVietnamAddress.ts  
+#### [NEW] [useVietnamAddress.ts](file:///i:/Website/BDS/src/hooks/useVietnamAddress.ts)
+Custom hook quản lý cascading dropdowns
+
+---
+
+### components/property/PostingForm.tsx
+#### [MODIFY] [PostingForm.tsx](file:///i:/Website/BDS/src/components/property/PostingForm.tsx)
+- Xóa mock data (PROVINCES, MOCK_WARDS, MOCK_STREETS)
+- Tích hợp useVietnamAddress hook
+- Thêm Google Places cho input Đường/Phố
+
+---
+
+## Verification Plan
+Test trực tiếp trên form đăng tin: đủ 63 tỉnh, cascading hoạt động, Places gợi ý đường

@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "Cập nhật hướng dẫn cài đặt sử dụng NSSM (Windows Service) thay vì Task Scheduler để đảm bảo ổn định và chạy ẩn hoàn toàn.",
+  "updatedAt": "2026-01-26T04:41:02.313604Z",
+  "version": "1"
+}

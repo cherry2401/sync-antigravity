@@ -1,0 +1,12 @@
+# Nhiệm vụ: Cấu hình và Cài đặt Claude-ws
+
+## Cấu hình đã hoàn tất
+- [x] Cấu hình Claude Code CLI & VS Code Extension <!-- id: 0 -->
+- [x] Thiết kế bản đặc tả hệ thống Docker (Alpine) <!-- id: 1 -->
+- [x] Kiểm tra Node.js v22.17.0 (Đáp ứng yêu cầu v20+) <!-- id: 2 -->
+
+## Thực hiện Chạy claude-ws tại Local (Windows)
+- [/] Chạy claude-ws qua npx <!-- id: 3 -->
+- [ ] Thiết lập Cloudflare Tunnel cho local (nếu cần truy cập từ xa) <!-- id: 4 -->
+- [ ] Xác minh truy cập file local qua Kanban Web <!-- id: 5 -->
+

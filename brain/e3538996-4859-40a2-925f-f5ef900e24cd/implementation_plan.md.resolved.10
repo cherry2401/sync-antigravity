@@ -1,0 +1,84 @@
+# Implement Xvideos Tool
+
+## Goal
+Add a comprehensive Xvideos tool containing "Download" (from URL) and "Search" (by keyword) functionalities.
+
+## Architecture
+`Frontend` -> `Cloudflare Function` -> `n8n Webhook` -> `External API (api.satoru.click)`
+
+## Components
+
+### 1. n8n Workflow (`Xvideos API.json`)
+- **Trigger**: Webhook POST `/xvideos`
+- **Logic**: Switch node based on `body.action`:
+    - Case [download](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/ShortenForm.tsx#58-85): GET `https://api.satoru.click/api/xvideos/download?url={url}`
+    - Case `search`: GET `https://api.satoru.click/api/xvideos?q={query}`
+- **Response**: JSON result.
+
+### 2. Cloudflare Function ([functions/api/xvideos.ts](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/functions/api/xvideos.ts))
+- Proxy to n8n webhook defined in `N8N_XVIDEOS_WEBHOOK_URL`.
+
+### 3. Frontend Component ([src/components/XvideosDownload.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/XvideosDownload.tsx))
+- **State**: `mode` ('download' | 'search').
+- **UI - Download Mode**:
+    - Input URL.
+    - Result: Title, Thumbnail, Video Player (if possible), Download Buttons (Low/High).
+- **UI - Search Mode**:
+    - Input Keyword.
+    - Grid Result: Thumbnails, Titles, Duration.
+    - Interaction: Clicking a result switches to Download mode or directly fetches download links.
+
+### 4. App Integration ([src/App.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/App.tsx))
+- Add "Xvideos" to the Tool Switcher.
+
+# Implement SoundCloud Tool
+
+## Goal
+Add SoundCloud music downloader tool.
+
+## Architecture
+`Frontend` -> `Cloudflare Function` -> `n8n Webhook` -> `External API (api.satoru.click)`
+
+## Components
+
+### 1. n8n Workflow (`SoundCloud Download API.json`)
+- **Trigger**: Webhook POST `/soundcloud`
+- **Action**: GET `https://api.satoru.click/api/soundcloud/download?url={url}`
+- **Response**: JSON result (Track info + Download links).
+
+### 2. Cloudflare Function ([functions/api/soundcloud.ts](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/functions/api/soundcloud.ts))
+- Proxy to n8n webhook defined in `N8N_SOUNDCLOUD_WEBHOOK_URL`.
+
+### 3. Frontend Component ([src/components/SoundCloudDownload.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/SoundCloudDownload.tsx))
+- Input URL.
+- Display Track Info: Artwork, Title, Artist, Plays/Likes stats.
+- Download Buttons: Filter `download_links` for `progressive` (MP3) or valid audio streams.
+
+### 4. App Integration ([src/App.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/App.tsx))
+- Add "SoundCloud" tab between "Zing MP3" and "Xvideos".
+
+## Dependencies
+- Lucide icons (`Music`, `Headphones`, etc.)
+
+# Mobile Optimization
+
+## Goal
+Optimize layout for mobile devices to fix clutter and improve UX.
+
+## Changes
+
+### 1. [src/components/Header.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/Header.tsx)
+- **Layout**: Change from `flex-col` to `flex-row` on mobile.
+- **Hamburger Menu**: Add `Menu` icon for mobile.
+- **Mobile Drawer**: Slide-out menu containing Navigation, Language, and Theme controls.
+- **Logo**: Adjust font size for mobile.
+
+### 2. [src/App.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/App.tsx)
+- **Tool Switcher**: Convert to horizontal scrollable list (`overflow-x-auto`) on mobile to prevent wrapping/stacking.
+- **Typography**: Reduce main title size on mobile (`text-3xl` -> `text-2xl`).
+
+
+## Dependencies
+- `react-player` (optional, or just use native `<video>`).
+- Existing `lucide-react` icons.
+

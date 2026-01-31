@@ -1,0 +1,22 @@
+# Extension Token Capture - Implementation
+
+## Extension Update
+- [ ] Add token capture function to extension
+- [ ] Setup auto-refresh timer (every 10s)
+- [ ] Send token to Data Table webhook
+- [ ] Test token capture on VEO3
+
+## Workflow Cleanup
+- [ ] Remove all OmoCaptcha nodes (Solve, Wait, Get Result)
+- [ ] Remove IF Check Captcha node
+- [ ] Update Create VEO node to use token from Data Table
+- [ ] Simplify flow
+
+## Data Table Setup
+- [ ] Add column: `VEO3_RecaptchaToken`
+- [ ] Setup webhook to receive token from extension
+
+## Testing
+- [ ] Test extension captures token
+- [ ] Test workflow uses token successfully
+- [ ] Verify video generation works

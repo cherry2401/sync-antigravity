@@ -1,0 +1,51 @@
+# Hướng dẫn cấu hình Claude Code với cliproxy (Hoàn chỉnh)
+
+## Tóm tắt
+
+Bạn đã cấu hình thành công Claude Code (cả CLI và VS Code Extension) để sử dụng cliproxy tại `http://192.168.1.145:8317`.
+
+## Điểm quan trọng
+
+> [!IMPORTANT]
+> **Claude Code CLI** và **Claude Code for VS Code Extension** đều đọc cấu hình từ **cùng một file**: [C:\Users\Cherry\.claude\settings.json](file:///Users/Cherry/.claude/settings.json)
+
+Điều này có nghĩa là bạn chỉ cần cấu hình **một lần duy nhất** trong file `.claude/settings.json` và cả hai sẽ hoạt động!
+
+## Cấu hình hiện tại
+
+File [.claude/settings.json](file:///C:/Users/Cherry/.claude/settings.json):
+```json
+{
+  "ANTHROPIC_AUTH_TOKEN": "claude-clia",
+  "ANTHROPIC_BASE_URL": "http://192.168.1.145:8317",
+  "ANTHROPIC_MODEL": "gemini-claude-sonnet-4-5"
+}
+```
+
+## Cách sử dụng
+
+### 1. Claude Code CLI
+Mở Terminal và chạy:
+```powershell
+claude
+```
+
+### 2. Claude Code Extension trong VS Code
+- Nhấn `Ctrl + Escape` để mở Claude Code
+- Hoặc click icon Claude ở góc phải trên cùng
+- Extension sẽ tự động sử dụng cấu hình từ `.claude/settings.json`
+
+## Xác minh kết nối
+
+Để kiểm tra Claude Code có đang dùng đúng proxy không:
+```powershell
+claude --debug api
+```
+
+Trong log, bạn sẽ thấy URL bắt đầu bằng `http://192.168.1.145:8317...` thay vì địa chỉ Anthropic mặc định.
+
+## Lưu ý
+
+- **Không cần** thiết lập biến môi trường (`CLAUDE_BASE_URL`, `ANTHROPIC_API_KEY`)
+- **Không cần** cấu hình riêng trong VS Code Settings
+- Chỉ cần duy trì file `.claude/settings.json` là đủ cho cả CLI và Extension

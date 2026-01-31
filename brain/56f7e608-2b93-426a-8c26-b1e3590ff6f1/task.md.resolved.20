@@ -1,0 +1,10 @@
+# PDP Upgrade Task
+
+## Progress
+- [x] Create ProductAccordion component
+- [x] Add Sticky Bottom Bar (mobile)
+- [x] Modify PDP page to use accordion
+- [x] Move Related Products above Reviews
+- [x] Add pagination to Reviews
+- [/] Testing and verification
+

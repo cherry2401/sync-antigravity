@@ -1,0 +1,32 @@
+# Walkthrough: Quản Lý Nội Dung Trang Chủ
+
+## Tính năng đã triển khai
+
+### 1. Quản lý địa điểm (Admin → Địa điểm)
+- Xem danh sách các địa điểm với ảnh thumbnail
+- Chọn địa điểm làm **card lớn** (icon ngôi sao)
+- Thay đổi ảnh bằng URL hoặc upload từ máy
+
+![Trang quản lý địa điểm](file:///C:/Users/Cherry/.gemini/antigravity/brain/5f5070e7-8cc4-4698-aecc-dbf14097d590/admin_locations_page_1768197129901.png)
+
+---
+
+### 2. Cài đặt trang chủ (Admin → Cài đặt trang chủ)
+- Xem preview banner hiện tại
+- Thay đổi banner bằng URL
+- Upload ảnh từ máy tính
+- Nút "Tạo bằng AI" (placeholder)
+
+![Trang cài đặt banner](file:///C:/Users/Cherry/.gemini/antigravity/brain/5f5070e7-8cc4-4698-aecc-dbf14097d590/admin_settings_page_1768197144172.png)
+
+---
+
+## Files đã tạo/sửa
+- [AdminLocations.tsx](file:///i:/Website/BDS/src/components/admin/AdminLocations.tsx) - Trang quản lý địa điểm
+- [AdminSettings.tsx](file:///i:/Website/BDS/src/components/admin/AdminSettings.tsx) - Trang cài đặt banner
+- [AdminLayout.tsx](file:///i:/Website/BDS/src/components/admin/AdminLayout.tsx) - Thêm 2 menu mới
+- [AdminDashboard.tsx](file:///i:/Website/BDS/src/components/admin/AdminDashboard.tsx) - Render 2 tabs mới
+
+## Cần làm tiếp
+- Tạo bảng `locations` và `site_settings` trong Supabase
+- Kết nối HomePage với dữ liệu từ database

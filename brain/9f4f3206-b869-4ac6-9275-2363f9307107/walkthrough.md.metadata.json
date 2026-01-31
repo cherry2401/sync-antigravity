@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary": "Comprehensive walkthrough of the Vortex Terminal project. Details the technical implementation using Wails v2, ConPTY, and xterm.js. Highlights key features like frameless design, multi-tab support, and built-in SSH client. Includes instructions for running the application and verifying Vietnamese Unicode support. Provides a summary of the technical challenges overcome during development.",
+  "updatedAt": "2026-01-26T12:14:28.935343900Z"
+}

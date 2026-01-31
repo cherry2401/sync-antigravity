@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Detailed plan for implementing Create Product logic: updating Prisma schema, adding server actions, and integrating Cloudinary upload in React Hook Form.",
+  "updatedAt": "2026-01-15T11:27:01.156901Z",
+  "version": "11"
+}

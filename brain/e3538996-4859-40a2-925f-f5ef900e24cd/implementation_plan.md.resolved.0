@@ -1,0 +1,227 @@
+# Thêm Tính Năng Tải Video Shopee
+
+## Mục tiêu
+
+Mở rộng workflow **Telegram Video Download** để hỗ trợ tải video từ Shopee ngoài các nền tảng hiện có (TikTok, Facebook, Instagram, YouTube, Twitter, v.v.)
+
+## Phân tích Workflow Hiện tại
+
+### Luồng xử lý chính:
+1. **Telegram Trigger** → nhận message từ user
+2. **Extract URL** → extract URL và detect platform
+3. **Call API** → gọi API `https://api.satoru.click/api/downall`
+4. **Parse Response** → parse response từ API Satoru
+5. **Download Video** → tải video từ link
+6. **Check File Size** → kiểm tra size (<200MB)
+7. **Send Video** → gửi video qua Telegram hoặc thông báo lỗi
+
+### API Shopee mới:
+- **Endpoint**: `https://4anm.top/get_download_shopee.php`
+- **Method**: `POST`
+- **Content-Type**: `application/json`
+- **Request Payload**:
+  ```json
+  {
+    "token": "FDBMm8KafHCP3rdi7zvKgXhTZ09mSitNbG5yQ2dRQlloWlpyNjBsNVA2TmxDb25IMDE5a0RKUU00QkxQa24zVTVPVC9DU1IwUWxYcjRJNGczbW1KOGNqRDhMS1YxamZSNGdIQUdBPT0=",
+    "urls": ["https://sv.shopee.vn/share-video/..."]
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "download_link": ["https://down-tx-vn.vod.susercontent.com/..."],
+    "message": "Getting download urls completed",
+    "error": false
+  }
+  ```
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Token API cố định**: Token trong request hiện tại là giá trị hard-coded. Cần xác nhận:
+> - Token này có expire không?
+> - Có cần cơ chế refresh token không?
+> - Nếu token hết hạn, bạn có cần tôi thêm mechanism để update token dễ dàng không?
+
+---
+
+## Proposed Changes
+
+### Node 1: [MODIFY] [Extract URL](file:///i:/Workflow/n8n/Workflow/Backups/Telegram%20Video%20Download.json#L32-L43)
+
+**Thay đổi**: Thêm Shopee vào danh sách platform detection
+
+**Chi tiết**:
+- Thêm domain mapping cho Shopee:
+  ```javascript
+  'sv.shopee.vn': 'shopee',
+  'shopee.vn': 'shopee',
+  'shopee.com.vn': 'shopee'
+  ```
+- Output sẽ bao gồm `platform: 'shopee'` khi detect URL Shopee
+
+---
+
+### Node 2: [NEW] Switch Platform
+
+**Vị trí**: Sau node `Extract URL`, trước node `Call API`
+
+**Mục đích**: Phân luồng giữa Shopee và các platform khác
+
+**Cấu hình**:
+- **Route 1 (Shopee)**: `{{ $json.platform === 'shopee' }}`
+- **Route 2 (Others)**: `{{ $json.platform !== 'shopee' }}`
+
+---
+
+### Node 3: [NEW] Call Shopee API
+
+**Type**: `HTTP Request`
+
+**Cấu hình**:
+- **Method**: `POST`
+- **URL**: `https://4anm.top/get_download_shopee.php`
+- **Headers**:
+  - `Content-Type: application/json`
+- **Body**:
+  ```json
+  {
+    "token": "FDBMm8KafHCP3rdi7zvKgXhTZ09mSitNbG5yQ2dRQlloWlpyNjBsNVA2TmxDb25IMDE5a0RKUU00QkxQa24zVTVPVC9DU1IwUWxYcjRJNGczbW1KOGNqRDhMS1YxamZSNGdIQUdBPT0=",
+    "urls": ["{{ $json.videoUrl }}"]
+  }
+  ```
+- **Options**:
+  - Retry on fail: `true`
+  - Wait between tries: `3000ms`
+  - Max tries: `5`
+
+---
+
+### Node 4: [NEW] Parse Shopee Response
+
+**Type**: `Code (JavaScript)`
+
+**Mục đích**: Chuyển đổi response của Shopee API sang format giống Satoru API để tương thích với flow hiện tại
+
+**Logic**:
+```javascript
+const response = $input.first().json;
+const chatId = $('Extract URL').item.json.chatId;
+
+try {
+  if (response.error === false && response.download_link && response.download_link.length > 0) {
+    return [{
+      json: {
+        chatId: chatId,
+        downloadUrl: response.download_link[0],
+        title: 'Shopee Video',
+        quality: 'HD',
+        author: '',
+        thumbnail: ''
+      }
+    }];
+  }
+  
+  throw new Error('❌ Không tải được video Shopee');
+  
+} catch (error) {
+  return [{
+    json: {
+      error: true,
+      chatId: chatId,
+      message: error.message
+    }
+  }];
+}
+```
+
+---
+
+### Node 5: [MODIFY] [Parse Response](file:///i:/Workflow/n8n/Workflow/Backups/Telegram%20Video%20Download.json#L68-L79)
+
+**Thay đổi**: Không cần thay đổi, vì `Parse Shopee Response` đã convert sang format tương thích
+
+---
+
+### Node 6: [MODIFY] [Download Video](file:///i:/Workflow/n8n/Workflow/Backups/Telegram%20Video%20Download.json#L135-L157)
+
+**Thay đổi**: Sửa expression để lấy download URL từ `Parse Response` thay vì hard-code
+
+**Hiện tại**:
+```javascript
+{{ $('Call API').item.json.data.attachment[0].url }}
+```
+
+**Mới**:
+```javascript
+{{ $('Parse Response').item.json.downloadUrl }}
+```
+
+---
+
+## Sơ đồ luồng mới
+
+```mermaid
+graph LR
+    A[Telegram Trigger] --> B[Extract URL]
+    B --> C{Switch Platform}
+    
+    C -->|Shopee| D[Call Shopee API]
+    C -->|Others| E[Call API Satoru]
+    
+    D --> F[Parse Shopee Response]
+    E --> G[Merge Response]
+    
+    F --> H[Check Error]
+    G --> I[Parse Response]
+    I --> H
+    
+    H -->|Error| J[Send Error]
+    H -->|Success| K[Download Video]
+    
+    K --> L[Prepare Send Data]
+    L --> M{Check File Size}
+    
+    M -->|Too Large| N[Send Too Large]
+    M -->|OK| O[Send Video]
+```
+
+---
+
+## Verification Plan
+
+### Automated Tests
+
+1. **Test với URL Shopee hợp lệ**:
+   - Input: `https://sv.shopee.vn/share-video/5gXZYYJnBwDSkd0xAAAAAA==?c=share_web&contentType=0&fromShareLink=share-marker&fromSource=copy_link&jumpType=share&myVideo=false&pid=sv&shareUserId=1271922156&share_obj=video&smtt=0.0.9&stm_medium=referral&stm_source=rw&uls_trackid=54jc31r800li`
+   - Expected: Download và gửi video thành công qua Telegram
+
+2. **Test với URL TikTok** (để đảm bảo không ảnh hưởng flow cũ):
+   - Input: URL TikTok bất kỳ
+   - Expected: Flow cũ vẫn hoạt động bình thường
+
+3. **Test error handling**:
+   - Input: URL Shopee không hợp lệ
+   - Expected: Nhận được thông báo lỗi
+
+### Manual Verification
+
+- Kiểm tra video được gửi qua Telegram có đúng không
+- Kiểm tra quality video có OK không
+- Kiểm tra caption có hiển thị đúng không
+
+---
+
+## Checklist
+
+- [ ] Cập nhật node `Extract URL` để detect Shopee
+- [ ] Tạo node `Switch Platform`
+- [ ] Tạo node `Call Shopee API`
+- [ ] Tạo node `Parse Shopee Response`
+- [ ] Sửa node `Download Video` để dùng dynamic URL
+- [ ] Kết nối các node theo sơ đồ
+- [ ] Test với URL Shopee
+- [ ] Test với URL platform khác (TikTok/Facebook)
+- [ ] Test error cases

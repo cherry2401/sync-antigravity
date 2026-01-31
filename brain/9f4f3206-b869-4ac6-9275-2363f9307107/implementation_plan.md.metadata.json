@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Comprehensive implementation plan for Vortex Terminal - a modern Windows terminal emulator. Covers tech stack (Wails v2 + React + ConPTY + SSH), project structure, backend components (ConPTY wrapper, SSH client), frontend components (TerminalView, TabManager, Titlebar, SSHModal), data flow architecture, UTF-8 Vietnamese support, and verification plan with manual testing steps.",
+  "updatedAt": "2026-01-26T11:37:52.097195200Z"
+}

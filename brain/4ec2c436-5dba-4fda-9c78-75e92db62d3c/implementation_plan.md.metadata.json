@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Updated implementation plan to migrate communication files to the system AppData folder. This will completely isolate them from Vite's HMR and ensure absolute stability. Also includes fixes for chat message race conditions.",
+  "updatedAt": "2026-01-20T05:40:20.927509500Z",
+  "version": "16"
+}

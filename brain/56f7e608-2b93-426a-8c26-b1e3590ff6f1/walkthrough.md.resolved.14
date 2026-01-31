@@ -1,0 +1,63 @@
+# Product Listing Page - Walkthrough
+
+## Tổng quan
+Đã triển khai trang `/san-pham` với bộ lọc nâng cao qua URL SearchParams.
+
+---
+
+## Architecture
+
+```mermaid
+graph LR
+    A[URL: /san-pham?brand=X] --> B[page.tsx Server]
+    B --> C[getFilteredProducts]
+    C --> D[ProductListingClient]
+    D --> E[ProductFilters + ProductGrid]
+```
+
+---
+
+## Files đã tạo
+
+| File | Mô tả |
+|------|-------|
+| [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/san-pham/page.tsx) | Server Component, đọc searchParams |
+| [ProductListingClient.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/san-pham/ProductListingClient.tsx) | Layout 2 cột + mobile sheet |
+| [ProductFilters.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/shop/ProductFilters.tsx) | Sidebar filters với debounce |
+| [ProductGrid.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/shop/ProductGrid.tsx) | Grid + pagination + skeleton |
+| [useProductFilter.ts](file:///i:/Website/MyphamHaKi/app-src/src/hooks/useProductFilter.ts) | Hook URL management |
+
+---
+
+## Features
+
+| Feature | Status |
+|---------|--------|
+| Category filter | ✅ |
+| Brand checkboxes | ✅ |
+| Price range inputs | ✅ Debounce 500ms |
+| Sort dropdown | ✅ 5 options |
+| Pagination | ✅ |
+| Mobile drawer | ✅ |
+| Skeleton loading | ✅ |
+| URL-based (SEO) | ✅ |
+
+---
+
+## Screenshots
+
+### Desktop View
+![Desktop view showing sidebar and product grid](file:///C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/.system_generated/click_feedback/click_feedback_1768367195616.png)
+
+### Mobile View  
+![Mobile view with filter button and drawer](file:///C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/.system_generated/click_feedback/click_feedback_1768367239769.png)
+
+---
+
+## Test Flow
+
+1. Vào `/san-pham` → Hiển thị tất cả sản phẩm
+2. Click filter category → URL: `?category=cham-soc-da`
+3. Tick brand checkbox → URL: `?brand=the-ordinary`
+4. Nhập giá min/max → Debounce 500ms → URL update
+5. Mobile: Nút "Bộ lọc" → Drawer mở ra

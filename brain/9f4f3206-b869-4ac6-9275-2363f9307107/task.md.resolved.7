@@ -1,0 +1,43 @@
+# Vortex Terminal - Task Checklist
+
+## Phase 1: Project Setup ✅
+- [x] Initialize Wails v2 project
+- [x] Configure TailwindCSS
+- [x] Setup folder structure
+
+## Phase 2: Frontend Development ✅
+- [x] Install xterm.js and addons
+- [x] Create TerminalView component
+- [x] Create TabManager component
+- [x] Create frameless Titlebar
+- [x] Create SSH modal
+
+## Phase 3: ConPTY Integration ✅
+- [x] Integrate ConPTY library
+- [x] Create PTY session manager
+- [x] Bidirectional streaming
+- [x] UTF-8 encoding
+
+## Phase 4: SSH Module ✅
+- [x] SSH connection with golang.org/x/crypto/ssh
+- [x] SSH session manager
+- [x] Stream SSH output
+
+## Phase 5: Feature Integration ✅
+- [x] Bind Go functions to frontend
+- [x] Terminal resize handler
+- [x] Multi-tab session management
+- [x] Vietnamese Input Helper (Ctrl+Shift+I)
+
+## Phase 6: UI/UX Overhaul (Tabby Style) ✅
+- [x] Deep Night color palette (#131313, #0f0f1f, #3d5afe)
+- [x] Chrome-style tabs in titlebar
+- [x] Win11 window controls (-, □, ×)
+- [x] Keyboard shortcuts (Ctrl+T, Ctrl+W)
+- [x] Empty state with logo
+- [x] Lucide icons integration
+- [x] **RECOLOR**: Titlebar to #282a36 (Purple Grey) & Tabs to #44475a
+
+## Phase 7: Testing ✅
+- [x] Build for Windows
+- [x] Manual testing verified

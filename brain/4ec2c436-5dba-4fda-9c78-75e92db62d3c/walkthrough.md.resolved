@@ -1,0 +1,39 @@
+# Walkthrough - Watcher Stability & AppData Migration 🚁✅
+
+I have implemented a robust solution to the "Stopping inbound file watcher" issue by migrating all transient communication files to the system's `AppData` directory. This ensures that Vite's development server never sees these file changes, preventing unnecessary Hot Module Replacement (HMR) reloads and component restarts.
+
+## Key Accomplishments
+
+### 1. AppData Migration (Vite HMR Isolation) 🛡️
+All communication files (`inbound_chat.json`, `outbound_chat.json`, `cdp_inbound.json`, `cdp_outbound.json`, [chopper_logs.json](file:///f:/Python/OpenSSH/clawdbot-client/chopper_logs.json)) have been moved from the project workspace to the user's local AppData folder.
+- **Electron Main**: Exposed `system:getCommDir` to provide the `userData` path.
+- **Preload**: Added [getCommDir](file:///f:/Python/OpenSSH/clawdbot-client/electron/preload.ts#41-42) to the `electronAPI` interface.
+- **Refactor**: All components ([App](file:///f:/Python/OpenSSH/clawdbot-client/src/App.tsx#18-211), [ChatPanel](file:///f:/Python/OpenSSH/clawdbot-client/src/components/ChatPanel.tsx#183-445), [ChopperLogs](file:///f:/Python/OpenSSH/clawdbot-client/src/components/ChopperLogs.tsx#12-189)) and services ([BrowserRelay](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/browserRelay.ts#61-676)) now fetch and use this dynamic path.
+
+### 2. Global Watcher Stability 🚁
+The inbound message watcher is now hosted in the top-level [App.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/App.tsx).
+- It starts exactly **once** on application load.
+- It remains active and stable regardless of which tab you select (Chat, Logs, etc.).
+- I added a "Watcher Active" system message to confirm it's running.
+
+### 3. Extension Auto-Reconnect 🔌
+Modified the Chrome extension's [background.js](file:///f:/Python/OpenSSH/chrome-extension/background.js) to proactively check its connection to the App's relay server.
+- **Heartbeat**: Every 5 seconds, the extension checks if the WebSocket is open.
+- **Auto-Reconnect**: If the connection is lost (due to an app restart), it silently reconnects and re-attaches to the active tab.
+
+### 4. Logic & UI Polish ✨
+- **Race Condition Fix**: Ensured the "Watcher Active" message only appears *after* the initial chat session is ready.
+- **Cleanup**: Deleted the now-redundant `data/` folder from the project root.
+- **Documentation**: Updated [CHOPPER_GUIDE.md](file:///f:/Python/OpenSSH/clawdbot-client/CHOPPER_GUIDE.md) with instructions on where to find the new communication files.
+
+## Visual Proof
+
+### Global Watcher Persistence
+The watcher starts once and persists across tab switches:
+![Watcher Global Init](file:///C:/Users/Cherry/.gemini/antigravity/brain/4ec2c436-5dba-4fda-9c78-75e92db62d3c/watcher_init_111111.png)
+> Note: The "Inbound Watcher Active" message now appears reliably after the chat session loads.
+
+## Next Steps
+- You can now use the app without any "Start/Stop" log loops.
+- All chat history and watcher state will remain stable during development and usage.
+- Chopper should be pointed to the new AppData paths as described in [CHOPPER_GUIDE.md](file:///f:/Python/OpenSSH/clawdbot-client/CHOPPER_GUIDE.md).

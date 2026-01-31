@@ -1,0 +1,238 @@
+# Walkthrough: Thêm Tính Năng Tải Video Shopee
+
+## Tóm tắt
+
+Đã thành công thêm tính năng tải video Shopee vào workflow [Telegram Video Download V2](file:///i:/Workflow/n8n/Workflow/Backups/Telegram%20Video%20Download%20V2.json). Workflow giờ đây hỗ trợ tải video từ Shopee ngoài các platform hiện có (TikTok, Facebook, Instagram, YouTube, v.v.)
+
+---
+
+## Changes Made
+
+### 1. Updated Node: `Extract URL`
+
+**Thay đổi**: Thêm Shopee vào platform detection
+
+**Chi tiết**:
+- Thêm 3 domain mappings cho Shopee:
+  ```javascript
+  'sv.shopee.vn': 'shopee',
+  'shopee.vn': 'shopee',
+  'shopee.com.vn': 'shopee'
+  ```
+- Khi user gửi URL Shopee, node sẽ output `platform: 'shopee'`
+
+---
+
+### 2. New Node: `Switch Platform`
+
+**Type**: `If` (Conditional)
+
+**Mục đích**: Phân luồng giữa Shopee và các platform khác
+
+**Logic**:
+- **Route 1 (True)**: `platform === 'shopee'` → đi tới `Call Shopee API`
+- **Route 2 (False)**: `platform !== 'shopee'` → đi tới `Call API` (Satoru API)
+
+---
+
+### 3. New Node: `Call Shopee API`
+
+**Type**: `HTTP Request`
+
+**Configuration**:
+- **Method**: `POST`
+- **URL**: `https://4anm.top/get_download_shopee.php`
+- **Headers**: `Content-Type: application/json`
+- **Body**:
+  ```json
+  {
+    "token": "FDBMm8KafHCP3rdi7zvKgXhTZ09mSitNbG5yQ2dRQlloWlpyNjBsNVA2TmxDb25IMDE5a0RKUU00QkxQa24zVTVPVC9DU1IwUWxYcjRJNGczbW1KOGNqRDhMS1YxamZSNGdIQUdBPT0=",
+    "urls": ["<videoUrl from Extract URL>"]
+  }
+  ```
+- **Retry Settings**:
+  - Retry on fail: `true`
+  - Wait between tries: `3000ms`
+  - Max tries: `5`
+
+---
+
+### 4. New Node: `Parse Shopee Response`
+
+**Type**: `Code` (JavaScript)
+
+**Mục đích**: Convert response từ Shopee API sang format chuẩn như Satoru API để tương thích với flow hiện tại
+
+**Logic**:
+```javascript
+// Check if response is successful
+if (response.error === false && response.download_link.length > 0) {
+  return {
+    chatId: chatId,
+    downloadUrl: response.download_link[0],
+    title: 'Shopee Video',
+    quality: 'HD',
+    // ... other fields
+  };
+}
+
+// If error, return error object
+return {
+  error: true,
+  chatId: chatId,
+  message: 'Error message'
+};
+```
+
+---
+
+### 5. Updated Node: `Download Video`
+
+**Thay đổi**: Sửa URL từ hard-coded sang dynamic
+
+**Trước**:
+```javascript
+{{ $('Call API').item.json.data.attachment[0].url }}
+```
+
+**Sau**:
+```javascript
+{{ $('Parse Response').item.json.downloadUrl }}
+```
+
+**Lý do**: Để tương thích với cả Shopee và Satoru API responses
+
+---
+
+## Updated Flow Diagram
+
+```mermaid
+graph TD
+    A[Telegram Trigger] --> B[Extract URL]
+    B --> C{Switch Platform}
+    
+    C -->|platform = shopee| D[Call Shopee API]
+    C -->|platform ≠ shopee| E[Call API Satoru]
+    
+    D --> F[Parse Shopee Response]
+    E --> G[Merge Response]
+    G --> H[Parse Response]
+    
+    F --> I{Check Error}
+    H --> I
+    
+    I -->|error = true| J[Send Error]
+    I -->|error = false| K[Download Video]
+    
+    K --> L[Prepare Send Data]
+    L --> M{Check File Size}
+    
+    M -->|> 200MB| N[Send Too Large]
+    M -->|≤ 200MB| O[Send Video]
+```
+
+---
+
+## Workflow Statistics
+
+| Metric | Before | After | Change |
+|--------|--------|-------|--------|
+| Total Nodes | 18 | 21 | +3 |
+| Supported Platforms | 15 | 16 | +1 (Shopee) |
+
+---
+
+## Testing Instructions
+
+### Test Case 1: URL Shopee
+
+**Input**: Gửi URL Shopee vào bot Telegram
+```
+https://sv.shopee.vn/share-video/5gXZYYJnBwDSkd0xAAAAAA==?c=share_web&contentType=0&fromShareLink=share-marker&fromSource=copy_link&jumpType=share&myVideo=false&pid=sv&shareUserId=1271922156&share_obj=video&smtt=0.0.9&stm_medium=referral&stm_source=rw&uls_trackid=54jc31r800li
+```
+
+**Expected Output**:
+- ✅ Bot tải video từ Shopee
+- ✅ Bot gửi video qua Telegram với caption "✅ Shopee Video"
+- ✅ Quality: HD
+
+### Test Case 2: URL TikTok (Regression Test)
+
+**Input**: Gửi URL TikTok vào bot
+```
+https://www.tiktok.com/@user/video/123456789
+```
+
+**Expected Output**:
+- ✅ Flow cũ vẫn hoạt động bình thường
+- ✅ Video được tải và gửi qua Telegram
+
+### Test Case 3: URL Shopee Invalid
+
+**Input**: URL Shopee không hợp lệ hoặc đã bị xóa
+
+**Expected Output**:
+- ✅ Bot gửi thông báo lỗi: "❌ Không tải được video Shopee"
+
+---
+
+## Files Modified
+
+- [Telegram Video Download V2.json](file:///i:/Workflow/n8n/Workflow/Backups/Telegram%20Video%20Download%20V2.json) - Main workflow file
+
+## Files Created
+
+- [add-shopee-support.js](file:///i:/Workflow/n8n/Workflow/Backups/add-shopee-support.js) - Automation script dùng để modify workflow
+
+---
+
+## Next Steps
+
+1. **Import vào n8n**:
+   - Mở n8n
+   - Import file `Telegram Video Download V2.json`
+   - Activate workflow
+
+2. **Test với URL thật**:
+   - Test với URL Shopee
+   - Test với URL platform khác để đảm bảo không break
+
+3. **Monitor**:
+   - Theo dõi logs để kiểm tra lỗi
+   - Kiểm tra token Shopee API có expire không
+
+---
+
+## Notes
+
+> [!WARNING]
+> **Token API Shopee**: Token hiện tại là hard-coded. Nếu token expire, bạn cần update trong node `Call Shopee API`.
+
+> [!TIP]
+
+---
+
+## Security Enhancement: API Proxy
+
+Để bảo mật URL backend n8n, một Cloudflare Function đã được implement làm proxy trung gian.
+
+### Cơ chế
+- **Frontend** gọi tới: `https://<deployed-url>/api/video-download`
+- **Cloudflare Function** ([functions/api/video-download.ts](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/functions/api/video-download.ts)) nhận request và forward tới n8n webhook thật.
+- **Backend URL** được lưu trong Environment Variable `N8N_WEBHOOK_URL` trên Cloudflare Pages, không lộ ra ngoài source code client.
+
+### Cấu hình
+Yêu cầu cấu hình Environment Variable trên Cloudflare Dashboard:
+
+---
+
+## Custom Domain: taivideo.io.vn
+
+Đã cấu hình tên miền tùy chỉnh cho Cloudflare Pages.
+
+### Cấu hình DNS (TinoHost)
+- **Record**: `CNAME`
+- **Name**: `@` (taivideo.io.vn)
+- **Target**: `tai-video.pages.dev`
+- **TTL**: `10 phút` (hoặc `Auto`)
+

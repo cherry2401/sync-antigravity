@@ -1,0 +1,35 @@
+# Clawdbot Desktop Client - Task Breakdown
+
+## Phase 1: Project Setup
+- [ ] Initialize Electron + React + TypeScript project
+- [ ] Configure TailwindCSS with dark theme
+- [ ] Setup shadcn/ui components
+- [ ] Configure Zustand for state management
+- [ ] Setup better-sqlite3 for storage
+
+## Phase 2: Core Services
+- [ ] Implement Gateway Connector (WebSocket)
+- [ ] Implement Command Executor (shell, file ops)
+- [ ] Implement Storage Service (SQLite)
+
+## Phase 3: State Management
+- [ ] Create Chat Store (messages, sessions)
+- [ ] Create Config Store (settings, security)
+
+## Phase 4: UI Components
+- [ ] Sidebar (session list, navigation)
+- [ ] Chat Area (message rendering, markdown, code)
+- [ ] Input Area (multi-line, send button)
+- [ ] Status Bar (connection status, settings)
+- [ ] Settings Modal (gateway, security config)
+
+## Phase 5: Integration & Polish
+- [ ] Connect all components
+- [ ] Add security confirmations for commands
+- [ ] Test WebSocket communication
+- [ ] Polish UI/UX
+
+## Phase 6: Build & Package
+- [ ] Configure electron-builder
+- [ ] Create Windows installer
+- [ ] Write README documentation

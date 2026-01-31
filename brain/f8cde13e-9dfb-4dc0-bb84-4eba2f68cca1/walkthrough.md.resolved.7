@@ -1,0 +1,120 @@
+# OmoCaptcha with Retry Logic
+
+## Flow với Max 3 Lần Solve Captcha
+
+```
+Edit Fields → Create VEO3 [Continue On Fail]
+  ├─ Success → Continue
+  └─ Error → IF Captcha? → Set Counter (0)
+                         → LOOP START
+                         → Solve Captcha
+                         → Wait 15s  
+                         → Get Result
+                         → IF Ready?
+                           ├─ Yes → Retry Create VEO3 [Continue On Fail]
+                           │         ├─ Success → Continue ✅
+                           │         └─ Error → Increment Counter → IF Counter < 3?
+                           │                     ├─ Yes → LOOP back to Solve
+                           │                     └─ No → Send Error
+                           └─ No → Wait 10s → Get Result (loop)
+```
+
+---
+
+## Nodes Setup
+
+### 1. Create VEO3 (Original)
+**Continue On Fail** = ✅
+
+### 2. IF Check Captcha Error
+```javascript
+{{ $json.error?.message?.includes('reCAPTCHA') }}
+```
+
+### 3. Set Counter = 0
+**Type**: Set  
+**Name**: `Set Counter`  
+**Value**: 
+```json
+{
+  "retryCount": 0
+}
+```
+
+### 4. Solve Captcha
+*(Same as before)*
+
+### 5. Wait 15s
+
+### 6. Get Result
+*(Same as before)*
+
+### 7. IF Result Ready
+```javascript
+{{ $json.status === 'ready' }}
+```
+
+### 8. Retry Create VEO3
+**Continue On Fail** = ✅ (Quan trọng!)
+
+**Body**: *(Same, với recaptchaToken)*
+
+### 9. IF Retry Success
+```javascript
+{{ !$json.error }}
+```
+- Yes → Continue normal flow
+- No → Increment counter
+
+### 10. Increment Counter
+**Type**: Set  
+**Expression**:
+```javascript
+{{ $('Set Counter').item.json.retryCount + 1 }}
+```
+
+### 11. IF Counter < 3
+```javascript
+{{ $json.retryCount < 3 }}
+```
+- Yes → **Loop back** to "Solve Captcha"
+- No → Send error notification
+
+---
+
+## Simplified Alternative: Duplicate Flow 3 Times
+
+**Đơn giản hơn** - Không cần counter:
+
+```
+Solve 1 → Wait → Get → Retry 1 [Continue On Fail]
+                         ├─ Success → Done
+                         └─ Error → Solve 2 → Wait → Get → Retry 2
+                                     ├─ Success → Done
+                                     └─ Error → Solve 3 → Done hoặc Fail
+```
+
+**Setup**:
+- Duplicate "Solve → Wait → Get → Retry" 3 lần
+- Connect error output của Retry 1 → Solve 2
+- Connect error output của Retry 2 → Solve 3
+
+**Ưu điểm**: 
+- ✅ Đơn giản, không cần logic
+- ✅ Visual rõ ràng
+- ✅ Dễ debug
+
+**Nhược điểm**:
+- ❌ Nhiều nodes (3x)
+- ❌ Không flexible (hard-coded 3 lần)
+
+---
+
+## Khuyến Nghị
+
+**Dùng cách Duplicate 3 lần** vì:
+- Đơn giản hơn nhiều
+- n8n không có built-in loop counter
+- 3 lần retry là enough
+
+Bạn muốn dùng cách nào?

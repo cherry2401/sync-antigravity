@@ -1,0 +1,56 @@
+# Kế hoạch Tái cấu trúc (Refactoring)
+
+Mục tiêu: Chia nhỏ file [index.tsx](file:///i:/Website/BDS/index.tsx) khổng lồ thành cấu trúc dự án chuẩn, dễ bảo trì và mở rộng.
+
+## 1. Cấu trúc thư mục mới
+Tôi sẽ tạo thư mục `src` (nếu chưa có hoặc dùng trực tiếp root nếu cấu hình Vite hiện tại bắt buộc) và tổ chức lại như sau:
+
+```
+/components
+  /common       (Header, Footer, Button, Modal...)
+  /property     (PropertyCard, FilterDropdown...)
+  /admin        (AdminDashboard...)
+  /tools        (FengShuiTool, InterestRateTool...)
+/pages
+  HomePage.tsx
+  ListingDetailPage.tsx  (Mới)
+  PostListingPage.tsx
+  SavedListingsPage.tsx
+  AdminPage.tsx
+  ToolsPage.tsx
+/types
+  index.ts      (User, Listing, NewsItem interfaces)
+/data
+  mock.ts       (INITIAL_LISTINGS, OPTIONS...)
+App.tsx         (Main Router)
+main.tsx        (Entry point)
+```
+
+## 2. Các bước thực hiện
+
+### Bước 1: Cài đặt Dependencies
+- Cài `react-router-dom`.
+
+### Bước 2: Tách File (Extraction)
+1.  **Types & Data**: Di chuyển Interface và Mock Data sang `/types` và `/data`.
+2.  **Components**: Cắt code từ [index.tsx](file:///i:/Website/BDS/index.tsx) sang các file component tương ứng. Đảm bảo import đúng các dependencies bị thiếu.
+3.  **Pages**: Tạo các file Page wrapper bao quanh các component hoặc logic page hiện tại.
+
+### Bước 3: Thiết lập Routing
+- Thay thế biến state `activeView` bằng `react-router-dom`.
+- Cấu hình các route:
+    - `/`: HomePage
+    - `/dang-tin`: PostListingPage
+    - `/da-luu`: SavedListingsPage
+    - `/admin`: AdminPage
+    - `/phong-thuy`: ToolsPage (FengShui)
+    - `/lai-suat`: ToolsPage (Interest)
+
+### Bước 4: Sửa lỗi & Kết nối
+- Sửa lại các đường dẫn import.
+- Đảm bảo [vite.config.ts](file:///i:/Website/BDS/vite.config.ts) trỏ đúng entry point (nếu thay đổi vị trí file chính).
+
+## Verification Plan
+1.  Chạy `npm run dev`.
+2.  Kiểm tra từng trang xem có load đúng không.
+3.  Thử các chức năng chuyển trang (Link) xem URL có thay đổi không.

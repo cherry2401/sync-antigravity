@@ -1,0 +1,42 @@
+# Nhiệm vụ: Xây dựng Claude Manager App (All-in-One Controller)
+
+## Giai đoạn 1: Architecture & Design (Đang thực hiện)
+- [x] Phân tích yêu cầu & Tech Stack (React vs Electron) <!-- id: 0 -->
+- [x] Xác định tính năng cốt lõi (Core Features) <!-- id: 1 -->
+- [x] Thiết kế UI/UX Mockup (Đã duyệt qua chat) <!-- id: 2 -->
+- [x] Viết Specification (Spec.md) <!-- id: 3 -->
+
+## Giai đoạn 2: Development (Bắt đầu)
+- [x] Init Project (Vite + React + TypeScript + Electron) <!-- id: 4 -->
+- [x] Cấu hình Electron Main Process & IPC <!-- id: 5 -->
+- [x] Implement Dashboard UI (Shadcn) <!-- id: 6 -->
+- [x] Implement System Logic (Start/Stop/Logs) <!-- id: 7 -->
+
+## Giai đoạn 3: Polish & Delivery
+- [x] Đóng gói ứng dụng (.exe) <!-- id: 8 -->
+- [x] Tạo Shortcut Desktop (Đã copy file exe ra Desktop) <!-- id: 9 -->
+
+## Giai đoạn 5: Fix lỗi & Optimize
+- [ ] Debug lỗi không mở được project trên Web UI <!-- id: 14 -->
+    - [x] Kiểm tra log server để xác định trạng thái khởi động <!-- id: 15 -->
+    - [x] Phân tích logic validate đường dẫn trong `SetupDialog.tsx` <!-- id: 16 -->
+    - [/] Sửa lỗi regex validate đường dẫn Windows <!-- id: 17 -->
+    - [ ] Kiểm tra quyền truy cập ổ đĩa `I:` của server <!-- id: 18 -->
+- [x] Cải thiện cơ chế chạy ẩn và tự khởi động <!-- id: 19 -->
+    - [x] Dùng VBScript để ẩn hoàn toàn cửa sổ <!-- id: 20 -->
+    - [x] Tạo shortcut trong thư mục Startup <!-- id: 21 -->
+
+## Giai đoạn 6: Dual-Update System
+- [x] Thiết kế hệ thống update kép (Server + App) <!-- id: 22 -->
+- [x] Implement IPC handlers trong main process <!-- id: 23 -->
+- [x] Expose methods trong preload script <!-- id: 24 -->
+- [x] Tạo UpdatePanel component với UI hiển thị versions <!-- id: 25 -->
+- [x] Tích hợp UpdatePanel vào Settings tab <!-- id: 26 -->
+- [x] Refactor Settings UI (Sub-tabs layout) <!-- id: 29 -->
+- [ ] Test check server update từ GitHub <!-- id: 27 -->
+- [ ] Test git pull và rebuild server <!-- id: 28 -->
+
+## Giai đoạn 7: Packaging & Installer
+- [x] Cấu hình Electron Builder (Icon, NSIS options) <!-- id: 30 -->
+- [x] Build Installer (.exe) với custom icon <!-- id: 31 -->
+- [x] Fix lỗi app không hiện cửa sổ khi chạy từ Program Files <!-- id: 32 -->

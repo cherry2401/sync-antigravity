@@ -1,0 +1,200 @@
+# Phương Án Browser Capture - Giải Thích Chi Tiết
+
+## Vấn Đề Hiện Tại
+
+Khi workflow gọi API VEO3, Google yêu cầu `recaptchaToken`:
+
+```json
+{
+  "clientContext": {
+    "recaptchaToken": "03AGdBq24..."  ← CẦN token này
+  }
+}
+```
+
+**Không có token** → ❌ Error: "reCAPTCHA evaluation failed"
+
+---
+
+## Giải Pháp: "Mượn" Token Từ Browser
+
+### Ý Tưởng Đơn Giản
+
+1. **Bạn** mở VEO3 trên Chrome và tạo 1 video (bất kỳ)
+2. Browser tự động solve captcha (vì bạn là người thật)
+3. **Extension** "nghe lén" request, bắt được `recaptchaToken`
+4. Extension gửi token về n8n (qua webhook)
+5. **Workflow** đọc token từ Data Table
+6. **Workflow** dùng token đó cho TẤT CẢ các requests từ Telegram
+
+---
+
+## Flow Chi Tiết
+
+### Bước 1: User Tạo Video Test (1 lần/ngày)
+
+```
+User mở Chrome → labs.google/fx/tools/veo3
+  → Tạo 1 video bất kỳ (ví dụ: "test")
+  → Browser tự solve captcha ✅
+```
+
+**Extension thấy request này:**
+```json
+POST https://aisandbox-pa.googleapis.com/.../batchAsyncGenerateVideoText
+{
+  "clientContext": {
+    "recaptchaToken": "03AGdBq24PxKfW..."  ← BINGO!
+  }
+}
+```
+
+### Bước 2: Extension Capture & Save
+
+```javascript
+// background.js
+if (requestBody.clientContext?.recaptchaToken) {
+  let token = requestBody.clientContext.recaptchaToken;
+  
+  // Gửi về n8n webhook
+  fetch('https://your-n8n.com/webhook/token', {
+    body: JSON.stringify({
+      recaptchaToken: token,
+      timestamp: Date.now()
+    })
+  });
+}
+```
+
+**n8n webhook** nhận token → Lưu vào **Data Table**:
+
+| Access_Token | projectId | **recaptchaToken** |
+|---|---|---|
+| Bearer ya29... | 80afb1dc... | **03AGdBq24PxKfW...** |
+
+### Bước 3: Workflow Sử Dụng Token
+
+Khi user gửi Telegram: `"tạo video robot"`
+
+**Workflow flow:**
+```
+1. Read Data → Đọc token từ Data Table
+2. Edit Fields → Chuẩn bị data
+3. Create VEO3 → Gửi request KÈM token:
+   {
+     "clientContext": {
+       "recaptchaToken": "03AGdBq24PxKfW..."  ← Dùng token từ Data Table
+     }
+   }
+4. ✅ Success! Video được tạo
+```
+
+**Không cần solve captcha** vì đã có token từ browser!
+
+---
+
+## Token Hết Hạn Thì Sao?
+
+Token captcha thường hết hạn sau **2-5 phút**.
+
+**Workflow xử lý:**
+
+```mermaid
+graph TD
+    A[Create VEO3 với token] --> B{Response?}
+    B -->|Success| C[Done ✅]
+    B -->|Captcha error| D[Send Telegram: Token hết hạn!]
+    D --> E[User mở VEO web, tạo video test]
+    E --> F[Extension capture token mới]
+    F --> G[Workflow tự động dùng token mới]
+```
+
+**Telegram message:**
+```
+⚠️ Token captcha hết hạn!
+Vui lòng mở VEO3 web và tạo 1 video test bất kỳ.
+```
+
+---
+
+## So Sánh Với Cách Khác
+
+### Cách 1: Browser Capture (Phương án này)
+- ✅ **Miễn phí**
+- ✅ Token fresh (từ browser thật)
+- ⚠️ User cần mở web thỉnh thoảng (vài phút 1 lần nếu dùng nhiều)
+
+### Cách 2: OmoCaptcha (Service trả phí)
+- ❌ Mất tiền ($0.003/captcha)
+- ✅ Hoàn toàn tự động
+- ⚠️ Chậm hơn (+15 giây mỗi lần)
+
+---
+
+## Ví Dụ Cụ Thể
+
+### Scenario: Bạn muốn tạo 100 videos từ Telegram
+
+**Với Browser Capture:**
+1. Sáng: Mở VEO web, tạo 1 video test → Token valid ~2-5 phút
+2. Gửi 10-20 messages Telegram trong 2 phút → Tất cả dùng chung 1 token
+3. Token hết hạn → Bot notify
+4. Mở web lại, tạo video test → Token mới
+5. Tiếp tục gửi messages...
+
+**Chi phí**: $0 (miễn phí)
+**Thời gian**: Nhanh (browser capture < 1 giây)
+
+---
+
+## Implementation - Những Gì Cần Update
+
+### 1. Extension ([background.js](file:///d:/EXTENTIONS/Extension_Chrome_Veo-OK_v2/background.js))
+
+Thêm code capture `recaptchaToken`:
+
+```javascript
+// Khi intercept request
+if (details.url.includes('batchAsyncGenerateVideoText') || 
+    details.url.includes('batchAsyncGenerateVideoStartAndEndImage')) {
+  
+  let body = parseRequestBody(details.requestBody);
+  
+  if (body.clientContext?.recaptchaToken) {
+    // Send về webhook
+    sendToWebhook({
+      recaptchaToken: body.clientContext.recaptchaToken
+    });
+  }
+}
+```
+
+### 2. Data Table
+
+Thêm column: `recaptchaToken` (string)
+
+### 3. Workflow Nodes
+
+**Create VEO3** và **Generate Video (Image)**:
+
+```json
+{
+  "clientContext": {
+    "sessionId": "...",
+    "projectId": "...",
+    "recaptchaToken": "{{ $('Read Data').first().json.recaptchaToken || '' }}"
+  }
+}
+```
+
+---
+
+## Kết Luận
+
+**Browser Capture = "Mượn" token từ browser thật của bạn**
+
+- Browser solve captcha (vì bạn là người)
+- Extension capture token
+- Workflow dùng lại token đó
+
+→ **Miễn phí, đơn giản, hiệu quả!**

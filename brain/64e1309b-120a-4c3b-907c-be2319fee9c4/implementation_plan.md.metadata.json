@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Fix argument parsing on Windows by forcing Commander to use 'node' mode when appropriate, ensuring `runCli` handles standard `process.argv` correctly.",
+  "updatedAt": "2026-01-20T06:25:32.196713300Z",
+  "version": "1"
+}

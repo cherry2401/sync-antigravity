@@ -1,0 +1,6 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_TASK",
+  "summary":  "Task tracking for Shopee Link Converter V2 development with n8n webhook integration for automatic cookie synchronization to data table",
+  "updatedAt":  "2025-12-24T05:44:01.616260600Z",
+  "version":  "3"
+}

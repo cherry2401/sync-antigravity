@@ -1,0 +1,27 @@
+# Auto CDP Connector Implementation
+
+## Hướng 1: Auto CDP Port Scanner (MŨI NHỌN)
+- [x] Thêm CDP port scanner vào [browserRelay.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/browserRelay.ts) - quét port 9222
+- [x] Tự động kết nối CDP endpoint khi phát hiện Chrome debugging port
+- [x] Ưu tiên tab đang active (page type, non-chrome URLs)
+- [x] Cập nhật StatusBar indicator (CDP Direct, tooltip)
+- [x] ⚠️ **Blocked by Windows Security** - Port 9222 không bind được
+
+## Hướng 2: Extension Auto-Attach (TRIỂN KHAI) ✅
+- [x] Thêm `chrome.tabs.onUpdated` listener vào [background.js](file:///f:/Python/OpenSSH/chrome-extension/background.js)
+- [x] Tự động attach khi tab load xong (`status === 'complete'`)
+- [x] Badge luôn hiện ON tự động
+- [x] Sửa lỗi HTTP 404 preflight block Extension kết nối
+- [x] Cập nhật StatusBar sang màu xanh 🟢 khi Extension connect
+- [x] Tinh chỉnh UI: Đồng bộ icon Circle, màu sắc và xóa emoji dư thừa (Balanced UI)
+- [x] Tạo hướng dẫn cài Extension (SETUP_GUIDE.md)
+- [x] Sửa lỗi HMR loop (Vite reload khi ghi file vào /src) ✅
+    - [x] Tạo thư mục /data ở root
+    - [x] Chuyển các file JSON (.inbound, .outbound) sang /data
+    - [x] Cập nhật ChatPanel, BrowserRelay và ChopperLogs
+    - [x] Cấu hình Vite ignore /data và Restart App
+- [x] Tạo hướng dẫn vận hành cho Chopper (CHOPPER_GUIDE.md)
+- [x] Kiểm tra thực tế: StatusBar đã hiện xanh 🟢 thành công!
+
+## Tài liệu
+- [x] Hướng dẫn cài Extension Auto-Attach

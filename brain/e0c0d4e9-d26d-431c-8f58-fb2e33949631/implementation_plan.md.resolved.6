@@ -1,0 +1,92 @@
+# Dynamic Server Path & Auto-Fix Feature
+
+## Vấn đề hiện tại
+- Đường dẫn `claude-ws` hardcode: `I:/AIHub/claude-ws`
+- Khi cài lại Windows hoặc clone repo mới, app không hoạt động
+- Các file fix (VBS scripts, shortcuts) phải tạo thủ công
+
+## Giải pháp đề xuất
+
+### 1. Cấu hình đường dẫn động
+Thay vì hardcode, lưu path vào file config trong `%APPDATA%/claude-manager/config.json`:
+
+```json
+{
+  "serverPath": "I:/AIHub/claude-ws",
+  "autoStart": true,
+  "port": 8556
+}
+```
+
+### 2. UI: Server Path Selector (Tab Advanced)
+- **Browse Button**: Mở dialog chọn thư mục `claude-ws`
+- **Validate**: Kiểm tra thư mục có chứa [package.json](file:///I:/AIHub/claude-ws/package.json) và [server.ts](file:///I:/AIHub/claude-ws/server.ts)
+- **Save**: Lưu path mới vào config
+
+### 3. Auto-Fix Generator
+Khi user chọn path mới, app tự động tạo các file cần thiết:
+
+| File | Mục đích |
+|------|----------|
+| [start_hidden.vbs](file:///I:/AIHub/claude-ws/start_hidden.vbs) | Chạy server ẩn |
+| [watchdog.vbs](file:///I:/AIHub/claude-ws/watchdog.vbs) | Tự restart khi crash |
+| [vinh-vien.vbs](file:///I:/AIHub/claude-ws/vinh-vien.vbs) | Khởi động cùng Windows |
+| [.env](file:///I:/AIHub/claude-ws/.env) | Biến môi trường (nếu chưa có) |
+
+### 4. Startup Shortcut Manager
+- Tự động cập nhật shortcut trong Windows Startup
+- Trỏ đến vị trí mới của [vinh-vien.vbs](file:///I:/AIHub/claude-ws/vinh-vien.vbs)
+
+---
+
+## Proposed Changes
+
+### Main Process ([src/main/index.ts](file:///I:/AIHub/claude-manager/src/main/index.ts))
+
+#### [MODIFY] [index.ts](file:///I:/AIHub/claude-manager/src/main/index.ts)
+- Thay `const PROJECT_ROOT = 'I:/AIHub/claude-ws'` bằng đọc từ config
+- Thêm IPC handlers:
+  - `config:getServerPath` - Lấy path hiện tại
+  - `config:setServerPath` - Lưu path mới
+  - `config:generateFixFiles` - Tạo các file VBS/env
+  - `config:updateStartupShortcut` - Cập nhật shortcut
+
+### Preload ([src/preload/index.ts](file:///I:/AIHub/claude-manager/src/preload/index.ts))
+
+#### [MODIFY] [index.ts](file:///I:/AIHub/claude-manager/src/preload/index.ts)
+- Expose các methods mới ra renderer
+
+### Renderer (UI)
+
+#### [NEW] `src/renderer/src/components/ServerPathConfig.tsx`
+- Input field hiển thị path
+- Browse button
+- Generate Fix Files button
+- Status indicators
+
+#### [MODIFY] [App.tsx](file:///I:/AIHub/claude-manager/src/renderer/src/App.tsx)
+- Thêm `ServerPathConfig` vào tab Advanced
+
+---
+
+## Logic Flow
+
+```mermaid
+flowchart TD
+    A[User mở Settings > Advanced] --> B[Hiện đường dẫn hiện tại]
+    B --> C{Chọn thư mục mới?}
+    C -->|Yes| D[Browse Dialog]
+    D --> E{Validate path}
+    E -->|Invalid| F[Hiện lỗi]
+    E -->|Valid| G[Lưu vào config.json]
+    G --> H[Tạo các file fix]
+    H --> I[Cập nhật Startup shortcut]
+    I --> J[Reload app với path mới]
+```
+
+---
+
+## Verification Plan
+1. Thay đổi path và kiểm tra app vẫn start/stop server đúng
+2. Clone claude-ws vào thư mục khác, chọn path mới, verify hoạt động
+3. Restart Windows và verify server tự khởi động đúng

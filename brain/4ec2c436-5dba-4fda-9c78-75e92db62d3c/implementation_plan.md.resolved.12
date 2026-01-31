@@ -1,0 +1,251 @@
+# Kế hoạch Fix Extension-Client Connection
+
+## Vấn đề hiện tại
+
+**Quan sát:**
+- ✅ App Client port 18792 LISTENING
+- ✅ Extension đã load vào Chrome
+- ❌ Extension báo "Relay not reachable" (đỏ)
+- ❌ StatusBar vẫn "CDP Off"
+
+**Root Cause:**
+Extension không kết nối được WebSocket tới `ws://127.0.0.1:18792/extension`
+
+---
+
+## Debug Plan
+
+### Step 1: Kiểm tra Extension WebSocket URL
+
+**Hiện tại Extension connect tới:**
+```javascript
+ws://127.0.0.1:${port}/extension
+```
+
+**App Server endpoint:**
+```typescript
+// browserRelay.ts
+this.wss.on('connection', (ws, req) => ...)
+```
+
+**Action:**
+1. Xem Extension console log (F12 trong Extension options page)
+2. Tìm error: "WebSocket connect failed" hoặc "ERR_CONNECTION_REFUSED"
+3. Check WebSocket path có đúng không
+
+---
+
+### Step 2: Kiểm tra App Server cho phép Extension connection
+
+**Possible issues:**
+- CORS blocking
+- WebSocket server không accept connections từ `chrome-extension://`
+- Path `/extension` không tồn tại
+
+**Fix:**
+- Sửa [browserRelay.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/browserRelay.ts) để log incoming connections
+- Thêm CORS headers nếu cần
+- Đảm bảo WebSocket server accept từ localhost
+
+---
+
+### Step 3: Test Connection trực tiếp
+
+**Tạo test HTML page:**
+```html
+<!DOCTYPE html>
+<html>
+<body>
+  <h1>WebSocket Test</h1>
+  <button onclick="testWS()">Test Connection</button>
+  <pre id="log"></pre>
+  
+  <script>
+    function testWS() {
+      const ws = new WebSocket('ws://127.0.0.1:18792/extension');
+      
+      ws.onopen = () => {
+        log('✅ Connected!');
+        ws.send(JSON.stringify({ type: 'test' }));
+      };
+      
+      ws.onerror = (e) => {
+        log('❌ Error: ' + e);
+      };
+      
+      ws.onclose = () => {
+        log('⚠️ Closed');
+      };
+    }
+    
+    function log(msg) {
+      document.getElementById('log').innerText += msg + '\n';
+    }
+  </script>
+</body>
+</html>
+```
+
+---
+
+## Implementation Plan
+
+### Phase 1: Fix WebSocket Path
+
+#### [MODIFY] [browserRelay.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/browserRelay.ts)
+
+**Changes:**
+1. Thêm logging cho incoming WebSocket connections
+2. Log request URL và headers
+3. Ensure `/extension` path được route đúng
+
+```typescript
+this.wss.on('connection', (ws, req) => {
+    console.log('🌐 [BrowserRelay] 🔌 Connection from:', req.socket.remoteAddress);
+    console.log('🌐 [BrowserRelay] 📍 Path:', req.url);
+    console.log('🌐 [BrowserRelay] 📨 Headers:', req.headers);
+    
+    // ... existing code
+});
+```
+
+---
+
+### Phase 2: Fix Extension WebSocket Connection
+
+#### [MODIFY] [background.js](file:///f:/Python/OpenSSH/chrome-extension/background.js)
+
+**Current code:**
+```javascript
+const wsUrl = `ws://127.0.0.1:${port}/extension`
+```
+
+**Add retry logic:**
+```javascript
+async function ensureRelayConnection() {
+  if (relayWs && relayWs.readyState === WebSocket.OPEN) return
+  if (relayConnectPromise) return await relayConnectPromise
+
+  relayConnectPromise = (async () => {
+    const port = await getRelayPort()
+    const wsUrl = `ws://127.0.0.1:${port}/extension`
+    
+    console.log('[Extension] Connecting to:', wsUrl)
+    
+    // ... existing connection code
+  })()
+}
+```
+
+---
+
+### Phase 3: Add Connection Health Check
+
+#### [NEW] Test page để verify connection
+
+**File:** `f:\Python\OpenSSH\clawdbot-client\test-ws.html`
+
+Tạo simple test page để verify WebSocket server hoạt động.
+
+---
+
+### Phase 4: Update Auto-Attach với error handling
+
+#### [MODIFY] [background.js](file:///f:/Python/OpenSSH/chrome-extension/background.js)
+
+**Improve auto-attach listener:**
+```javascript
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  if (changeInfo.status !== 'complete') return
+  if (tab.url && (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://'))) return
+  if (tabs.has(tabId)) return
+  
+  console.log(`🚁 [Auto-Attach] Tab ${tabId} loaded: ${tab.url}`)
+  
+  tabs.set(tabId, { state: 'connecting' })
+  setBadge(tabId, 'connecting')
+  
+  try {
+    // RETRY với timeout
+    await ensureRelayConnection()
+    await attachTab(tabId)
+    console.log(`🚁 [Auto-Attach] ✅ Tab ${tabId} attached successfully`)
+  } catch (err) {
+    tabs.delete(tabId)
+    setBadge(tabId, 'error')
+    console.warn(`🚁 [Auto-Attach] ❌ Failed:`, err.message)
+    
+    // RETRY after 3s
+    setTimeout(() => {
+      console.log(`🚁 [Auto-Attach] 🔄 Retrying tab ${tabId}...`)
+      chrome.tabs.onUpdated.removeListener(arguments.callee)
+      chrome.tabs.reload(tabId)
+    }, 3000)
+  }
+})
+```
+
+---
+
+## Verification Plan
+
+### Test 1: WebSocket Server
+
+```powershell
+# Check port
+netstat -ano | findstr "18792"
+
+# Should see LISTENING
+```
+
+### Test 2: Extension Connection
+
+1. Load Extension
+2. Open Chrome DevTools → Console
+3. Should see:
+   ```
+   [Extension] Connecting to: ws://127.0.0.1:18792/extension
+   [Extension] ✅ WebSocket connected
+   ```
+
+### Test 3: Auto-Attach
+
+1. Open new tab (google.com)
+2. Wait 2-3s
+3. Check:
+   - ✅ Extension badge shows "ON"
+   - ✅ App console shows "Extension connected"
+   - ✅ StatusBar shows 🟢 "Browser Relay"
+
+---
+
+## Fallback Options
+
+### Option A: Nếu WebSocket vẫn không hoạt động
+
+**Dùng HTTP Polling thay vì WebSocket:**
+- Extension poll `http://127.0.0.1:18792/status` mỗi 2s
+- Gửi commands qua POST requests
+
+### Option B: Nếu CORS blocking
+
+**Add CORS headers:**
+```typescript
+this.server.on('request', (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST')
+})
+```
+
+---
+
+## Success Criteria
+
+✅ **Mở App Client**
+✅ **Load Extension vào Chrome**
+✅ **Mở/reload tab**
+→ Badge tự động ON
+→ StatusBar 🟢 Browser Relay
+→ Console: "Extension connected"
+
+**Không cần thao tác gì khác!**

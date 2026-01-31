@@ -1,0 +1,5 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_TASK",
+  "summary":  "Task checklist tracking the development of n8n workflows for SORA video generation, including Image to Video, Text to Video, watermark removal, and storage integration phases.",
+  "updatedAt":  "2025-12-20T12:34:58.348224100Z"
+}

@@ -1,0 +1,8 @@
+# Checkout Address Integration Task
+
+## Progress
+- [x] Create address API service
+- [x] Create AddressSelector component with cascading dropdowns
+- [x] Style the dropdowns beautifully
+- [x] Integrate into checkout page
+- [x] Testing

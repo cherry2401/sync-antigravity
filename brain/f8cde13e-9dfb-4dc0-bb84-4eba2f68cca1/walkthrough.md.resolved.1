@@ -1,0 +1,153 @@
+# Hướng Dẫn: Cập Nhật Model Selection Logic
+
+## Tổng Quan
+
+Đã cập nhật workflow VEO3 để:
+- **Mặc định**: Dùng Ultra models (`veo_3_1_t2v_fast_ultra`, `veo_3_1_i2v_s_fast_ultra_fl`)
+- **Với `#pro`**: Chuyển về models thường (`veo_3_1_t2v_fast`, `veo_3_1_i2v_s_fast_fl`)
+- **Xóa `#pro`** khỏi prompt (giống `#doc`, `#ngang`)
+
+---
+
+## Thay Đổi Chi Tiết
+
+### 1. Text-to-Video Flow (Edit Fields Node)
+
+#### Field: `prompt`
+
+**Trước:**
+```javascript
+{{ $('Telegram Trigger').item.json.message.text.replace(/#doc/gi, '').replace(/#ngang/gi, '').replace(/#portrait/gi, '').replace(/#landscape/gi, '').trim() }}
+```
+
+**Sau:**
+```javascript
+{{ $('Telegram Trigger').item.json.message.text.replace(/#doc/gi, '').replace(/#ngang/gi, '').replace(/#portrait/gi, '').replace(/#landscape/gi, '').replace(/#pro/gi, '').trim() }}
+```
+
+➕ Thêm `.replace(/#pro/gi, '')` để xóa `#pro` khỏi prompt
+
+---
+
+#### Field: `videoModelKey`
+
+**Trước:**
+```javascript
+{{ $('Telegram Trigger').item.json.message.text.toLowerCase().includes('#doc') || $('Telegram Trigger').item.json.message.text.toLowerCase().includes('#portrait') ? 'veo_3_1_t2v_fast_portrait' : 'veo_3_1_t2v_fast' }}
+```
+
+**Sau:**
+```javascript
+{{ $('Telegram Trigger').item.json.message.text.toLowerCase().includes('#pro') ? 
+   ($('Telegram Trigger').item.json.message.text.toLowerCase().includes('#doc') || $('Telegram Trigger').item.json.message.text.toLowerCase().includes('#portrait') ? 'veo_3_1_t2v_fast_portrait' : 'veo_3_1_t2v_fast') 
+   : 
+   ($('Telegram Trigger').item.json.message.text.toLowerCase().includes('#doc') || $('Telegram Trigger').item.json.message.text.toLowerCase().includes('#portrait') ? 'veo_3_1_t2v_fast_portrait_ultra' : 'veo_3_1_t2v_fast_ultra') 
+}}
+```
+
+**Logic mới:**
+- Có `#pro` → Dùng models thường
+- Không có `#pro` → Dùng models Ultra (default)
+- Vẫn support `#doc`/`#portrait` cho aspect ratio
+
+---
+
+### 2. Image-to-Video Flow (Edit Fields (Image) Node)
+
+#### Field: `prompt`
+
+**Trước:**
+```javascript
+{{ $('Telegram Trigger').item.json.message.caption || 'Create video from this image' }}
+```
+
+**Sau:**
+```javascript
+{{ ($('Telegram Trigger').item.json.message.caption || 'Create video from this image').replace(/#doc/gi, '').replace(/#ngang/gi, '').replace(/#portrait/gi, '').replace(/#landscape/gi, '').replace(/#pro/gi, '').trim() }}
+```
+
+➕ Thêm logic xóa tất cả hashtags control (`#doc`, `#ngang`, `#pro`, v.v...)
+
+---
+
+#### Field: `aspectRatio`
+
+**Trước:**
+```javascript
+VIDEO_ASPECT_RATIO_PORTRAIT
+```
+(Hardcoded)
+
+**Sau:**
+```javascript
+{{ $('Telegram Trigger').item.json.message.caption?.toLowerCase().includes('#ngang') || $('Telegram Trigger').item.json.message.caption?.toLowerCase().includes('#landscape') ? 'VIDEO_ASPECT_RATIO_LANDSCAPE' : 'VIDEO_ASPECT_RATIO_PORTRAIT' }}
+```
+
+➕ Thêm logic dynamic aspect ratio (giống text flow)
+
+---
+
+#### Field: `videoModelKey`
+
+**Trước:**
+```javascript
+veo_3_1_i2v_s_fast_portrait_fl
+```
+(Hardcoded)
+
+**Sau:**
+```javascript
+{{ $('Telegram Trigger').item.json.message.caption?.toLowerCase().includes('#pro') ? 
+   ($('Telegram Trigger').item.json.message.caption?.toLowerCase().includes('#ngang') ? 'veo_3_1_i2v_s_fast_fl' : 'veo_3_1_i2v_s_fast_portrait_fl') 
+   : 
+   ($('Telegram Trigger').item.json.message.caption?.toLowerCase().includes('#ngang') ? 'veo_3_1_i2v_s_fast_ultra_fl' : 'veo_3_1_i2v_s_fast_portrait_ultra_fl') 
+}}
+```
+
+**Logic mới:** Tương tự text flow, với suffix `_fl` cho image-to-video models
+
+---
+
+## Cách Sử Dụng
+
+### Text-to-Video
+
+| Telegram Message | Model | Aspect Ratio |
+|---|---|---|
+| `"tạo video robot"` | `veo_3_1_t2v_fast_ultra` | Landscape |
+| `"tạo video robot #doc"` | `veo_3_1_t2v_fast_portrait_ultra` | Portrait |
+| `"tạo video robot #pro"` | `veo_3_1_t2v_fast` | Landscape |
+| `"tạo video robot #doc #pro"` | `veo_3_1_t2v_fast_portrait` | Portrait |
+
+### Image-to-Video
+
+| Telegram Caption | Model | Aspect Ratio |
+|---|---|---|
+| `"tạo video từ ảnh"` | `veo_3_1_i2v_s_fast_portrait_ultra_fl` | Portrait |
+| `"tạo video từ ảnh #ngang"` | `veo_3_1_i2v_s_fast_ultra_fl` | Landscape |
+| `"tạo video từ ảnh #pro"` | `veo_3_1_i2v_s_fast_portrait_fl` | Portrait |
+| `"tạo video từ ảnh #ngang #pro"` | `veo_3_1_i2v_s_fast_fl` | Landscape |
+
+---
+
+## Hashtags Control
+
+| Hashtag | Chức Năng | Bị Xóa Khỏi Prompt |
+|---|---|---|
+| `#pro` | Downgrade về models thường (không Ultra) | ✅ |
+| `#doc` / `#portrait` | Chọn Portrait aspect ratio | ✅ |
+| `#ngang` / `#landscape` | Chọn Landscape aspect ratio | ✅ |
+
+---
+
+## Kiểm Tra
+
+User cần test các trường hợp:
+
+1. **Text-to-Video Ultra (default)**: Gửi `"tạo video test"`
+2. **Text-to-Video Pro**: Gửi `"tạo video test #pro"`
+3. **Image-to-Video Ultra (default)**: Gửi ảnh + caption `"tạo video"`
+4. **Image-to-Video Pro**: Gửi ảnh + caption `"tạo video #pro"`
+5. **Aspect ratio**: Test với `#doc` và `#ngang`
+
+Sau khi test, reload workflow trong n8n và chạy thử!

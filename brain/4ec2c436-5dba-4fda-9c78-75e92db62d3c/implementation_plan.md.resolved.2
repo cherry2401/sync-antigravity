@@ -1,0 +1,100 @@
+# Clawdbot Desktop - IDE Layout Restructure
+
+## Goal
+Chuyển đổi layout từ Chat-centric sang IDE-centric giống như Antigravity/VS Code.
+
+## Current vs Target Layout
+
+````carousel
+### Current Layout
+```
+┌─────────────────────────────────────────┐
+│ TitleBar                                │
+├──────────┬──────────────────────────────┤
+│ Sidebar  │ Main (Chat tabs + Files)     │
+│ (Chats)  │                              │
+│          │                              │
+├──────────┴──────────────────────────────┤
+│ StatusBar                               │
+└─────────────────────────────────────────┘
+```
+<!-- slide -->
+### Target Layout (IDE-style)
+```
+┌─────────────────────────────────────────────────┐
+│ TitleBar                                        │
+├─────────────┬─────────────────────┬─────────────┤
+│ Explorer    │ Viewer (Center)     │ Chat Panel  │
+│ (Files)     │ - Files/Tabs        │ - History   │
+│ - Tree View │ - Image/Video       │ - Messages  │
+│             │ - Editor            │ - Input     │
+├─────────────┴─────────────────────┴─────────────┤
+│ StatusBar                                       │
+└─────────────────────────────────────────────────┘
+```
+````
+
+---
+
+## User Panel Icons
+Chat panel sẽ có thanh action bar:
+
+| Icon | Chức năng |
+|------|-----------|
+| ➕ | New Chat |
+| 📋 | Past Conversations (dropdown) |
+| ⚙️ | Settings (menu: Rename, Delete, Export) |
+
+---
+
+## Proposed Changes
+
+### [MODIFY] [App.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/App.tsx)
+- Đổi layout từ 2-column sang 3-column
+- Explorer (left) + Viewer (center) + ChatPanel (right)
+- Resizable panels với react-resizable-panels
+
+### [NEW] [FileExplorer.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/FileExplorer.tsx)
+- Tree view hiển thị files/folders
+- Click file → mở trong Viewer
+- Actions: New/Delete/Rename
+- Width: ~240px (resizable)
+
+### [NEW] [Viewer.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/Viewer.tsx)
+- Tabs để mở nhiều files
+- Preview: Image, Video, Text, Code (syntax highlighting)
+- Monaco Editor hoặc đơn giản hơn: Prism.js
+
+### [MODIFY] [ChatPanel.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/ChatPanel.tsx)
+- Rename từ Sidebar, đưa qua phải
+- Action bar: New Chat, History dropdown, Settings menu
+- Settings menu: Rename, Delete, Export JSON
+
+### [NEW] [ActionMenu.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/ActionMenu.tsx)
+- Dropdown menu component (dùng chung)
+
+---
+
+## Dependencies
+```bash
+npm install react-resizable-panels lucide-react
+```
+(lucide-react đã có sẵn)
+
+---
+
+## Verification Plan
+1. Resize panels hoạt động mượt
+2. File Explorer hiển thị đúng tree
+3. Click file → mở trong Viewer
+4. Chat panel hoạt động như cũ
+5. Action menus hoạt động đúng
+
+---
+
+## ⚠️ NEXT STEPS:
+```
+1️⃣ OK với Plan? Gõ "OK" để bắt đầu code
+2️⃣ Muốn xem UI trước? Tôi sẽ generate mockup
+3️⃣ Cần chỉnh sửa? Tiếp tục thảo luận
+```

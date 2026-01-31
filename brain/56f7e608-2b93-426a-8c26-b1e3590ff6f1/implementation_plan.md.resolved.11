@@ -1,0 +1,48 @@
+# Create Product Feature (Admin) Implementation Plan
+
+## Goal Description
+Implement the "Create Product" functionality for the Admin dashboard, enabling the addition of new cosmetic products with detailed information (ingredients, usage steps) and image uploading via Cloudinary.
+
+## User Review Required
+> [!IMPORTANT]
+> This plan involves installing new dependencies (`slugify`) and updating the database schema.
+> **Cloudinary**: We will use a simple unsigned upload to Cloudinary via their REST API to avoid heavy server-side SDKs if possible, or use `next-cloudinary` if preferred. For now, I'll use a direct fetch to Cloudinary's generic upload endpoint from the client for simplicity and speed.
+> I will need your **Cloudinary Cloud Name** and **Upload Preset** to make this work.
+
+## Proposed Changes
+
+### Database Schema
+#### [MODIFY] [schema.prisma](file:///i:/Website/MyphamHaKi/app-src/prisma/schema.prisma)
+- Add [Product](file:///i:/Website/MyphamHaKi/app-src/src/components/product/ProductCard.tsx#15-30) model with fields:
+    - [name](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts#94-103), `slug` (unique), `sku`, `brand`, `category`
+    - `price`, `originalPrice` (salePrice in form corresponds to price, originalPrice corresponds to price in form... wait, need to clarify mapping. Default: `price` is current selling price, `originalPrice` is higher scratched price).
+    - `stock`, `description` (HTML)
+    - `images` (String[]), `ingredients` (String[]), `usageSteps` (Json), `usageNote` (String?)
+    - `status` (String)
+
+### Dependencies
+- Install `slugify`.
+
+### Server Actions
+#### [NEW] [src/actions/product.ts](file:///i:/Website/MyphamHaKi/app-src/src/actions/product.ts)
+- `createProduct(data)`:
+    - Auth check (Admin only).
+    - Slug generation.
+    - DB Creation.
+    - Revalidation.
+
+### Client Integration
+#### [MODIFY] [src/components/admin/ProductForm.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/admin/ProductForm.tsx)
+- Implement `uploadToCloudinary` helper.
+- In [onSubmit](file:///i:/Website/MyphamHaKi/app-src/src/components/address/AddressForm.tsx#93-127):
+    1. Upload `images` (File objects) to Cloudinary -> get URLs.
+    2. Combine URLs with form data.
+    3. Call `createProduct`.
+    4. Handle response.
+
+## Verification Plan
+1.  **Form Fill**: Fill all fields in Admin Add Product form.
+2.  **Upload**: Select images and verify they upload.
+3.  **Submit**: Save product.
+4.  **DB Check**: Verify data in SQLite.
+5.  **UI Check**: Verify product appears on storefront.

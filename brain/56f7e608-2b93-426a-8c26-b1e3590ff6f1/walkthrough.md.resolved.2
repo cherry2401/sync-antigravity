@@ -1,0 +1,57 @@
+# HaKi Beauty - Development Walkthrough
+
+## ✅ Phase 1 Complete
+
+### Footer Component
+[Footer.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/layout/Footer.tsx) - Logo, links, contact info, social icons, newsletter, payment icons.
+
+### Product Detail Page
+[page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/san-pham/%5Bslug%5D/page.tsx) - Image gallery, product info, quantity selector, add to cart.
+
+---
+
+## ✅ Phase 2 Complete
+
+### Cart Store with Zustand
+[cartStore.ts](file:///i:/Website/MyphamHaKi/app-src/src/store/cartStore.ts) - Persistent cart state with localStorage.
+
+**Features:**
+- [addItem](file:///i:/Website/MyphamHaKi/app-src/src/store/cartStore.ts#42-63), [removeItem](file:///i:/Website/MyphamHaKi/app-src/src/store/cartStore.ts#64-69), [updateQuantity](file:///i:/Website/MyphamHaKi/app-src/src/store/cartStore.ts#70-84), [clearCart](file:///i:/Website/MyphamHaKi/app-src/src/store/cartStore.ts#85-88)
+- [getTotalItems](file:///i:/Website/MyphamHaKi/app-src/src/store/cartStore.ts#101-104), [getTotalPrice](file:///i:/Website/MyphamHaKi/app-src/src/store/cartStore.ts#105-111)
+- Cart drawer open/close state
+
+### Cart Drawer
+[CartDrawer.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/cart/CartDrawer.tsx) - Slide-in drawer with animated transitions.
+
+![Cart Drawer](C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/cart_screenshot.png)
+
+### Product Listing Page
+[page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/san-pham/page.tsx) - `/san-pham` route.
+
+**Features:**
+- **Filter sidebar**: Brand, Price range
+- **Sort dropdown**: Featured, Newest, Price, Rating
+- **Mobile filter drawer**
+- **Active filter pills** with clear option
+
+![Product Listing](C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/products_page_screenshot.png)
+
+---
+
+## 🎬 Recording
+
+![Phase 2 Test](C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/phase2_cart_test_1768237164999.webp)
+
+---
+
+## 📂 Files Changed in Phase 2
+
+| File | Description |
+|------|-------------|
+| [store/cartStore.ts](file:///i:/Website/MyphamHaKi/app-src/src/store/cartStore.ts) | ✨ Zustand cart store |
+| [components/cart/CartDrawer.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/cart/CartDrawer.tsx) | ✨ Cart drawer component |
+| [app/san-pham/page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/san-pham/page.tsx) | ✨ Product listing page |
+| [app/layout.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/layout.tsx) | Added CartDrawer |
+| [components/layout/Header.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/layout/Header.tsx) | Connected to cart store |
+| [app/page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/page.tsx) | Connected Quick Add |
+| `app/san-pham/[slug]/page.tsx` | Connected Add to Cart |

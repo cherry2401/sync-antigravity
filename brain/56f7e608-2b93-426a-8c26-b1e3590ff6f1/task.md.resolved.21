@@ -1,0 +1,9 @@
+# Mobile Navigation Task
+
+## Progress
+- [ ] Create MobileBottomNav component (4 items)
+- [ ] Create FloatingContactButton (Zalo)
+- [ ] Add to layout.tsx
+- [ ] Hide Bottom Nav on PDP page
+- [ ] Add active state styling
+- [ ] Testing

@@ -1,0 +1,35 @@
+# Walkthrough - Extension Connection & UI Refinement 🟢
+
+We have successfully resolved the issue where the Chrome Extension could not connect to the App Client, and the status bar was stuck on orange.
+
+## Changes Made
+
+### 1. Fixed HTTP Preflight Error
+The extension sends an `HTTP HEAD` request to `http://127.0.0.1:18792/` before establishing a WebSocket connection. Previously, the server returned a `404 Not Found`, which blocked the extension.
+- **Fix:** Added a handler for the root path (`/`) in [browserRelay.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/browserRelay.ts) to return `200 OK`.
+- **Improvements:** Added CORS headers (`Access-Control-Allow-Origin: *`) to ensure the browser doesn't block the request.
+
+### 2. Status Bar UI Refinement
+The StatusBar previously had inconsistent icons and redundant emoji dots, making it look unbalanced.
+- **Fix:** Standardized both Chat and Browser Relay statuses to use the same `Circle` icon style.
+- **Balanced Look:** Matched sizes (`w-2.5`) and removed the `🟢` emoji from the text labels.
+- **Clean Label:** Changed "Ext Only" to "Browser Relay" to be more professional.
+
+### 3. Structural Code Repair
+Fixed a syntax error in [browserRelay.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/browserRelay.ts) that caused the class to be closed prematurely, ensuring all methods are properly accessible.
+
+## Verification Results
+
+### Terminal Logs
+The logs clearly show the successful preflight and WebSocket connection:
+```text
+[1] 🌐 [BrowserRelay] HTTP HEAD /
+[1] 🌐 [BrowserRelay] Extension connected from: ::ffff:127.0.0.1  
+[1] 🌐 [BrowserRelay] 🔌 Extension WebSocket connected!
+```
+
+### UI Status
+- ✅ **Extension Badge:** Automatically turns **ON**.
+- ✅ **App StatusBar:** Displays **🟢 Browser Relay** in green.
+
+The bot is now fully "thông nòng" and ready to control Chrome! 🚀

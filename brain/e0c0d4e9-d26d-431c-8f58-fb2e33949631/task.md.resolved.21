@@ -1,0 +1,17 @@
+# Nhiệm vụ: Xây dựng Claude Manager App (All-in-One Controller)
+
+## Giai đoạn 1: Architecture & Design (Đang thực hiện)
+- [/] Phân tích yêu cầu & Tech Stack (React vs Electron) <!-- id: 0 -->
+- [ ] Xác định tính năng cốt lõi (Core Features) <!-- id: 1 -->
+- [ ] Thiết kế UI/UX Mockup <!-- id: 2 -->
+- [ ] Viết Specification (Spec.md) <!-- id: 3 -->
+
+## Giai đoạn 2: Development (Dự kiến)
+- [ ] Init Project (Vite + React + TypeScript + Electron?) <!-- id: 4 -->
+- [ ] Implement System Commands (Start, Stop, Fix Lock) <!-- id: 5 -->
+- [ ] Implement Log Viewer (Real-time) <!-- id: 6 -->
+- [ ] Implement Config Manager (Editor cho .env/pm2) <!-- id: 7 -->
+
+## Giai đoạn 3: Polish & Delivery
+- [ ] Đóng gói ứng dụng (.exe) <!-- id: 8 -->
+- [ ] Tạo Shortcut Desktop <!-- id: 9 -->

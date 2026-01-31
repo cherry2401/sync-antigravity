@@ -1,0 +1,6 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary":  "Walkthrough for auto-sync on page visit feature with SHA-256 hash deduplication, including setup, testing steps, and technical details",
+  "updatedAt":  "2025-12-24T06:26:01.854321400Z",
+  "version":  "3"
+}

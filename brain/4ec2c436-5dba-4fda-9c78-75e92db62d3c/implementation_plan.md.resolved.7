@@ -1,0 +1,57 @@
+# Kế Hoạch Triển Khai Context Menu
+
+## Mục Tiêu
+Thêm Menu Chuột Phải (Context Menu) vào File Explorer để thực hiện các thao tác tệp tin phổ biến.
+
+## Lưu Ý Cần Review
+> [!IMPORTANT]
+> **Hành động Xóa**: "Xóa" nên đưa file vào Thùng Rác (Recycle Bin) hay xóa vĩnh viễn?
+> *Đề xuất*: Dùng `shell.trashItem()` để đưa vào Thùng Rác (an toàn hơn).
+
+## Các Tính Năng Đề Xuất
+
+### 1. Cấu Trúc Menu (Tiếng Việt)
+
+#### **Đối với File (Tệp tin)**
+| Menu Item | Icon | Hành động |
+| :--- | :--- | :--- |
+| **Mở** (Open) | `VscOpenPreview` | Mở file trong vùng xem chính. |
+| **Mở trong Explorer** | `VscFolder` | Mở vị trí file trong Windows Explorer. |
+| **Sao chép đường dẫn** | `VscCopy` | Copy đường dẫn tuyệt đối. |
+| **Đổi tên** (Rename) | `VscEdit` | Kích hoạt đổi tên (inline). |
+| **Xóa** (Delete) | `VscTrash` | Chuyển vào Thùng Rác (có xác nhận). |
+
+#### **Đối với Thư mục (Folder)**
+| Menu Item | Icon | Hành động |
+| :--- | :--- | :--- |
+| **Tạo File mới** | `VscNewFile` | Tạo file mới trong thư mục này. |
+| **Tạo Thư mục mới** | `VscNewFolder` | Tạo thư mục con mới. |
+| **Mở trong Explorer** | `VscFolder` | Mở thư mục trong Windows Explorer. |
+| **Sao chép đường dẫn** | `VscCopy` | Copy đường dẫn tuyệt đối. |
+| **Đổi tên** (Rename) | `VscEdit` | Kích hoạt đổi tên. |
+| **Xóa** (Delete) | `VscTrash` | Chuyển thư mục vào Thùng Rác. |
+
+#### **Vùng Trống (Background)**
+- **Làm mới** (Refresh): Tải lại cây thư mục.
+- **Tạo File mới**: Tạo file ở thư mục gốc hiện tại.
+- **Tạo Thư mục mới**: Tạo thư mục ở thư mục gốc hiện tại.
+
+### 2. Triển Khai UI
+- **Thư viện**: Sài `@radix-ui/react-context-menu` cho menu chuẩn, hỗ trợ phím tắt và accessibility ngon.
+- **Giao diện**: Tailwind CSS (Dark mode, style giống VS Code).
+
+### 3. Backend (Electron IPC)
+Cần thêm các IPC handler trong [main.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/main.ts):
+- `fs:reveal`: Dùng `shell.showItemInFolder(path)`.
+- `fs:delete`: Dùng `shell.trashItem(path)`.
+- `fs:rename`: Dùng `fs.rename(oldPath, newPath)`.
+- `fs:createFile`: Dùng `fs.writeFile(path, '')`.
+- `fs:createDirectory`: Dùng `fs.mkdir(path)`.
+
+## Kế Hoạch Kiểm Thử
+1. **Test thao tác**:
+   - Chuột phải vào file -> Menu hiện ra tiếng Việt.
+   - Chọn "Mở trong Explorer" -> Windows Explorer hiện lên đúng chỗ.
+   - Chọn "Sao chép đường dẫn" -> Paste thử vào Notepad.
+   - Chọn "Xóa" -> File biến mất khỏi cây và nằm trong Thùng Rác.
+   - Chọn "Đổi tên" -> Đổi tên file và kiểm tra.

@@ -1,0 +1,49 @@
+# Redesigning Interest Rate Tool
+
+## Goal
+Overhaul the UI of `InterestRateTool.tsx` to match the design of [batdongsan.com.vn](https://batdongsan.com.vn/ho-tro-tien-ich/ht-tinh-lai-suat). The user explicitly requested an exact visual match due to dissatisfaction with the current "clean" design.
+
+## User Review Required
+> [!IMPORTANT]
+> This redesign moves away from the modern, clean style used elsewhere in the clone to closely mimic the denser, specific style of the reference site, including button colors, borders, and font sizing.
+
+## Proposed Changes
+
+### [src/components/tools/InterestRateTool.tsx](file:///i:/Website/BDS/src/components/tools/InterestRateTool.tsx)
+- **Structure**:
+    - **Header**: Tab-like header "Tính lãi suất" centered with specific styling.
+    - **Section 1: Bank Interest Lookup**:
+        - Title "Tìm lãi suất ngân hàng".
+        - Radio buttons: VND (checked), USD (disabled).
+        - **Dropdowns**:
+            - "Ngân hàng": Full list including Standard Chartered, Eximbank, Sacombank, Hong Leong Bank, Shinhan Bank, HSBC, PVcomBank, UOB, SEABANK, etc.
+            - "Kỳ hạn": 1, 2, 3, 6, 9, 12, 18, 24, 36 (tháng).
+        - Result text: "Lãi suất tham khảo: [value]% /năm" (Red, bold). Value updates based on selection (will mock some values).
+    - **Section 2: Loan Calculator**:
+        - Introductory text: "Bảng này giúp bạn tính toán số tiền cần trả khi vay ngân hàng để mua nhà trả góp" (Gray text).
+        - **Input Rows**: using a table-like layout or grid to match the reference.
+        - **Fields**:
+            - "Số tiền vay": Input with "VND" suffix inside the right side of the box.
+            - "Thời gian vay": Input number + Dropdown (Năm/Tháng) on the right.
+            - "Lãi suất": Input with "% / năm" suffix.
+            - "Loại hình": Dropdown (Dư nợ giảm dần / Dư nợ ban đầu).
+        - **Button**: "Xem kết quả" (Red outline or background, specific padding).
+    - **Section 3: Result Table**:
+        - Summary block above table: Total Principal, Total Interest (Red), Total Payment (Blue).
+        - Table Columns: Kỳ, Dư nợ đầu kỳ, Gốc trả, Lãi trả, Tổng trả.
+        - Styling: Light gray header, borders between rows.
+
+- **Logic**:
+    - Keep existing logic for "Declining Balance" and "Flat Rate".
+    - Populate mock data for bank lookup.
+
+## Verification Plan
+
+### Manual Verification
+- **Browser Test**:
+    1. Navigate to `/lai-suat`.
+    2. Verify the layout matches the screenshot (dense information, specific colors).
+    3. Input values (e.g., 2 billion, 20 years, Declining).
+    4. Click "Xem kết quả".
+    5. Verify the table appears and calculations are correct.
+    6. Verify the bank lookup dropdown updates the "Lãi suất tham khảo".

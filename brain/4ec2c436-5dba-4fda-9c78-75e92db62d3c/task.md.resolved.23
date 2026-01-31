@@ -1,0 +1,14 @@
+# Task: BrowserView Integration
+
+## Progress
+
+- [/] Create `electron/services/browserViewManager.ts`
+- [ ] Update [electron/main.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/main.ts) with IPC handlers + resize listener
+- [ ] Update [electron/preload.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/preload.ts) with browser API methods
+- [ ] Update [src/App.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/App.tsx) with tab state and toggle logic
+- [ ] Update [src/components/FileExplorer.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/FileExplorer.tsx) with tab switch UI
+- [ ] Create `src/components/BrowserControls.tsx` toolbar
+
+## Key Constants
+- TOOLBAR_HEIGHT = 50px
+- Uses WebContentsView (Electron v40+)

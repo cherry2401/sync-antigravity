@@ -1,0 +1,20 @@
+# Hướng dẫn sử dụng Tính năng Mới
+
+Tôi đã hoàn thành việc nâng cấp extension. Dưới đây là hướng dẫn sử dụng các tính năng mới.
+
+## 1. Cài đặt Webhook & Tự động làm mới
+1.  Mở Popup của extension.
+2.  Bạn sẽ thấy phần **"Auto-Refresh Settings"** mới.
+3.  **N8N Webhook URL**: Nhập địa chỉ Webhook của bạn (ví dụ từ N8N).
+4.  **Interval (minutes)**: Nhập số phút bạn muốn extension tự động tải lại trang (ví dụ: 5 phút).
+5.  **Enable Auto-Refresh**: Tích vào ô này để bật tính năng tự động.
+6.  Nhấn **"Save Settings"**.
+
+## 2. Cách hoạt động
+- **Bắt Token dễ dàng hơn**: Bây giờ bạn chỉ cần truy cập vào trang `aisandbox-pa.googleapis.com` (ImageFX hoặc VideoFX). Extension sẽ tự động bắt token ngay khi trang tải xong hoặc có bất kỳ request nào chạy ngầm, **không cần phải bấm tạo video thủ công nữa**.
+- **Tự động gửi Webhook**: Khi bắt được token, extension sẽ tự động gửi dữ liệu JSON (bao gồm `api_key` và [header](file:///d:/EXTENTIONS/Extension_Chrome_Veo-OK_v2/background.js#105-112)) đến địa chỉ Webhook bạn đã cài đặt.
+- **Tự động duy trì**: Nếu bạn bật "Enable Auto-Refresh", extension sẽ tự động tải lại tab AI Sandbox sau mỗi khoảng thời gian bạn cài đặt. Việc này giúp duy trì session và liên tục lấy token mới gửi về Webhook.
+
+## Lưu ý
+- Hãy đảm bảo bạn luôn giữ một tab `aisandbox-pa.googleapis.com` mở để tính năng Auto-Refresh hoạt động.
+- Kiểm tra N8N của bạn để đảm bảo dữ liệu được nhận đúng định dạng.

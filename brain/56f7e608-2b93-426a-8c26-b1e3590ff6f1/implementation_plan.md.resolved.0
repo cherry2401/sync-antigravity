@@ -1,0 +1,51 @@
+# HaKi Beauty - Implementation Plan (Phase 1)
+
+Triển khai các tính năng cốt lõi cho website mỹ phẩm HaKi Beauty, bắt đầu với trang chi tiết sản phẩm và Footer.
+
+## Proposed Changes
+
+### 1. Product Detail Page
+
+#### [NEW] [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/san-pham/[slug]/page.tsx)
+Trang chi tiết sản phẩm với:
+- **Image Gallery**: Hình chính + thumbnails, zoom on hover
+- **Product Info**: Tên, thương hiệu, giá (sale price nếu có), rating, mô tả
+- **Quantity Selector**: Chọn số lượng
+- **Add to Cart Button**: Nút thêm vào giỏ
+- **Related Products**: Grid 4 sản phẩm liên quan
+
+---
+
+### 2. Footer Component
+
+#### [NEW] [Footer.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/layout/Footer.tsx)
+Footer component bao gồm:
+- **Logo & mô tả ngắn**
+- **Quick Links**: Trang chủ, Sản phẩm, Về chúng tôi, Liên hệ
+- **Chính sách**: Đổi trả, Bảo mật, Vận chuyển
+- **Thông tin liên hệ**: Địa chỉ, SĐT, Email
+- **Social Links**: Facebook, Instagram, TikTok
+- **Newsletter**: Form đăng ký nhận tin
+- **Copyright**
+
+#### [MODIFY] [layout.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/layout.tsx)
+Thêm Footer vào layout chính.
+
+---
+
+## Verification Plan
+
+### Manual Testing
+1. **Product Detail Page**:
+   - Truy cập `http://localhost:3006/san-pham/serum-vitamin-c-20-pure-brightening`
+   - Kiểm tra hình ảnh hiển thị đúng
+   - Kiểm tra thông tin sản phẩm (tên, giá, rating)
+   - Click vào thumbnails để đổi hình chính
+   - Thử tăng/giảm số lượng
+   - Kiểm tra responsive trên mobile (F12 → Toggle device toolbar)
+
+2. **Footer**:
+   - Scroll xuống cuối trang để xem Footer
+   - Kiểm tra tất cả links có hover effect
+   - Kiểm tra form newsletter hoạt động
+   - Kiểm tra responsive trên mobile

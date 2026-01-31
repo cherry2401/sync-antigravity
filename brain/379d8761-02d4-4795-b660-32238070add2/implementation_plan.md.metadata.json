@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Added a fix for the 'Process Post Data' node to correctly handle 'video_inline' by extracting the video source URL instead of the fallback image.",
+  "updatedAt": "2025-11-20T15:20:53.904638500Z",
+  "version": "1"
+}

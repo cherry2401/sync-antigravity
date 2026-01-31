@@ -1,0 +1,32 @@
+# Walkthrough - Admin Dashboard Overhaul
+
+## Goal
+The goal was to transform the basic Admin Dashboard into a professional, modular control center with enhanced management capabilities and visual analytics.
+
+## Changes
+
+### 1. Architecture Refactoring
+- **Modularization**: Split the monolithic [AdminDashboard.tsx](file:///i:/Website/BDS/src/components/admin/AdminDashboard.tsx) into dedicated components: [AdminLayout](file:///i:/Website/BDS/src/components/admin/AdminLayout.tsx#12-110), [AdminOverview](file:///i:/Website/BDS/src/components/admin/AdminOverview.tsx#11-169), [AdminListings](file:///i:/Website/BDS/src/components/admin/AdminListings.tsx#13-151), [AdminUsers](file:///i:/Website/BDS/src/components/admin/AdminUsers.tsx#4-134), and [AdminNews](file:///i:/Website/BDS/src/components/admin/AdminNews.tsx#11-194).
+- **Dependency**: Added `recharts` for data visualization.
+
+### 2. New Features
+- **Admin Overview**: Added a dashboard landing page featuring:
+    - **Stats Cards**: Real-time metrics for Listings, Views, Users, and Revenue.
+    - **Area Chart**: Visualizing traffic and listing trends over the last 7 days.
+    - **Bar Chart**: Breakdown of property types.
+    - **Recent Activity**: A log of recent user actions.
+- **Listing Management**: 
+    - Converted grid view to a detailed **Table View**.
+    - Added **Filters** (Tabs for All/Pending/Active) and **Search**.
+    - Added columns for detailed info (Price, Area, Location, Date).
+- **User Management**: 
+    - New module to manage users.
+    - Mock data table with Ban/Unban and Reset Password actions.
+- **News Management**:
+    - Integrated AI writing assistant (Gemini) into the news editor.
+    - Improved table layout for content management.
+
+## Verification
+- **Compilation**: The code compiles successfully with the new `recharts` dependency.
+- **Navigation**: Switching tabs in the sidebar updates the main content area correctly using the new [AdminLayout](file:///i:/Website/BDS/src/components/admin/AdminLayout.tsx#12-110).
+- **Visuals**: Charts render correctly using the mock and real data provided.

@@ -1,0 +1,5 @@
+- [x] Restore Direct Blob Download (PC)
+- [x] Refine PC Fallback (Proxy for CORS)
+- [x] Implement Link Shortener (Frontend + n8n Proxy)
+- [x] Deploy Fix
+- [x] Optimize Link Shortener (Cloudflare -> Supabase Direct)

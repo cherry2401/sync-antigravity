@@ -1,0 +1,6 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary":  "Architecture and code for having Chrome Extension make VEO3 API calls instead of n8n server, solving token validation issues by calling from browser context",
+  "updatedAt":  "2025-12-21T05:22:01.320091100Z",
+  "version":  "12"
+}

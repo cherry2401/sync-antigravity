@@ -1,0 +1,90 @@
+# Admin Dashboard Overhaul Plan
+
+## Goal Description
+Transform the current basic Admin Dashboard into a professional, modular, and feature-rich administration system. The goal is to provide specific management capabilities for Listings, Users, and Content, along with high-level analytics to track platform performance.
+
+## User Review Required
+> [!IMPORTANT]
+> This is a major refactor. The existing `AdminDashboard.tsx` will be broken down into a layout component and several page/feature components.
+
+## Proposed Changes
+
+### 1. Architecture Refactoring
+Break down the monolithic `AdminDashboard.tsx` into:
+- **`AdminLayout`**: Sidebar navigation and Top header (User profile, notifications).
+- **`AdminOverview`**: The landing page with statistics and charts.
+- **[AdminListings](file:///i:/Website/BDS/src/components/admin/AdminListings.tsx#13-156)**: Advanced table for listing management.
+- **`AdminUsers`**: New section for user management.
+- **`AdminNews`**: Content management system.
+
+### 2. Dashboard Overview (New)
+Implement a "Command Center" view containing:
+- **Stats Cards**: Total Listings, New Users (Today/Week), Total Views, Revenue (Mock).
+- **Activity Chart**: Visual representation of views/listings over time (using Recharts or CSS-based charts).
+- **Recent Activity**: Log of latest actions (User X posted Listing Y).
+
+### 3. Listing Management Enhancements
+Upgrade the current grid view to a powerful management table:
+- **Tabbed View**: All | Pending Approval | Active | Rejected.
+- **Quick Actions**: Approve/Reject buttons directly in the list.
+- **Filtering**: Filter by Province, Price Range, Type.
+- **Status Badges**: Visual indicators for listing status.
+
+### 4. User Management (New)
+Create a new section to manage user accounts:
+- **User List**: Table showing Name, Email, Phone, Role, Join Date.
+- **Actions**: View details, Ban/Unban user, Reset password (mock).
+
+### 5. News & Content
+- Improve the editor experience (Rich text or better layout).
+- Manage "Featured" news items.
+
+## Detailed Component Structure
+
+### `src/components/admin/`
+#### [NEW] `AdminLayout.tsx`
+- Sidebar with navigation links.
+- Responsive design.
+
+#### [NEW] `AdminOverview.tsx`
+- `StatsCard` component.
+- `ActivityChart` component.
+
+#### [NEW] `AdminListings.tsx`
+- Data table for listings.
+#### [NEW] `AdminListings.tsx`
+- **Data Source**: Fetch from `bds_listings` table.
+- **Joins**: Join with `bds_users` to get poster's name/phone.
+- **Actions**:
+    - `approve`: Update `status` to 'active'.
+    - `reject`: Update `status` to 'rejected'.
+    - `delete`: Delete row.
+- **Schema Mapping**:
+    - `id` (int) -> string
+    - `status` -> `isVerified`
+    - `created_at` -> `publishedAt`
+    - Handle missing fields gracefully until schema is updated.
+
+#### [NEW] `AdminUsers.tsx`
+- Data table for users.
+
+#### [MODIFY] `AdminDashboard.tsx`
+- Refactor to be the main router/controller that renders `AdminLayout` and switches between the sub-components based on state.
+
+- [x] Refactor `AdminNews` to fetch data from Supabase
+- [x] Refactor `AdminNews` to save/delete data to Supabase
+
+## Xác thực & Đăng nhập (Supabase)
+- [x] Tạo `AuthContext` (`src/contexts/AuthContext.tsx`) - Quản lý trạng thái đăng nhập
+- [x] Tạo `LoginPage` (`src/pages/LoginPage.tsx`) - Trang đăng nhập
+- [x] Cập nhật `App.tsx` - Tích hợp AuthProvider và thêm route Login
+- [x] Bảo vệ `AdminLayout` - Chuyển hướng về Login nếu chưa đăng nhập
+- [x] Cập nhật Header - Hiển thị thông tin user thật
+
+## Verification Plan
+
+### Manual Verification
+- **Navigation**: Verify switching between tabs (Dashboard, Listings, Users, News) works smoothly without page reload.
+- **Interactive Elements**: Test Approve/Reject buttons on listings.
+- **Responsiveness**: Ensure the dashboard looks good on tablet/desktop.
+- **Data Integrity**: Verify that editing a listing in Admin reflects in the public view.

@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "Quick reference guide for fixing the bun.exe auto-spawn issue in Wails projects. Explains why bun was being used instead of npm and provides multiple solutions.",
+  "updatedAt": "2026-01-27T10:46:58.038204600Z"
+}

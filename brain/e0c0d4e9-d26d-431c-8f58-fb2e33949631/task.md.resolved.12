@@ -1,0 +1,12 @@
+# Nhiệm vụ: Cấu hình và Cài đặt Claude-ws
+
+## Cấu hình đã hoàn tất
+- [x] Cấu hình Claude Code CLI & VS Code Extension <!-- id: 0 -->
+- [x] Chạy claude-ws tại Local (Windows) <!-- id: 1 -->
+- [x] Thiết lập Cloudflare Tunnel truy cập từ xa <!-- id: 2 -->
+
+## Thiết lập chạy ngầm vĩnh viễn (Persistence)
+- [/] Cài đặt cloudflared làm Windows Service <!-- id: 3 -->
+- [ ] Cài đặt PM2 để quản lý tiến trình claude-ws <!-- id: 4 -->
+- [ ] Đảm bảo hệ thống tự khởi động lại sau khi reboot <!-- id: 5 -->
+

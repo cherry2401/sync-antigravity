@@ -1,0 +1,20 @@
+# File Explorer Refinement & IPC Debugging
+
+## UI Refinement
+- [ ] Remove separate "Go" button and text input from [FileExplorer.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/FileExplorer.tsx).
+- [ ] Ensure Drive dropdown is the primary navigation control.
+- [ ] Verify auto-load functionality.
+
+## IPC Debugging
+- [x] Investigate why `window.electronAPI.listDir` is undefined despite `preload.js` having it. (Fixed via compilation)
+- [x] Add debug logging to Renderer to inspect `window.electronAPI` keys.
+- [x] Verify [main.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/main.ts) IPC handlers are registered.
+- [x] Ensure clean build/restart cycle.
+
+## Dynamic Drive Detection
+- [x] Add `fs:getDrives` IPC handler in [main.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/main.ts) using `systeminformation`.
+- [x] Expose [getDrives](file:///f:/Python/OpenSSH/clawdbot-client/src/vite-env.d.ts#71-72) in [preload.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/preload.ts) and [vite-env.d.ts](file:///f:/Python/OpenSSH/clawdbot-client/src/vite-env.d.ts).
+- [x] Update [fileStore.ts](file:///f:/Python/OpenSSH/clawdbot-client/src/stores/fileStore.ts) to include `drives` state and [loadDrives](file:///f:/Python/OpenSSH/clawdbot-client/src/stores/fileStore.ts#62-73) action.
+- [x] Update [FileExplorer.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/FileExplorer.tsx) to display real drives with labels.
+- [x] Refine Drive Label format (User request: "I:\ Label").
+- [x] Fix incorrect drive content listing (force root path with trailing slash).

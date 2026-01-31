@@ -1,0 +1,100 @@
+# Admin Dashboard Implementation Plan
+
+## Goal
+Xây dựng Admin Dashboard (`/admin`) với các tính năng quản lý Marketing, Sản phẩm, Đơn hàng và Khách hàng.
+
+## Proposed Changes
+
+### 1. Admin Layout & Navigation
+#### [NEW] [AdminLayout.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/admin/AdminLayout.tsx)
+- Sidebar responsive với menu navigation
+- Header với thông tin admin
+- Menu items:
+  - 📊 Tổng quan (Dashboard)
+  - 📦 Sản phẩm (Products) - với submenu
+  - 🎯 Marketing - với submenu  
+  - 🎨 Giao diện (Storefront)
+  - 📋 Đơn hàng (Orders)
+  - 👥 Khách hàng (Customers)
+
+---
+
+### 2. Admin Routes Structure
+```
+app/admin/
+├── layout.tsx              (AdminLayout wrapper)
+├── page.tsx                (Dashboard overview)
+├── san-pham/
+│   ├── page.tsx           (Product list with TanStack Table)
+│   └── them-moi/page.tsx  (Add product form)
+├── marketing/
+│   ├── page.tsx           (Campaign list)
+│   ├── chien-dich/page.tsx (Flash Sale management)
+│   └── voucher/page.tsx   (Voucher/Coupon management)
+├── don-hang/page.tsx      (Orders list)
+└── khach-hang/page.tsx    (Customers list)
+```
+
+---
+
+### 3. Product Management Features
+#### [NEW] Product List Page
+- TanStack Table với:
+  - Search by name/SKU
+  - Filter by category, status
+  - Pagination
+  - Bulk actions (delete, update status)
+
+#### [NEW] Add Product Form
+- Multi-image upload với drag & drop
+- Rich Text Editor (Tiptap) cho mô tả
+- Variants: Size, Color
+- Fields: Tên, SKU, Giá gốc, Giá sale, Tồn kho, Danh mục, Thương hiệu
+
+---
+
+### 4. Marketing Campaign Features
+#### [NEW] Flash Sale Campaign
+- Tên chương trình
+- Start Time - End Time (date/time picker)
+- Product selector: checkbox list
+- Set giá khuyến mãi cho từng sản phẩm
+- Status: Draft, Active, Ended
+
+#### [NEW] Voucher Management
+- Mã voucher
+- Loại: Fixed amount / Percentage
+- Điều kiện: Min order value
+- Số lượng sử dụng
+- Thời hạn
+
+---
+
+### 5. Dependencies
+```bash
+npm install @tanstack/react-table @tiptap/react @tiptap/starter-kit
+```
+
+---
+
+## Verification Plan
+
+### Automated Tests
+- Check routing works for all admin pages
+- Verify sidebar navigation highlights correctly
+- Test form validation on product add
+
+### Manual Verification
+- Navigate through all admin pages
+- Test responsive design on mobile/tablet
+- Verify table sorting/filtering works
+
+---
+
+## Implementation Order
+1. AdminLayout + basic routes
+2. Dashboard overview with stats cards
+3. Product list (TanStack Table)
+4. Product add form
+5. Marketing campaigns
+6. Orders & Customers pages

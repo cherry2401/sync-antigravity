@@ -1,0 +1,43 @@
+# Kế hoạch phát triển Giai đoạn 2 (Phase 2) - BDS Website
+
+Hiện tại dự án đang là một bản Prototype chạy tốt trên Frontend. Để phát triển thành một sản phẩm thực tế và chuyên nghiệp hơn, dưới đây là lộ trình tôi đề xuất:
+
+## 1. Tái cấu trúc mã nguồn (Refactoring) - ⚠️ Ưu tiên cao
+File [index.tsx](file:///i:/Website/BDS/index.tsx) hiện đã quá lớn (~2000 dòng), rất khó quản lý và mở rộng.
+- **Tách Component**: Chuyển `Header`, `Footer`, [PropertyCard](file:///i:/Website/BDS/index.tsx#1168-1228), [FilterDropdown](file:///i:/Website/BDS/index.tsx#1240-1300), [AdminDashboard](file:///i:/Website/BDS/index.tsx#810-1167) ra các file riêng trong thư mục `src/components`.
+- **Tách Trang (Pages)**: Chia nhỏ thành `HomePage`, `ListingDetailPage`, `AdminPage`, `SavedPage` trong thư mục `src/pages`.
+- **Routing**: Sử dụng `react-router-dom` để điều hướng thật thay vì dùng state `activeView`. Điều này giúp người dùng có thể chia sẻ link (ví dụ: `bds.com/tin-dang/123`).
+
+## 2. Tính năng thiết yếu (Core Features)
+Những tính năng cần có để trang web hoạt động "thật":
+- **Backend & Database**:
+    - Tích hợp **Supabase** hoặc **Firebase** (miễn phí, dễ dùng) để thay thế `localStorage`.
+    - Lợi ích: Dữ liệu không bị mất khi đổi trình duyệt/máy tính, hỗ trợ nhiều người dùng.
+- **Xác thực (Auth)**:
+    - Đăng ký/Đăng nhập thật qua Email/Google.
+    - Phân quyền Admin/User bảo mật hơn.
+- **Upload ảnh thật**:
+    - Hiện tại ảnh chỉ là blob tạm. Cần tích hợp **Cloudinary** hoặc **Supabase Storage** để lưu ảnh người dùng upload.
+
+## 3. Cải tiến Giao diện (UI/UX Improvement)
+- **Trang Chi tiết tin đăng (Listing Detail)**:
+    - Làm đẹp hơn với thư viện ảnh dạng Slider/Carousel chuyên nghiệp.
+    - Hiển thị bản đồ vị trí BĐS (dùng **Leaflet** hoặc **Google Maps**).
+    - Gợi ý "Bất động sản tương tự" ở cuối trang.
+- **Bản đồ tương tác (Map Search)**:
+    - Tính năng "Tìm bất động sản quanh đây" là "killer feature" của các app BĐS. Hiển thị giá tiền trên bản đồ.
+- **Mobile Experience**:
+    - Tối ưu thanh điều hướng dưới đáy (Bottom Navigation) giống native app.
+    - Animation chuyển trang mượt mà.
+
+## 4. Đề xuất lộ trình thực hiện
+Bạn nên chọn **1 trong các hướng sau** để bắt đầu ngay:
+
+> [!TIP]
+> **Option A (Kỹ thuật)**: Tái cấu trúc code (Split Components + React Router). Giúp code gọn gàng trước khi thêm tính năng mới.
+>
+> **Option B (Dữ liệu)**: Tích hợp Supabase để có Database thật.
+>
+> **Option C (Giao diện)**: Làm đẹp trang Chi tiết tin đăng + Tích hợp Bản đồ.
+
+Bạn muốn tôi bắt đầu với hướng nào?

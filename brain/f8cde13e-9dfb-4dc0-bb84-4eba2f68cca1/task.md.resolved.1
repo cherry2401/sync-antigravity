@@ -1,0 +1,17 @@
+# Task: Fix VEO3_V2 Telegram Image Upload
+
+## Investigation
+- [x] Compare VEO3_ImageUpload_Fixed_V3 (working) vs VEO3_V2 (failing)
+- [x] Identify base64 cleaning issue (user already fixed this)
+- [x] Find additional issues: HTTP typeVersion and missing mimeType
+- [x] Create comprehensive implementation plan
+
+## Implementation
+- [ ] Fix 1: Change Upload Image typeVersion from 4.2 to 3
+- [ ] Fix 2: Add mimeType output in Convert to Base64 node
+
+## Verification
+- [ ] Test with Telegram JPEG image
+- [ ] Test with Telegram PNG image
+- [ ] Verify Upload Image returns mediaGenerationId
+- [ ] Verify video generation completes successfully

@@ -1,0 +1,113 @@
+# Refactor Homepage for Dynamic Builder
+
+**Mục tiêu:** Tích hợp Page Builder vào Trang chủ mà **KHÔNG làm mất bất kỳ style nào**.
+
+## Current State Analysis
+
+| Component | File | Status |
+|-----------|------|--------|
+| HeroBanner | [components/sections/HeroBanner.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/HeroBanner.tsx) | ✅ Exists (484 lines) |
+| BrandCarousel | [components/sections/BrandCarousel.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/BrandCarousel.tsx) | ✅ Exists (77 lines) |
+| PromoBanner | [components/sections/PromoBanner.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/PromoBanner.tsx) | ✅ Exists (77 lines) |
+| PromotionalProducts | [components/sections/PromotionalProducts.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/PromotionalProducts.tsx) | ✅ Exists (219 lines) |
+| ServiceFeatures | Inline in [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/page.tsx) | ⚠️ Need extract |
+| FeaturedProducts | Inline in [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/page.tsx) | ⚠️ Need extract |
+| CategoriesGrid | Inline in [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/page.tsx) | ⚠️ Need extract |
+
+---
+
+## Proposed Changes
+
+### Component Layer: Extract Remaining Sections
+
+#### [NEW] [ServiceFeaturesBar.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/ServiceFeaturesBar.tsx)
+Copy-paste **100% nguyên bản** lines 141-193 từ [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/page.tsx) (section "SERVICE FEATURES BAR").
+
+#### [NEW] [FeaturedProducts.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/FeaturedProducts.tsx)
+Copy-paste **100% nguyên bản** lines 196-240 từ [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/page.tsx). Component nhận props:
+- `title: string` (e.g. "Nổi bật nhất")
+- `subtitle?: string`
+- `products: Product[]`
+- `viewAllLink?: string`
+
+#### [NEW] [CategoriesGrid.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/CategoriesGrid.tsx)
+Copy-paste **100% nguyên bản** lines 273-311 từ [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/page.tsx). Component nhận props:
+- `title: string`
+- `subtitle?: string`
+- `categories: Array<{name, image, count, link}>`
+
+---
+
+### BlockRenderer: Create Registry
+
+#### [NEW] [BlockRenderer.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/storefront/BlockRenderer.tsx)
+
+```tsx
+const BLOCK_COMPONENTS: Record<string, React.FC<any>> = {
+  'HERO_BANNER': HeroBanner,           // Re-use existing beautiful component
+  'BRAND_CAROUSEL': BrandCarousel,     // Re-use existing
+  'PROMO_BANNER': PromoBanner,         // Re-use existing  
+  'PROMOTIONAL_PRODUCTS': PromotionalProducts,
+  'SERVICE_FEATURES': ServiceFeaturesBar,
+  'FEATURED_PRODUCTS': FeaturedProducts,
+  'CATEGORY_GRID': CategoriesGrid,
+};
+```
+
+---
+
+### Homepage: Use BlockRenderer
+
+#### [MODIFY] [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/page.tsx)
+
+**Strategy A: Keep working homepage, add builder switch**
+```tsx
+export default function Home() {
+  // Default blocks = current layout
+  const defaultBlocks = [
+    { type: 'HERO_BANNER', props: {} },
+    { type: 'SERVICE_FEATURES', props: {} },
+    { type: 'FEATURED_PRODUCTS', props: { title: 'Nổi bật nhất', products: featuredProducts } },
+    // ...
+  ];
+  
+  return (
+    <div className="min-h-screen bg-[var(--color-off-white)]">
+      <BlockRenderer blocks={defaultBlocks} />
+    </div>
+  );
+}
+```
+
+---
+
+### Admin Preview: Use Real Components
+
+#### [MODIFY] [trang-tri/page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/admin/giao-dien/trang-tri/page.tsx)
+
+Thay thế các preview boxes với:
+```tsx
+<div className="origin-top-left scale-[0.4] w-[250%]">
+  <BlockRenderer blocks={currentBlocks} />
+</div>
+```
+
+---
+
+## Verification Plan
+
+### Visual Verification (Before/After)
+1. **Screenshot BEFORE**: Capture current homepage at `localhost:3006`
+2. Run implementation
+3. **Screenshot AFTER**: Capture new homepage
+4. Compare: Must be **pixel-identical**
+
+### Automated Test
+Navigate to `localhost:3006/` and verify all sections render without console errors.
+
+### Manual Checklist
+- [ ] HeroBanner slider works (auto-play, arrows, dots)
+- [ ] Brand carousel animates infinitely
+- [ ] Featured products display with correct images
+- [ ] Category grid shows 4 items
+- [ ] Admin Page Builder shows live preview

@@ -1,0 +1,24 @@
+# Backup Credentials Workflow Fix
+
+## Problem
+- Original workflow used `n8n-nodes-base.n8n` API node which returns 404 error due to hosting API configuration issues
+- Need to adapt workflow to use custom `n8n-nodes-backup-credentials` node instead
+
+## Tasks
+
+### Main Workflow
+- [x] Replace "Get many workflows" node with "Backup credentials" custom node
+- [x] Add Code node to parse binary data into JSON array (29 credentials parsed)
+- [ ] Update "Loop Over Items" to process credentials
+- [ ] Modify "Execute Workflow" trigger to handle credential data
+
+### Subworkflow  
+- [ ] Update "Get file data" GitHub node to use credential ID instead of workflow ID
+- [ ] Modify "isDiffOrNew" Code node to compare credentials instead of workflows
+- [ ] Update GitHub "Create new file" node with correct file path for credentials
+- [ ] Update GitHub "Edit existing file" node with correct file path for credentials
+
+### Testing
+- [ ] Test single credential backup
+- [ ] Test loop through all credentials
+- [ ] Verify GitHub file structure

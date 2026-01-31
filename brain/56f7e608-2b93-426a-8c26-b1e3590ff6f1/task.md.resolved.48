@@ -1,0 +1,22 @@
+# Homepage Sections Implementation
+
+## 1. Featured Products (Nổi bật nhất) ✅
+- [x] Tạo [products.json](file:///i:/Website/MyphamHaKi/app-src/data/products.json) và Server Actions ([products.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts))
+- [x] Refactor FeaturedProducts → Server + Client component
+
+## 2. Promotional Products (Ưu đãi đặc biệt) ✅
+- [x] Sử dụng [getPromotionalProducts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts#103-125) Server Action
+- [x] Refactor PromotionalProducts → Server + Client component  
+
+## 3. Categories Grid (Danh mục nổi bật) ✅
+- [x] Tạo [categories.json](file:///i:/Website/MyphamHaKi/app-src/data/categories.json) và Server Actions ([categories.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/categories.ts))
+- [x] Refactor CategoriesGrid với product count
+
+## 4. Promo Banner (Banner khuyến mãi) ⏳
+- [ ] Thêm PromoBannerSettings trong Page Builder (tùy chọn)
+- Hiện tại đã có design đẹp, hoạt động tốt
+
+## 5. Brand Carousel (Thương hiệu) ✅
+- [x] Tạo [brands.json](file:///i:/Website/MyphamHaKi/app-src/data/brands.json) và Server Actions ([brands.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/brands.ts))
+- [x] Refactor BrandCarousel → Server + Client component
+- [x] Tạo trang admin `/admin/thuong-hieu`

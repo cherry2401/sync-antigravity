@@ -1,0 +1,7 @@
+# Debugging Clawdbot Installation
+
+- [x] Analyze project configuration and status <!-- id: 0 -->
+- [x] Reproduce installation errors <!-- id: 1 -->
+- [x] Fix dependencies or build scripts <!-- id: 2 -->
+- [x] Verify successful installation <!-- id: 3 -->
+- [x] Stabilize background service and dashboard access <!-- id: 4 -->

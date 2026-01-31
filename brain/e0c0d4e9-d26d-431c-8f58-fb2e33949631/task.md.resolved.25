@@ -1,0 +1,23 @@
+# Nhiệm vụ: Xây dựng Claude Manager App (All-in-One Controller)
+
+## Giai đoạn 1: Architecture & Design (Đang thực hiện)
+- [x] Phân tích yêu cầu & Tech Stack (React vs Electron) <!-- id: 0 -->
+- [x] Xác định tính năng cốt lõi (Core Features) <!-- id: 1 -->
+- [x] Thiết kế UI/UX Mockup (Đã duyệt qua chat) <!-- id: 2 -->
+- [x] Viết Specification (Spec.md) <!-- id: 3 -->
+
+## Giai đoạn 2: Development (Bắt đầu)
+- [x] Init Project (Vite + React + TypeScript + Electron) <!-- id: 4 -->
+- [x] Cấu hình Electron Main Process & IPC <!-- id: 5 -->
+- [x] Implement Dashboard UI (Shadcn) <!-- id: 6 -->
+- [x] Implement System Logic (Start/Stop/Logs) <!-- id: 7 -->
+
+## Giai đoạn 3: Polish & Delivery
+- [x] Đóng gói ứng dụng (.exe) <!-- id: 8 -->
+- [x] Tạo Shortcut Desktop (Đã copy file exe ra Desktop) <!-- id: 9 -->
+
+## Giai đoạn 4: UI/UX Redesign (Modern Dark)
+- [ ] Xóa bỏ Hacker Theme (Matrix Green) <!-- id: 10 -->
+- [ ] Cập nhật bảng màu Modern Blue/Slate <!-- id: 11 -->
+- [ ] Viết lại Layout theo Cladbot Client (Sidebar + Dashboard + Logs) <!-- id: 12 -->
+- [ ] Build lại bản final <!-- id: 13 -->

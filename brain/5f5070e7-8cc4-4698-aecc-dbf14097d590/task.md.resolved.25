@@ -1,0 +1,55 @@
+# BDS Website Development Tasks
+
+- [x] Phân tích source code hiện tại
+- [x] Triển khai Lưu trữ dữ liệu (LocalStorage)
+    - [x] Cập nhật `index.tsx` để đọc/ghi listings từ localStorage
+    - [x] Cập nhật `index.tsx` để đọc/ghi news từ localStorage
+- [x] Triển khai Bộ lọc tìm kiếm
+    - [x] Thêm UI Dropdown cho Mức giá, Diện tích, Khu vực
+    - [x] Viết logic lọc dữ liệu (`filteredListings`)
+- [ ] Triển khai tính năng Yêu thích (Favorites)
+    - [x] Thêm state lưu danh sách ID yêu thích
+- [x] Phân tích source code hiện tại
+- [x] Triển khai Lưu trữ dữ liệu (LocalStorage)
+    - [x] Cập nhật `index.tsx` để đọc/ghi listings từ localStorage
+    - [x] Cập nhật `index.tsx` để đọc/ghi news từ localStorage
+- [x] Triển khai Bộ lọc tìm kiếm
+    - [x] Thêm UI Dropdown cho Mức giá, Diện tích, Khu vực
+    - [x] Viết logic lọc dữ liệu (`filteredListings`)
+- [x] Triển khai tính năng Yêu thích (Favorites)
+    - [x] Thêm state lưu danh sách ID yêu thích
+    - [x] Cập nhật UI trái tim để toggle yêu thích
+    - [x] Tạo trang xem tin đã lưu
+- [x] Sửa lỗi IDE / Linting
+    - [x] Chạy npm install
+
+- [x] Giai đoạn 2: Tái cấu trúc (Refactoring) [x]
+    - [x] Cài đặt `react-router-dom`
+    - [x] Tạo cấu trúc thư mục (`components`, `pages`, `types`, `data`)
+    - [x] Tách `types` và `mock data`
+    - [x] Tách các Component nhỏ ([Header](file:///i:/Website/BDS/src/components/common/Header.tsx#13-93), `Footer`, `PropertyCard`, etc.)
+    - [x] Tách các Pages (`Home`, [Admin](file:///i:/Website/BDS/src/components/admin/AdminNews.tsx#15-242), [Post](file:///i:/Website/BDS/src/components/property/PostingForm.tsx#80-123), `Saved`, etc.)
+    - [x] Thiết lập Routing trong `App.tsx`
+    - [x] Integrate `react-quill-new` and fix layout issues
+- [x] Optimize Admin Dashboard for Mobile
+    - [x] Make Sidebar responsive (Drawer mode)
+    - [x] Add Hamburger Menu for Sidebar toggle
+    - [x] Fix table overflow on mobile
+    - [x] Adjust padding and margins for small screens
+- [ ] Giai đoạn 3: Kết nối Backend (Supabase)
+    - [ ] Cài đặt `@supabase/supabase-js`
+    - [ ] Cấu hình Client (`src/lib/supabase.ts`)
+    - [ ] Kết nối dữ liệu Tin tức (News)
+    - [ ] Kết nối dữ liệu Người dùng (Users)
+- [ ] Giai đoạn 4: Cải tiến giao diện & Tính năng [/]
+    - [x] Trang chi tiết BĐS (Slider, Map)
+    - [x] Bản đồ tìm kiếm
+    - [x] Mobile UX
+    - [x] Căn chỉnh Layout (Max-width 1200px)
+
+## Phase 3: Admin Dashboard Overhaul
+- [x] Create AdminLayout component (Sidebar/Header) <!-- id: 6 -->
+- [x] Create AdminOverview component with Stats and Charts <!-- id: 7 -->
+- [x] Create AdminListings component (Table view, Filtering, Approval) <!-- id: 8 -->
+- [x] Create AdminUsers component (User management) <!-- id: 9 -->
+- [x] Refactor AdminDashboard.tsx to route to new modules <!-- id: 10 -->

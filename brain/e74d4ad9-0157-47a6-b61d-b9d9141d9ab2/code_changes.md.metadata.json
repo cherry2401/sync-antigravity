@@ -1,0 +1,5 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_OTHER",
+  "summary":  "Code snippets for key nodes needed to fix the Media ID duplication issue. Includes modified 'Combine Post + Groups Data', new 'Prepare Media for Group', 'Upload Media for This Group', and 'Collect Media IDs for Group' nodes.",
+  "updatedAt":  "2025-12-31T05:22:43.508426300Z"
+}

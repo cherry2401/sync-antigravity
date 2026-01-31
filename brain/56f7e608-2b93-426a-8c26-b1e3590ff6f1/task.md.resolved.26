@@ -1,0 +1,7 @@
+# Checkout Discount Code Feature
+
+## Progress
+- [x] Add discount states and coupon logic
+- [x] Add coupon input UI
+- [x] Update price display with discount
+- [ ] Testing

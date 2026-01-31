@@ -1,0 +1,124 @@
+# Giải Quyết Captcha - 2 Phương Án Tối Ưu
+
+## Phương Án 1: Browser Capture (KHUYẾN NGHỊ) ⭐
+
+**Ý tưởng**: Extension capture `recaptchaToken` từ browser → Lưu vào Data Table → Workflow dùng
+
+### Ưu điểm
+- ✅ **MIỄN PHÍ** (không cần service giải captcha)
+- ✅ Token fresh (browser tự solve khi user browse)
+- ✅ Reliable (browser real solve captcha tự nhiên)
+- ✅ Đã có sẵn extension infrastructure
+
+### Flow
+
+```mermaid
+graph TD
+    A[User mở VEO web + tạo video test] --> B[Browser solve captcha tự động]
+    B --> C[Extension capture recaptchaToken]
+    C --> D[Gửi token về webhook/Data Table]
+    D --> E[Workflow đọc token từ Data Table]
+    E --> F[Create VEO3 với token]
+    F --> G{Error?}
+    G -->|Success| H[Done ✅]
+    G -->|Token expired| I[Notify user: refresh token]
+```
+
+### Implementation
+
+#### 1. Update Extension [background.js](file:///d:/EXTENTIONS/Extension_Chrome_Veo-OK_v2/background.js)
+
+Capture `recaptchaToken` từ request:
+
+```javascript
+// Trong onBeforeSendHeaders listener
+if (details.requestBody && details.requestBody.formData) {
+  let requestBody = JSON.parse(details.requestBody.raw[0].bytes);
+  
+  // Capture recaptchaToken nếu có
+  if (requestBody.clientContext?.recaptchaToken) {
+    capturedData.recaptchaToken = requestBody.clientContext.recaptchaToken;
+  }
+}
+
+// Send về webhook
+sendToWebhook({
+  token: apiKey,
+  projectId: projectId,
+  recaptchaToken: capturedData.recaptchaToken
+});
+```
+
+#### 2. Update Data Table
+
+Thêm column: `recaptchaToken` (string)
+
+#### 3. Update Workflow Nodes
+
+**Read Data (Image)** và **Read Data**: Đọc thêm `recaptchaToken`
+
+**Create VEO3** / **Generate Video (Image)**:
+```json
+{
+  "clientContext": {
+    ...
+    "recaptchaToken": "{{ $('Read Data').first().json.recaptchaToken || '' }}"
+  }
+}
+```
+
+#### 4. Error Handling
+
+**IF: Token Expired?**
+```javascript
+{{ $json.error?.message?.includes('reCAPTCHA') }}
+```
+→ Send Telegram message: "Token hết hạn! Mở VEO web và tạo 1 video test"
+
+---
+
+## Phương Án 2: TokenRecaptcha Method
+
+**Ý tưởng**: Generate token mà không cần solve captcha (exploit nếu có)
+
+### Research Notes
+
+- Token reuse có thể work nếu VEO API không validate strict
+- Token validity: ~2 minutes
+- Cần test xem VEO có accept token reused không
+
+### Risks
+
+- ⚠️ Có thể bị detect và block account
+- ⚠️ Token format có thể thay đổi
+- ⚠️ Không bền vững
+
+**→ KHÔNG khuyến nghị cho production**
+
+---
+
+## So Sánh
+
+| Feature | Browser Capture | Token Reuse | OmoCaptcha |
+|---|---|---|---|
+| Chi phí | **FREE** | FREE | $0.003/video |
+| Độ tin cậy | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐ |
+| Setup | Dễ (update extension) | Khó (exploit) | Dễ |
+| Tốc độ | Nhanh | Nhanh | Chậm (+15s) |
+| Risk | Không | Cao | Không |
+
+---
+
+## Khuyến Nghị
+
+**Dùng Phương Án 1 (Browser Capture)** vì:
+- Miễn phí
+- Dễ implement (chỉ update extension có sẵn)
+- An toàn, không risk
+- User chỉ cần mở VEO web thỉnh thoảng để refresh token
+
+**User workflow**:
+1. Mỗi ngày/tuần: Mở VEO web, tạo 1 video test
+2. Extension tự capture token mới
+3. Workflow dùng token đó cho tất cả requests
+4. Khi token hết hạn → Bot notify → User refresh lại

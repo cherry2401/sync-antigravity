@@ -1,0 +1,63 @@
+# Implementation Plan - TikTok User Video Crawler
+
+## Mục tiêu
+Tạo workflow tự động crawl video từ TikTok user bằng RapidAPI và lưu vào sheet `Public Reel` để workflow chính xử lý.
+
+## Luồng hoạt động
+
+### 1. Đọc thông tin User
+- **Read Cấu Hình Đăng**: Lấy danh sách user cần crawl (cột `Kênh TikTok`)
+- **Filter**: Lọc những user đang active (có thể thêm cột "Crawl" = TRUE/FALSE)
+
+### 2. Kiểm tra sec_uid
+- **If Node**: Check xem `sec_uid` đã có chưa?
+  - **Nếu CHƯA**: Gọi API `get_uniqueid`
+    - URL: `https://free-tiktok-api-scraper-mobile-version.p.rapidapi.com/user_uniqueid/`
+    - Query: `unique_id={{ $json["Kênh TikTok"] }}`
+    - Headers: `X-RapidAPI-Key`, `X-RapidAPI-Host`
+    - Lưu `sec_uid` vào biến (UID đã có sẵn từ cột `ID TikTok`)
+  - **Nếu ĐÃ CÓ**: Bỏ qua, dùng luôn
+
+### 3. Lấy danh sách video
+- **Get User Videos** (HTTP Request):
+  - URL: `https://free-tiktok-api-scraper-mobile-version.p.rapidapi.com/user_video/`
+  - Query Parameters:
+    - `uid`: `{{ $json.uid }}`
+    - `sec_uid`: `{{ $json.sec_uid }}`
+    - `count`: `10` (lấy 10 video mới nhất)
+  - Headers: `X-RapidAPI-Key`, `X-RapidAPI-Host`
+
+### 4. Lọc video trùng
+- **Read Public Reel**: Đọc sheet để lấy danh sách `Post ID` đã có
+- **Merge/Filter**: So sánh `video_id` từ API với `Post ID` trong sheet
+  - Loại bỏ video đã tồn tại
+- **Limit**: Chỉ lấy 1 video mới nhất
+
+### 5. Lưu vào sheet
+- **If**: Nếu có video mới
+  - **Append to Public Reel**: Thêm dòng mới với:
+    - `Post ID`: `{{ $json.video_id }}`
+    - `Tác giả`: `{{ $json.author.nickname }}`
+    - `Video TikTok`: `{{ $json.video_url }}`
+    - `Nội dung`: `{{ $json.title }}`
+    - `Page đích`: (lấy từ Cấu Hình Đăng)
+  - **Update Cấu Hình Đăng**: Cập nhật:
+    - `UID`: nếu mới lấy
+    - `sec_uid`: nếu mới lấy
+    - `ID Post Video mới nhất`: `{{ $json.video_id }}`
+
+## Cấu trúc Sheet cần thêm
+
+### Sheet "Cấu Hình Đăng"
+Thêm 3 cột:
+- `UID` (column G)
+- `sec_uid` (column H)
+- `ID Post Video mới nhất` (column I)
+
+## File mới
+- Tạo file: `c:\Users\Cherry\Clone_facebook\Test WF\Tiktok\Crawl_TikTok.json`
+
+## Lưu ý
+- API RapidAPI cần **API Key** từ tài khoản của bạn
+- Nên chạy định kỳ (15-30 phút/lần) để tránh spam
+- Nếu không có video mới, workflow sẽ dừng tại node If

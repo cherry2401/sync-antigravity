@@ -1,0 +1,121 @@
+# Clawdbot Desktop Client - Walkthrough
+
+## Summary
+
+Successfully built an Electron + React desktop application for connecting to Clawdbot Gateway. The app features a modern dark theme UI with chat functionality, command execution capabilities, and persistent storage.
+
+---
+
+## Screenshot
+
+![Clawdbot Client UI](C:/Users/Cherry/.gemini/antigravity/brain/4ec2c436-5dba-4fda-9c78-75e92db62d3c/clawdbot_client_ui_initial_1768387731448.png)
+
+---
+
+## What Was Built
+
+### Project Structure
+```
+clawdbot-client/
+├── electron/
+│   ├── main.ts           # Electron main process
+│   ├── preload.ts        # IPC bridge for secure API exposure
+│   └── services/
+│       ├── executor.ts   # Command executor (shell, file ops)
+│       └── database.ts   # LowDB JSON-based storage
+├── src/
+│   ├── App.tsx           # Main app with layout
+│   ├── components/
+│   │   ├── TitleBar.tsx  # Custom window controls
+│   │   ├── Sidebar.tsx   # Session list with grouping
+│   │   ├── ChatArea.tsx  # Messages with markdown
+│   │   ├── InputArea.tsx # Multi-line input
+│   │   ├── StatusBar.tsx # Connection status
+│   │   └── Settings.tsx  # Config modal
+│   ├── services/
+│   │   └── gateway.ts    # HTTP REST API connector
+│   └── stores/
+│       ├── chatStore.ts  # Zustand chat state
+│       └── configStore.ts # Config persistence
+└── README.md
+```
+
+### Features Implemented
+
+| Feature | Status |
+|---------|--------|
+| Dark theme UI (GitHub style) | ✅ |
+| Custom title bar with window controls | ✅ |
+| Session management (create/rename/delete) | ✅ |
+| Message rendering with Markdown | ✅ |
+| Code syntax highlighting | ✅ |
+| Command executor (shell, file read/write) | ✅ |
+| Gateway connector (HTTP REST) | ✅ |
+| Command polling (every 2s) | ✅ |
+| Persistent storage (LowDB JSON) | ✅ |
+| Settings modal (gateway, security) | ✅ |
+| Security: command blacklist | ✅ |
+| Security: toggle shell/file write | ✅ |
+
+---
+
+## How to Run
+
+```bash
+# Navigate to project
+cd f:\Python\OpenSSH\clawdbot-client
+
+# Install dependencies (already done)
+npm install
+
+# Run dev server
+npm run dev
+
+# Open http://localhost:5173 in browser
+# OR run with Electron
+npm run electron:dev
+```
+
+---
+
+## Gateway Integration
+
+The client expects these endpoints on your Clawdbot Gateway:
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/health` | GET | Connection test |
+| `/api/client/chat` | POST | Send chat messages |
+| `/api/client/commands` | GET | Poll pending commands |
+| `/api/client/commands/:id` | POST | Submit command results |
+
+### Request/Response Format
+
+**Send Chat:**
+```json
+POST /api/client/chat
+{
+  "sessionId": "uuid",
+  "message": "Hello Clawdbot"
+}
+```
+
+**Poll Commands:**
+```json
+GET /api/client/commands
+Response: [
+  {
+    "id": "cmd-123",
+    "type": "shell",
+    "payload": { "command": "dir" }
+  }
+]
+```
+
+---
+
+## Next Steps
+
+1. **Build Electron executable**: Run `npm run build:win` to create Windows installer
+2. **Add gateway endpoints**: Implement the REST API on Clawdbot Gateway
+3. **Test bidirectional communication**: Verify chat and command execution flow

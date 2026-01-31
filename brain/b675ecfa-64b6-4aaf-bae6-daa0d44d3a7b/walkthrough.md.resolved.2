@@ -1,0 +1,163 @@
+# Extension V2 - N8n Webhook Integration Walkthrough
+
+## ✅ Tính Năng Đã Implement
+
+Extension V2 giờ có thể tự động đồng bộ cookies sang N8n webhook!
+
+## 🔧 Các Thay Đổi
+
+### 1. UI Updates - [sidebar.html](file:///d:/EXTENTIONS/custome-link_v2/sidebar.html)
+
+**Thêm section mới trong Settings:**
+- Input field "N8N Webhook URL"
+- Checkbox "Tự động đồng bộ sau khi lấy cookies"
+- Button "Test Webhook"
+
+### 2. Storage & State - [sidebar.js](file:///d:/EXTENTIONS/custome-link_v2/sidebar.js)
+
+**State variables mới:**
+```javascript
+state = {
+  webhookUrl: '',    // Webhook URL
+  autoSync: false    // Auto-sync enabled/disabled
+}
+```
+
+**Chrome Storage:**
+- `n8n_webhook_url` - Lưu webhook URL
+- `auto_sync_enabled` - Lưu trạng thái auto-sync
+
+### 3. Webhook Sync Function
+
+**Function [syncToWebhook(cookieString, cookieCount)](file:///d:/EXTENTIONS/custome-link_v2/sidebar.js#518-562):**
+
+Gửi data đến N8n webhook với format:
+```json
+{
+  "cookies": "SPC_F=...; SPC_ST=...",
+  "timestamp": "2025-12-24T12:49:13+07:00",
+  "cookie_count": 23,
+  "user_id": "1271922156",
+  "source": " chrome_extension_v2"
+}
+```
+
+**Helper function [extractUserId()](file:///d:/EXTENTIONS/custome-link_v2/sidebar.js#512-517):**
+- Extract `SPC_U` value từ cookie string
+
+### 4. Auto-Sync Integration
+
+Sau khi lấy cookies thành công:
+- Check `state.autoSync` và `state.webhookUrl`
+- Nếu enabled → Gọi [syncToWebhook()](file:///d:/EXTENTIONS/custome-link_v2/sidebar.js#518-562)
+- Show message: "✅ Đã lấy X cookies và đồng bộ với N8n!"
+- Nếu sync fails: "✅ Đã lấy X cookies (⚠️ Đồng bộ thất bại)"
+
+## 🧪 Hướng Dẫn Test
+
+### Bước 1: Reload Extension
+1. Mở `chrome://extensions/`
+2. Tìm "Shopee Link Converter"
+3. Click Reload
+
+### Bước 2: Cấu Hình Webhook
+1. Mở extension → Settings (⚙️)
+2. Nhập webhook URL: `https://auto.myphamhaki.id.vn/webhook/api-key-xxx`
+3. Check ✓ "Tự động đồng bộ sau khi lấy cookies"
+4. Click "Lưu Cookie & Bắt Đầu"
+
+### Bước 3: Test Webhook
+1. Quay lại Settings
+2. Click "🔄 Test Webhook"
+3. Sẽ hiện alert: "✅ Test webhook thành công!" hoặc error message
+
+### Bước 4: Test Auto-Sync
+1. Mở https://affiliate.shopee.vn (đã đăng nhập)
+2. Extension → Settings → "🍪 Lấy Cookies Tự Động"
+3. Xem message: Should show "...và đồng bộ với N8n!"
+4. **Mở Console (F12)** để xem logs:
+   ```
+   Syncing to webhook: https://...
+   Payload: {...}
+   ✅ Webhook sync successful: {...}
+   ```
+
+### Bước 5: Verify N8n
+1. Mở n8n workflow editor
+2. Check webhook node có nhận data không
+3. Verify data structure đúng
+
+## 📊 Webhook Data Structure
+
+N8n webhook nhận POST request với:
+
+```json
+{
+  "cookies": "SPC_F=...; SPC_T_ID=...; ...",
+  "timestamp": "2025-12-24T12:49:13.123Z",
+  "cookie_count": 23,
+  "user_id": "1271922156",
+  "source": "chrome_extension_v2"
+}
+```
+
+**Fields:**
+- `cookies` (string): Cookie string đầy đủ
+- `timestamp` (ISO string): Thời gian sync
+- `cookie_count` (number): Số lượng cookies
+- `user_id` (string): SPC_U value hoặc "unknown"
+- `source` (string): Luôn là "chrome_extension_v2"
+
+## 🎯 Use Cases
+
+### Use Case 1: Auto-Sync Enabled
+1. User lấy cookies tự động
+2. Extension tự động gửi đến webhook
+3. N8n lưu vào data table
+4. User sees: "✅ Đã lấy 23 cookies và đồng bộ với N8n!"
+
+### Use Case 2: Auto-Sync Disabled
+1. User lấy cookies tự động
+2. Extension KHÔNG gửi webhook
+3. User sees: "✅ Đã lấy 23 cookies từ DevTools!"
+4. User có thể test webhook manually
+
+### Use Case 3: Webhook Fails
+1. User lấy cookies, auto-sync enabled
+2. Webhook URL sai hoặc n8n offline
+3. Extension vẫn lấy cookies OK
+4. User sees: "⚠️ Đồng bộ thất bại"
+5. Console logs error details
+
+## 🔍 Debugging
+
+**Console logs:**
+- "Syncing to webhook: [URL]"
+- "Payload: {...}" (với cookies preview)
+- "✅ Webhook sync successful: {...}"
+- "❌ Webhook sync failed: [error]"
+
+**Check Chrome Storage:**
+```javascript
+chrome.storage.local.get(['n8n_webhook_url', 'auto_sync_enabled'], console.log)
+```
+
+## ⚠️ Lưu Ý
+
+- Webhook URL được lưu trong Chrome storage local
+- Auto-sync chỉ chạy khi CÓ webhook URL
+- Sync failures KHÔNG block việc lấy cookies
+- User ID extract từ cookie `SPC_U`
+- Error handling: try-catch với fallback graceful
+
+## 🎓 Kết Luận
+
+Extension V2 đã có đầy đủ tính năng:
+- ✅ Webhook URL configuration
+- ✅ Auto-sync toggle
+- ✅ Test webhook button  
+- ✅ Auto-sync after cookie fetch
+- ✅ Error handling & logging
+- ✅ Chrome storage integration
+
+**Đã sẵn sàng để test và deploy!** 🚀

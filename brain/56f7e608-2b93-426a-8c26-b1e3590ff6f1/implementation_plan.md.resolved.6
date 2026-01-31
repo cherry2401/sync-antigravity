@@ -1,0 +1,92 @@
+# Product Listing Page Implementation
+
+## Mục tiêu
+Xây dựng trang `/san-pham` với bộ lọc nâng cao qua URL SearchParams, layout responsive và phân trang.
+
+---
+
+## Architecture
+
+```mermaid
+graph TD
+    A["/san-pham?category=X&min_price=Y"] --> B[page.tsx Server Component]
+    B --> C[Read searchParams]
+    C --> D[Filter Products Server-side]
+    D --> E[ProductFilters Client]
+    D --> F[ProductGrid]
+    E --> G[useProductFilter Hook]
+    G --> H[router.push - Update URL]
+```
+
+---
+
+## Files Structure
+
+### [NEW] `src/app/san-pham/page.tsx`
+- Server Component đọc `searchParams`
+- Gọi `getFilteredProducts(params)`
+- Trả về layout 2 cột
+
+### [NEW] `src/components/shop/ProductFilters.tsx`
+- Client Component với `"use client"`
+- Categories list, Price range slider, Brand checkboxes
+- Mobile: Drawer/Sheet khi bấm nút "Lọc"
+
+### [NEW] `src/components/shop/ProductGrid.tsx`
+- Hiển thị grid sản phẩm với ProductCard
+- Top bar: count + sort dropdown
+- Pagination component
+
+### [NEW] `src/hooks/useProductFilter.ts`
+- `setFilter(key, value)` - update URL
+- `resetFilters()` - clear all params
+- Dùng `useRouter` + `useSearchParams`
+
+### [MODIFY] [src/lib/actions/products.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts)
+- Thêm `getFilteredProducts(params)` với logic lọc
+
+---
+
+## Filter Params
+
+| Param | Type | Example |
+|-------|------|---------|
+| `category` | string | `cham-soc-da` |
+| `brand` | string (comma) | `loreal,maybelline` |
+| `min_price` | number | `100000` |
+| `max_price` | number | `500000` |
+| `sort` | string | `price_asc`, `price_desc`, `newest` |
+| `page` | number | `1` |
+
+---
+
+## UI Mockup
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Danh sách sản phẩm                      [Lọc] (mobile) │
+├──────────────┬──────────────────────────────────────────┤
+│ DANH MỤC    │  Hiển thị 20 sản phẩm    [Sắp xếp ▼]     │
+│ ● Chăm sóc   ├──────────────────────────────────────────┤
+│ ○ Trang điểm │  [Card] [Card] [Card] [Card]             │
+│ ○ Nước hoa   │  [Card] [Card] [Card] [Card]             │
+│              │  [Card] [Card] [Card] [Card]             │
+│ GIÁ         ├──────────────────────────────────────────┤
+│ [===●===●==] │          < 1 2 3 4 5 >                   │
+│ 100K - 500K  │                                          │
+│              │                                          │
+│ THƯƠNG HIỆU │                                          │
+│ ☑ L'Oreal    │                                          │
+│ ☐ Maybelline │                                          │
+└──────────────┴──────────────────────────────────────────┘
+```
+
+---
+
+## Verification
+
+1. Vào `/san-pham` - hiển thị tất cả sản phẩm
+2. Click category → URL thay đổi → danh sách filter
+3. Kéo price slider → URL update → danh sách filter
+4. Copy URL share cho người khác → hiển thị đúng kết quả
+5. Mobile: Nút Lọc mở drawer

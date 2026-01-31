@@ -1,0 +1,14 @@
+# Cấu hình Claude Code với cliproxy (Vĩnh viễn)
+
+Claude Code cho phép định tuyến các yêu cầu API thông qua một máy chủ proxy bằng cách sửa đổi biến môi trường base URL.
+
+## Thay đổi đề xuất
+
+1. **Biến môi trường**: Thiết lập `CLAUDE_BASE_URL` vĩnh viễn trong hệ thống Windows.
+2. **Giá trị**: Sử dụng địa chỉ mặc định của cliproxy (giả định là `http://localhost:3000/v1` nếu người dùng không cung cấp địa chỉ khác).
+
+## Kế hoạch xác minh
+
+### Xác minh thủ công
+- Chạy lệnh `claude` và kiểm tra xem nó có kết nối qua proxy không.
+- Sử dụng `claude --debug api` để xác nhận các yêu cầu đang được gửi đến endpoint chính xác.

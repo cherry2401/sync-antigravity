@@ -1,0 +1,22 @@
+# OmoCaptcha Integration - Task Checklist
+
+## Setup
+- [ ] Đăng ký OmoCaptcha account
+- [ ] Lấy API key
+- [ ] Thêm API key vào Data Table (column: `OmoCaptcha_API_Key`)
+- [ ] Lấy reCAPTCHA site key từ browser
+
+## Workflow Implementation  
+- [ ] Thêm IF node: Check Captcha Error
+- [ ] Thêm node: Solve Captcha (OmoCaptcha API)
+- [ ] Thêm node: Wait 15s
+- [ ] Thêm node: Get Captcha Result
+- [ ] Thêm IF node: Check Result Ready
+- [ ] Clone node: Retry Create VEO3 (with token)
+- [ ] Connect nodes theo flow
+
+## Testing
+- [ ] Test request không có captcha (should pass quickly)
+- [ ] Test request có captcha (should auto-solve)
+- [ ] Verify token được apply đúng
+- [ ] Check OmoCaptcha dashboard (usage & cost)

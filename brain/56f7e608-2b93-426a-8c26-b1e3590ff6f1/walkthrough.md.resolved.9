@@ -1,0 +1,87 @@
+# Phase 2: Admin Builder Database Integration ✅
+
+Đã hoàn thành tích hợp Admin Page Builder với BlockRenderer thật và database persistence.
+
+---
+
+## What Was Done
+
+### 1. Server Actions (file storage + revalidate)
+
+[storefront.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/storefront.ts):
+
+```ts
+export async function savePageConfig(blocks) {
+  await fs.writeFile(CONFIG_FILE, JSON.stringify({ blocks }));
+  revalidatePath("/"); // ⚠️ Critical for cache busting
+  return { success: true };
+}
+
+export async function getPageConfig(): Promise<BlockConfig[]> {
+  // Returns saved blocks or defaultBlocks
+}
+```
+
+---
+
+### 2. Homepage Dynamic Loading
+
+[page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/page.tsx):
+
+```tsx
+export default async function Home() {
+  const blocks = await getPageConfig();
+  return <BlockRenderer blocks={blocks} />;
+}
+```
+
+---
+
+### 3. Admin Builder Integration
+
+[trang-tri/page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/admin/giao-dien/trang-tri/page.tsx):
+
+- ✅ Load blocks on mount via `useEffect`
+- ✅ Save button calls [savePageConfig()](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/storefront.ts#113-136) with loading/success states
+- ✅ Live Preview tab shows scaled BlockRenderer (WYSIWYG)
+
+---
+
+## Visual Verification
+
+````carousel
+![Admin Desktop - Blocks Loaded](C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/admin_builder_blocks_loaded_1768304210316.png)
+<!-- slide -->
+![Admin Live Preview - Real Components](C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/admin_builder_live_preview_1768304224593.png)
+````
+
+**Results:**
+- Blocks load correctly from server ✅
+- Live Preview shows real homepage components ✅  
+- Save button shows green "Đã lưu!" feedback ✅
+- Homepage reloads with new layout after save ✅
+
+---
+
+## Demo Recording
+
+![Admin Builder Demo](C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/admin_builder_test_1768304199607.webp)
+
+---
+
+## Files Changed
+
+| File | Changes |
+|------|---------|
+| [lib/actions/storefront.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/storefront.ts) | NEW - Server actions |
+| [data/storefront.json](file:///i:/Website/MyphamHaKi/app-src/data/storefront.json) | NEW - JSON storage |
+| [app/page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/page.tsx) | Async load from DB |
+| `admin/.../page.tsx` | Load/Save/Live Preview |
+
+---
+
+## ⚠️ Notes for Production
+
+> [!CAUTION]
+> File-based storage **không hoạt động trên Vercel** (ephemeral filesystem).
+> Khi deploy thật, cần đổi sang Supabase/PostgreSQL.

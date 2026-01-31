@@ -1,0 +1,31 @@
+# Walkthrough - Client-Side Routing, Deployment & Security
+
+## Goal
+Implement client-side routing, deploy to Cloudflare, and secure API endpoints against unauthorized cross-origin usage.
+
+## Changes
+
+### 1. [App.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/App.tsx) Refactoring (Client-Side Routing)
+- **Integration**: Wrapped the application with `BrowserRouter`.
+- **Routing**: Replaced `renderContent` conditional logic with `Routes` and `Route` components.
+- **Tools Layout**: Introduced [ToolsLayout](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/App.tsx#136-175) to handle individual tool routes (`/instagram`, `/zing-mp3`, etc.).
+
+### 2. Deployment Configuration
+- **Cloudflare**: Added [_redirects](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/dist/_redirects) file for SPA routing.
+- **Scripts**: Added `"deploy": "npm run build && npx wrangler pages deploy dist --project-name tai-video"` to [package.json](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/package.json).
+
+### 3. Security Implementation (Phase 1: Strict CORS)
+To prevent unauthorized access to the API (e.g., from other websites):
+- **Middleware**: Created [functions/api/_middleware.ts](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/functions/api/_middleware.ts) to intercept all API requests.
+- **Centralized Logic**: Created [functions/cors.ts](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/functions/cors.ts) to manage allowed origins.
+- **Whitelist**: Only allowed requests from:
+    - `localhost`
+    - `tai-video.pages.dev`
+    - `taivideo.io.vn`
+- **Cleanup**: Removed insecure `Access-Control-Allow-Origin: *` headers from individual API files ([video-download.ts](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/functions/api/video-download.ts), [instagram.ts](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/functions/api/instagram.ts), etc.).
+
+## Usage
+To deploy updates in the future with security rules applied:
+```bash
+npm run deploy
+```

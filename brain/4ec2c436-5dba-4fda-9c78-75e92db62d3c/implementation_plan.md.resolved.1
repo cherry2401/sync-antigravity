@@ -1,0 +1,206 @@
+# Clawdbot Desktop Client - Implementation Plan
+
+Build a desktop application using Electron + React that connects to Clawdbot Gateway via **HTTP REST API** (with optional WebSocket for realtime), enabling bidirectional chat and remote command execution.
+
+## Tech Stack
+
+| Component | Technology |
+|-----------|------------|
+| Framework | Electron 28+ |
+| Frontend | React 18 + TypeScript |
+| Styling | TailwindCSS + shadcn/ui |
+| State | Zustand |
+| Storage | better-sqlite3 |
+| HTTP | Fetch API |
+| Icons | lucide-react |
+
+---
+
+## Gateway Protocol (Hybrid HTTP + Optional WS)
+
+### Primary: HTTP REST API
+
+```typescript
+class GatewayConnector {
+  // Chat message
+  async sendMessage(content: string): Promise<Response> {
+    return fetch(`${this.baseUrl}/api/client/chat`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ sessionId, message: content })
+    });
+  }
+  
+  // Poll pending commands (every 2s)
+  async pollCommands(): Promise<Command[]> {
+    return fetch(`${this.baseUrl}/api/client/commands`);
+  }
+  
+  // Submit command result
+  async submitResult(cmdId: string, result: CommandResult): Promise<void> {
+    await fetch(`${this.baseUrl}/api/client/commands/${cmdId}`, {
+      method: 'POST',
+      body: JSON.stringify(result)
+    });
+  }
+}
+```
+
+### Optional: WebSocket for Realtime
+```typescript
+// If gateway supports WS endpoint
+ws.onmessage = (event) => {
+  const msg = JSON.parse(event.data);
+  if (msg.type === 'command') {
+    const result = await executor.execute(msg.command);
+    ws.send(JSON.stringify({ type: 'commandResult', ...result }));
+  }
+};
+```
+
+---
+
+## Database Schema
+
+```sql
+-- Sessions
+CREATE TABLE sessions (
+  id TEXT PRIMARY KEY,
+  title TEXT,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Messages
+CREATE TABLE messages (
+  id TEXT PRIMARY KEY,
+  sessionId TEXT,
+  role TEXT,  -- 'user' | 'assistant' | 'system'
+  content TEXT,
+  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+  metadata TEXT,  -- JSON
+  FOREIGN KEY (sessionId) REFERENCES sessions(id)
+);
+
+-- Command Audit Log
+CREATE TABLE command_logs (
+  id TEXT PRIMARY KEY,
+  sessionId TEXT,
+  commandType TEXT,
+  payload TEXT,
+  result TEXT,
+  success INTEGER,
+  executedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Config
+CREATE TABLE config (
+  key TEXT PRIMARY KEY,
+  value TEXT
+);
+```
+
+---
+
+## Project Structure
+
+```
+clawdbot-client/
+├── package.json
+├── electron.vite.config.ts
+├── electron/
+│   ├── main.ts
+│   ├── preload.ts
+│   └── services/
+│       ├── executor.ts
+│       └── database.ts
+├── src/
+│   ├── App.tsx
+│   ├── index.css
+│   ├── components/
+│   │   ├── Sidebar/
+│   │   ├── ChatArea/
+│   │   ├── InputArea/
+│   │   ├── StatusBar/
+│   │   └── Settings/
+│   ├── services/
+│   │   └── gateway.ts
+│   ├── stores/
+│   │   ├── chatStore.ts
+│   │   └── configStore.ts
+│   └── lib/utils.ts
+└── README.md
+```
+
+---
+
+## Dependencies
+
+```json
+{
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "zustand": "^4.5.0",
+    "react-markdown": "^9.0.0",
+    "react-syntax-highlighter": "^15.5.0",
+    "better-sqlite3": "^9.2.0",
+    "uuid": "^9.0.0",
+    "@radix-ui/react-dialog": "^1.0.0",
+    "@radix-ui/react-scroll-area": "^1.0.0",
+    "date-fns": "^3.0.0",
+    "lucide-react": "^0.300.0",
+    "clsx": "^2.0.0",
+    "tailwind-merge": "^2.0.0"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-vite": "^2.0.0",
+    "electron-builder": "^24.0.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.0.0"
+  }
+}
+```
+
+---
+
+## Security Features
+
+- **Path Whitelist**: Only allow file access to configured directories
+- **Command Blacklist**: Block dangerous commands (rm -rf, format, etc.)
+- **Confirmation Dialog**: Optional prompt before executing commands
+- **Audit Log**: Log all executed commands to `command_logs` table
+
+---
+
+## Verification Plan
+
+### Development
+```bash
+npm run dev
+```
+1. App window opens with dark theme
+2. UI components render correctly
+3. Settings modal works
+4. HTTP chat works (when gateway ready)
+5. Command polling works (when gateway ready)
+
+### Build
+```bash
+npm run build:win
+```
+1. `.exe` created in `dist/`
+2. App launches and persists data
+
+---
+
+> [!NOTE]
+> Gateway needs these endpoints:
+> - `POST /api/client/chat` - Receive chat messages
+> - `GET /api/client/commands` - Return pending commands
+> - `POST /api/client/commands/:id` - Receive command results
+> - `WS /ws/client` - Optional WebSocket

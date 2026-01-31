@@ -1,0 +1,170 @@
+# Hướng dẫn Tự động khởi động Clawdbot trên Windows
+
+## 📋 Tổng quan
+Hướng dẫn này giúp cài đặt Clawdbot Gateway tự động khởi động khi boot Windows và chạy ngầm ở background (không hiện cửa sổ CMD).
+
+---
+
+## ✅ Bước 1: Cài đặt Daemon Service
+
+### 1.1. Mở PowerShell as Administrator
+- Nhấn `Win + X`
+- Chọn **"Terminal (Admin)"** hoặc **"Windows PowerShell (Admin)"**
+
+### 1.2. Chạy lệnh cài đặt
+```powershell
+cd G:\AIHub\clawdbot
+pnpm clawdbot daemon install
+```
+
+**Kết quả:** Sẽ tạo Task Scheduler tên "Clawdbot Gateway" để tự động chạy khi login Windows.
+
+---
+
+## 🔧 Bước 2: Sửa Task để chạy ẩn hoàn toàn (QUAN TRỌNG)
+
+### 2.1. Tạo file VBScript để chạy ẩn
+1. Tạo thư mục `C:\Scripts\` (nếu chưa có)
+2. Tạo file `start-clawdbot-hidden.vbs` trong thư mục đó với nội dung:
+
+```vbscript
+Set WshShell = CreateObject("WScript.Shell")
+WshShell.Run "cmd /c cd /d G:\AIHub\clawdbot && pnpm clawdbot gateway", 0, False
+Set WshShell = Nothing
+```
+
+### 2.2. Chỉnh sửa Task Scheduler
+1. **Mở Task Scheduler:**
+   - Nhấn `Win + R`, gõ `taskschd.msc`
+
+2. **Tìm task "Clawdbot Gateway":**
+   - Trong **Task Scheduler Library**, tìm task "Clawdbot Gateway"
+
+3. **Chỉnh sửa Properties:**
+   - Nhấn chuột phải → **Properties**
+
+4. **Tab General:**
+   - ✅ Tick **"Run only when user is logged on"**
+   - ✅ Tick **"Hidden"**
+
+5. **Tab Actions:**
+   - Nhấn **Edit** action hiện có
+   - Thay đổi:
+     - **Program/script:** `wscript.exe`
+     - **Add arguments:** `C:\Scripts\start-clawdbot-hidden.vbs`
+     - **Start in:** (để trống)
+   - Nhấn **OK**
+
+6. **Nhấn OK để lưu**
+   - Nếu hỏi password: để trống và nhấn OK (nếu Windows không có password)
+
+---
+
+## 🎯 Bước 3: Tự động mở Dashboard khi boot (Tùy chọn)
+
+### 3.1. Tạo file Script
+Tạo file `start-dashboard.bat` tại `C:\Scripts\` với nội dung:
+
+```batch
+@echo off
+timeout /t 15 /nobreak
+start http://localhost:18789/chat
+```
+
+### 3.2. Thêm vào Startup
+1. Nhấn `Win + R`, gõ `shell:startup`
+2. Copy file `start-dashboard.bat` vào thư mục này
+   - Hoặc tạo **Shortcut** của file `.bat` và copy shortcut vào
+
+---
+
+## 🚀 Bước 4: Khởi động ngay (không cần restart máy)
+
+```powershell
+pnpm clawdbot daemon start
+```
+
+---
+
+## 📊 Kiểm tra trạng thái
+
+### Kiểm tra daemon
+```powershell
+pnpm clawdbot daemon status
+```
+
+**Kết quả mong muốn:**
+```
+Runtime: running
+RPC probe: ok
+Listening: 0.0.0.0:18789
+```
+
+### Kiểm tra health
+```powershell
+pnpm clawdbot health
+```
+
+### Truy cập Dashboard
+Mở trình duyệt: `http://localhost:18789/chat`
+
+---
+
+## 🔄 Các lệnh quản lý thường dùng
+
+| Mục đích | Lệnh |
+|----------|------|
+| **Khởi động daemon** | `pnpm clawdbot daemon start` |
+| **Dừng daemon** | `pnpm clawdbot daemon stop` |
+| **Restart daemon** | `pnpm clawdbot daemon restart` |
+| **Kiểm tra trạng thái** | `pnpm clawdbot daemon status` |
+| **Gỡ cài đặt daemon** | `pnpm clawdbot daemon uninstall` |
+| **Kiểm tra health** | `pnpm clawdbot health` |
+
+---
+
+## 🐛 Xử lý sự cố
+
+### Lỗi: "Access is denied" khi install
+- **Nguyên nhân:** Chưa chạy PowerShell as Administrator
+- **Giải pháp:** Mở PowerShell as Admin (Win + X → Terminal Admin)
+
+### Lỗi: Gateway bị disconnect khi tắt CMD
+- **Nguyên nhân:** Đang chạy gateway thủ công thay vì qua daemon
+- **Giải pháp:** 
+  1. Dừng gateway thủ công (Ctrl + C)
+  2. Chạy `pnpm clawdbot daemon start`
+
+### Lỗi: Vẫn hiện cửa sổ CMD khi chạy
+- **Nguyên nhân:** Chưa dùng VBScript hoặc chưa sửa Task Scheduler
+- **Giải pháp:** Làm lại **Bước 2** ở trên
+
+### Kiểm tra log khi có lỗi
+```powershell
+notepad \tmp\clawdbot\clawdbot-2026-01-22.log
+```
+
+---
+
+## ✨ Kết quả cuối cùng
+
+Sau khi hoàn thành:
+- ✅ Gateway tự động khởi động khi boot Windows
+- ✅ Chạy ngầm ở background (không hiện cửa sổ)
+- ✅ Dashboard tự động mở sau 15 giây (nếu setup Bước 3)
+- ✅ Có thể tắt PowerShell/CMD mà gateway vẫn chạy
+- ✅ Restart máy → Gateway tự động chạy lại
+
+---
+
+## 📝 Ghi chú
+
+- File config: [C:\Users\Cherry\.clawdbot\clawdbot.json](file:///Users/Cherry/.clawdbot/clawdbot.json)
+- Sau khi sửa config, cần restart daemon: `pnpm clawdbot daemon restart`
+- Gateway listen trên: `ws://0.0.0.0:18789`
+- Dashboard: `http://localhost:18789/chat`
+
+---
+
+**Ngày tạo:** 22/01/2026  
+**Người tạo:** Tổng hợp từ quá trình cài đặt thực tế

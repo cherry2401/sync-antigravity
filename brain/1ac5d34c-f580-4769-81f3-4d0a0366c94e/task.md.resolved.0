@@ -1,0 +1,18 @@
+# Task: Integrate 52 K-12 Schools into Verifier Mode
+
+## Planning
+- [ ] Create implementation plan
+- [ ] Review requirements with user
+- [ ] Get approval on approach
+
+## Implementation
+- [ ] Update config.py with 52 schools data
+- [ ] Create logo mapping system
+- [ ] Update img_generator.py for auto logo selection
+- [ ] Update UI dropdown to show all schools
+- [ ] Test with sample schools
+
+## Verification
+- [ ] Test logo auto-selection
+- [ ] Test PDF generation with different schools
+- [ ] Verify Verifier Mode works with new schools

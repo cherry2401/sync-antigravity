@@ -1,0 +1,61 @@
+# Analytics System Implementation Plan
+
+## Goal
+Implement a robust measurement system to track:
+1.  **Traffic**: Page views, users, geography, devices.
+2.  **Usage**: Number of video downloads, AI generations, tool usage (Instagram vs TikTok vs Zing).
+3.  **Affiliate Performance**: Tracking redirects to Shopee to compare with traffic/downloads.
+
+## Proposed Strategy: The "Hybrid" Approach
+
+To get "real" and "accurate" data as you requested, we should not rely on just one tool. I propose combining **Google Analytics 4 (GA4)** with **Supabase Custom Logging**.
+
+### 1. Google Analytics 4 (GA4) - The "Big Picture"
+*   **Why**: Standard industry tool. Best for seeing where users come from (Facebook, Google Search, Direct), what devices they use (iPhone vs Android), and user retention.
+*   **What it tracks**:
+    *   Page Views (Traffic).
+    *   User Sessions.
+    *   Demographics.
+
+### 2. Supabase Custom Events - The "Precise Truth"
+*   **Why**: You already use Supabase. Storing raw events in your own database gives you 100% accuracy on *actions* and lets you query exact numbers without sampling.
+*   **What it tracks**:
+    *   **`download_video`**: Triggered when a user successfully gets a download link. (Metadata: provider, platform).
+    *   **`use_ai_tool`**: Triggered when AI content is generated.
+    *   **`affiliate_redirect`**: Triggered specifically when the app redirects the user to Shopee (compare this count vs `download_video` count to see the ratio).
+    *   **`copy_link`**: When user copies content.
+
+## Implementation Steps
+
+### Phase 1: Supabase Setup (Precise Tracking)
+1.  **Database**: Create table `analytics_events`.
+    *   [id](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/XvideosDownload.tsx#22-28): uuid
+    *   `event_name`: string (e.g., 'download', 'shopee_redirect')
+    *   `metadata`: jsonb (store url, platform, error_message)
+    *   `session_id`: string (fingerprint to track unique users anonymously)
+    *   `created_at`: timestamp
+2.  **Code Integration**:
+    *   Create `src/services/analyticsService.ts`.
+    *   Inject tracking calls into `HomeVideoDownloader.tsx`, [AiWriter.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/AiWriter.tsx), [ShopeeAffiliate.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/ShopeeAffiliate.tsx).
+
+### Phase 2: Google Analytics 4 (General Traffic)
+1.  **Setup**: Create GA4 Property.
+2.  **Integration**: Add `react-ga4` to the project.
+3.  **Events**: Map key events from custom analytics to GA4 as well (double verification).
+
+### Phase 3: In-App Admin Dashboard (Visual Reports)
+1.  **Route**: Create a protected page `/admin-stats` (password protected via simple local storage or hardcoded env for now).
+2.  **UI**:
+    *   **Summary Cards**: Total Views, Total Downloads, Redirect Ratio.
+    *   **Charts**: Line chart showing Downloads vs Shopee Clicks over last 7 days.
+    *   **Table**: Recent activity log.
+3.  **Function**: Fetches data directly from `analytics_events` table and aggregates it.
+
+## Reporting
+*   **Immediate**: You can view the Admin Page on your website.
+*   **Deep Dive**: Use Supabase Dashboard for complex SQL queries if needed.
+
+## User Review Required
+*   **Agreed?**: Do you agree with this Hybrid approach? Or do you prefer something simpler (just GA4)?
+*   **Supabase**: Confirm we can use your existing Supabase project.
+

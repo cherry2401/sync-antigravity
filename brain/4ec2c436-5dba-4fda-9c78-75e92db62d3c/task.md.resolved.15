@@ -1,0 +1,12 @@
+# File Explorer Refinement & IPC Debugging
+
+## UI Refinement
+- [ ] Remove separate "Go" button and text input from [FileExplorer.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/FileExplorer.tsx).
+- [ ] Ensure Drive dropdown is the primary navigation control.
+- [ ] Verify auto-load functionality.
+
+## IPC Debugging
+- [ ] Investigate why `window.electronAPI.listDir` is undefined despite [preload.js](file:///f:/Python/OpenSSH/clawdbot-client/dist-electron/electron/preload.js) having it.
+- [ ] Add debug logging to Renderer to inspect `window.electronAPI` keys.
+- [ ] Verify [main.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/main.ts) IPC handlers are registered.
+- [ ] Ensure clean build/restart cycle.

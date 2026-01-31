@@ -1,0 +1,56 @@
+# AI Writer Implementation Plan
+
+## Goal
+Add an AI Writer tool to the website utilizing n8n as the backend engine. Implement rate limiting for normal users (IP-based) and an Admin Bypass mechanism for the site owner.
+
+## Architecture
+
+### 1. Frontend (`src/components/AiWriter.tsx`)
+-   **UI**:
+    -   Input Area: Prompt/Topic.
+    -   Options: Tone, Language, Length.
+    -   **Admin Section**: A collapsible/hidden field to enter an `Admin Key`.
+    -   Output Area: Markdown rendered result with "Copy" button.
+-   **Integration**:
+    -   Add `AI_WRITER` to `NavItem` in [src/types.ts](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/types.ts).
+    -   Update [Header.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/components/Header.tsx) to include "AI Tool" link.
+    -   Update [App.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/App.tsx) to render `AiWriter` when active.
+
+### 2. Backend Proxy (`functions/api/ai-writer.ts`)
+-   **Role**: Securely forward requests to n8n.
+-   **Data Forwarded**:
+    -   `prompt`: User input.
+    -   `ip`: User's IP address (from `headers.get('CF-Connecting-IP')`).
+    -   `admin_key`: value from the Admin Section.
+
+### 3. n8n Workflow (User Setup)
+-   **Logic**:
+    1.  **Webhook**: Receives Prompt, IP, Admin Key.
+    2.  **Switch/If**:
+        -   If `Admin Key` == `YOUR_SECRET_PASS` -> **Skip Limit**.
+        -   Else -> **Check Database/Sheet** for IP usage today.
+            -   If > 50 -> Return Error "Quota Exceeded".
+    3.  **AI Node**: Generate content (OpenAI/Gemini).
+    4.  **Response**: Return generated text.
+
+## Proposed Changes
+
+### [src/types.ts](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/types.ts)
+-   Add `AI_WRITER` to `NavItem` enum.
+
+### [src/utils/translations.ts](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/utils/translations.ts)
+-   Add translations for AI Tool menu and UI.
+
+### [src/components/Header.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/Header.tsx)
+-   Add "AI Tool" to navigation menu (Desktop & Mobile).
+
+### `src/components/AiWriter.tsx` (NEW)
+-   Component implementation.
+
+### `functions/api/ai-writer.ts` (NEW)
+-   Proxy function.
+
+## Verification
+-   **Test Admin**: Enter correct key -> Success.
+-   **Test User**: Enter no key -> Success (up to limit).
+-   **Test Limit**: Mock limit reached -> Error message.

@@ -1,0 +1,53 @@
+# Implementation Plan - BDS Website Enhancements
+
+The goal is to "develop further" the existing functionality by turning static UI elements into working features and ensuring data persists during the session.
+
+## User Review Required
+> [!NOTE]
+> I am assuming we want to keep this a "Frontend-only" prototype for now. I will use `localStorage` to save your data (new posts, edits) so they don't disappear when you refresh the page.
+
+## Proposed Changes
+
+### 1. Data Persistence (Local Storage)
+**File**: [index.tsx](file:///i:/Website/BDS/index.tsx)
+- Initialize `listings` and `news` state from `localStorage` if available.
+- Add `useEffect` hooks to save `listings`, `news`, and `bookmarks` (favorites) to `localStorage` whenever they change.
+
+### 2. Advanced Search & Filtering
+**File**: [index.tsx](file:///i:/Website/BDS/index.tsx)
+- **Component**: Create a `FilterDropdown` component to handle "Price", "Area", and "Location" selections.
+- **Logic**: 
+    - Implement `priceRange` state (min, max).
+    - Implement `areaRange` state (min, max).
+    - Implement `location` state (City/District).
+    - Update `filteredListings` logic to include these new filters in addition to the text search.
+- **UI**: detailed dropdowns for the buttons in the Hero section:
+    - "Toàn quốc" -> Select City/Location.
+    - "Mức giá" -> Select Price Range (e.g., < 1 Billion, 1-3 Billion, etc.).
+    - "Diện tích" -> Select Area Range (e.g., < 30m2, 30-50m2, etc.).
+
+### 3. Favorites / Saved Listings
+**File**: [index.tsx](file:///i:/Website/BDS/index.tsx)
+- **State**: Add `savedListings` state (array of IDs).
+- **UI**:
+    - Update [PropertyCard](file:///i:/Website/BDS/index.tsx#1167-1225) heart icon to toggle saved state.
+    - Add a new View/Tab in the Profile dropdown (or Header) to "Xem tin đã lưu" (View Saved Listings).
+
+## Verification Plan
+
+### Automated Tests
+- None (Visual/Interactive functionality).
+
+### Manual Verification
+1.  **Persistence**:
+    - Create a new listing via "Đăng tin".
+    - Refresh the page.
+    - Verify the new listing is still there.
+2.  **Filters**:
+    - In Hero section, select "Mức giá" -> "1 - 3 tỷ".
+    - Verify only listings within that range appear.
+    - Test combinations (e.g., "Hà Nội" + "1 - 3 tỷ").
+3.  **Favorites**:
+    - Click the Heart icon on a listing.
+    - Refresh page.
+    - Verify the heart remains red/filled.

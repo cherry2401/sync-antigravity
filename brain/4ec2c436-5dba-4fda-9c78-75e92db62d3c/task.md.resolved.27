@@ -1,0 +1,23 @@
+# Task: MCP Bridge Integration
+
+## Progress
+
+- [x] Create [electron/services/mcpTransport.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/mcpTransport.ts) - WebSocket transport with auth
+- [x] Create [electron/services/mcpTools.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/mcpTools.ts) - Tool registry (9 tools)
+- [x] Create [electron/services/mcpBridge.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/mcpBridge.ts) - Main orchestrator
+- [x] Create [electron/services/localMcpProvider.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/localMcpProvider.ts) - Local MCP provider
+- [x] Update [electron/main.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/main.ts) - Initialize MCPBridge
+- [x] Update [package.json](file:///f:/Python/OpenSSH/clawdbot-client/package.json) - Add ws, zod, @types/ws
+- [x] Install dependencies
+- [x] Run and verify connection
+
+## Verification Results
+
+✅ **MCP Bridge initialized** with 9 tools  
+✅ **LocalMcpProvider initialized**  
+✅ **HTTP polling fallback** works (200 OK)  
+⚠️ **WebSocket /mcp/ws** returns 404 - **Expected**: Gateway needs MCP endpoint  
+
+## Status: ✅ COMPLETE (Client-side)
+
+> **Next Step:** Update Clawdbot Gateway to add `/mcp/ws` WebSocket endpoint

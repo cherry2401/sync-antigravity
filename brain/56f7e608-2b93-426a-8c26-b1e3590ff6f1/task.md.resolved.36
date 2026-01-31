@@ -1,0 +1,24 @@
+# Refactor Homepage for Dynamic Builder
+
+## Task Checklist
+
+### Step 1: Extract Components (giữ nguyên 100% style)
+- [ ] Create `ServiceFeaturesBar.tsx` - copy từ page.tsx lines 141-193
+- [ ] Create `FeaturedProducts.tsx` - copy từ page.tsx lines 196-240
+- [ ] Create `CategoriesGrid.tsx` - copy từ page.tsx lines 273-311
+
+### Step 2: Create BlockRenderer Registry  
+- [ ] Create [components/storefront/BlockRenderer.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/storefront/BlockRenderer.tsx)
+- [ ] Map all block types to real components
+
+### Step 3: Update Homepage
+- [ ] Modify [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/page.tsx) to use BlockRenderer
+- [ ] Define default blocks matching current layout
+
+### Step 4: Admin Preview WYSIWYG
+- [ ] Update Admin Page Builder preview to use BlockRenderer
+- [ ] Add CSS scaling for preview container
+
+### Step 5: Verification
+- [ ] Visual comparison before/after
+- [ ] Test all interactive elements

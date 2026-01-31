@@ -1,0 +1,40 @@
+# Walkthrough - Client-Side Routing Implementation
+
+## Goal
+Implement client-side routing to provide unique URLs for each feature (e.g., `/ai-tool`, `/instagram`, `/chinh-sach`) and replace the previous state-based navigation. This improves SEO and user experience.
+
+## Changes
+
+### 1. [App.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/App.tsx) Refactoring
+- **Integration**: Wrapped the application with `BrowserRouter`.
+- **Routing**: Replaced `renderContent` conditional logic with `Routes` and `Route` components.
+- **Tools Layout**: Introduced [ToolsLayout](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/App.tsx#136-175) to handle individual tool routes (`/instagram`, `/zing-mp3`, etc.) while maintaining a consistent UI.
+- **Aliases**: Added route aliases (e.g., `/rut-gon-link` and `/shorten`).
+
+```tsx
+<Routes>
+  <Route path="/" element={<HomeVideoDownloader t={t} />} />
+  <Route path="/ai-tool" element={<AiWriter t={t} language={language} />} />
+  <Route path="/instagram" element={<ToolsLayout initialTool="instagram" />} />
+  {/* ... other routes */}
+</Routes>
+```
+
+### 2. [Header.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/Header.tsx) & [Footer.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/Footer.tsx) Update
+- **Navigation**: Switched from `onClick` handlers modifying state to standard `react-router-dom` [Link](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/SoundCloudDownload.tsx#47-75) components.
+- **Active State**: Implemented `useLocation` to correctly highlight the active navigation item based on the current URL.
+
+### 3. Translation Updates ([translations.ts](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/utils/translations.ts))
+- **Fix**: Updated all language objects (vi, en, zh, ko, ja, id, th, es, fr) to include the `AI_WRITER` nav item and the full `aiWriter` content structure (upload label, options). This resolved TypeScript union type errors.
+
+### 4. Cloudflare Configuration ([public/_redirects](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/public/_redirects))
+- **SPA Routing**: Added `/* /index.html 200` to ensure all routes are handled by the React application on Cloudflare Pages.
+
+## Verification
+- **Navigation**: Clicking links in Header/Footer should change the URL without reloading the page.
+- **Direct Access**: Accessing `/ai-tool` or `/instagram` directly should load the correct component.
+- **Tools**: Switching between tools in the Tools section updates the URL (e.g., `/instagram` -> `/zing-mp3`).
+- **404**: Unknown routes redirect to Home (via `*` route).
+
+## Next Steps
+- Deploy to Cloudflare and verify production behavior.

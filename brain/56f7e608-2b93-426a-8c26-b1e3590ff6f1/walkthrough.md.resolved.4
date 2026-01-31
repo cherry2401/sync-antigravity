@@ -1,0 +1,68 @@
+# HaKi Beauty - Development Walkthrough
+
+## ✅ Phases 1-3: E-commerce Core
+
+| Feature | Route | Key Files |
+|---------|-------|-----------|
+| Footer | - | [Footer.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/layout/Footer.tsx) |
+| Product Detail | `/san-pham/[slug]` | [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/san-pham/%5Bslug%5D/page.tsx) |
+| Cart (Zustand) | - | [cartStore.ts](file:///i:/Website/MyphamHaKi/app-src/src/store/cartStore.ts) |
+| Product Listing | `/san-pham` | [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/san-pham/page.tsx) |
+| Checkout | `/thanh-toan` | [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/thanh-toan/page.tsx) |
+| Auth (Login/Register) | `/tai-khoan` | [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/tai-khoan/page.tsx) |
+
+---
+
+## ✅ Phase 5: Content Pages
+
+### Blog (`/blog`)
+[page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/blog/page.tsx)
+- Search bar + category filters
+- Featured posts grid
+- Blog cards with author, date, read time
+
+### Blog Detail (`/blog/[slug]`)  
+[page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/blog/%5Bslug%5D/page.tsx)
+- Article content with markdown
+- Tags, share buttons, author box
+- Related posts section
+
+### Contact (`/lien-he`)
+[page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/lien-he/page.tsx)
+- Contact info (address, phone, email, hours)
+- Form with validation + success state
+- Social links + Google Maps
+
+### About (`/gioi-thieu`)
+[page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/gioi-thieu/page.tsx)
+- Hero section with company intro
+- Stats: 50K+ customers, 200+ brands
+- Core values + Team section
+
+---
+
+## 🎬 Recordings
+
+````carousel
+![Phase 2 - Cart](C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/phase2_cart_test_1768237164999.webp)
+<!-- slide -->
+![Phase 3 - Checkout & Auth](C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/phase3_verification_1768237705556.webp)
+<!-- slide -->
+![Phase 5 - Content Pages](C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/phase5_final_verify_1768238695623.webp)
+````
+
+---
+
+## 📂 All Routes Summary
+
+| Route | Page |
+|-------|------|
+| `/` | Homepage |
+| `/san-pham` | Product Listing |
+| `/san-pham/[slug]` | Product Detail |
+| `/thanh-toan` | Checkout |
+| `/tai-khoan` | Login/Register |
+| `/blog` | Blog Listing |
+| `/blog/[slug]` | Blog Detail |
+| `/lien-he` | Contact |
+| `/gioi-thieu` | About |

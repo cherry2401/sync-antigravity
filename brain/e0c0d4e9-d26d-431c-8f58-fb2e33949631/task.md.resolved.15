@@ -1,0 +1,12 @@
+# Nhiệm vụ: Cấu hình và Cài đặt Claude-ws
+
+## Cấu hình đã hoàn tất
+- [x] Cấu hình Claude Code CLI & VS Code Extension <!-- id: 0 -->
+- [x] Chạy claude-ws tại Local (Windows) <!-- id: 1 -->
+- [x] Thiết lập Cloudflare Tunnel truy cập từ xa <!-- id: 2 -->
+
+## Thiết lập chạy ngầm vĩnh viễn (Persistence)
+- [x] Đã nắm bắt cấu trúc Cloudflare Tunnel Service <!-- id: 3 -->
+- [/] Thử nghiệm lệnh PM2 đặc trị lỗi "bun" (node + cli.mjs) <!-- id: 4 -->
+- [ ] Thiết lập PM2 khởi động cùng Windows <!-- id: 5 -->
+

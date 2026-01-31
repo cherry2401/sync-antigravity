@@ -1,0 +1,160 @@
+# Phân Tích Lỗi Upload Image - VEO3 Workflows
+
+## 🔍 Tổng Quan Vấn Đề
+
+Workflow **VEO3_ImageUpload_Fixed_V3** hoạt động thành công khi upload ảnh, trong khi **VEO3_V2.json** liên tục gặp lỗi **"Bad request - please check your parameters"** tại node Upload Image.
+
+## ⚠️ Nguyên Nhân Chính
+
+Sau khi phân tích chi tiết, tôi phát hiện **sự khác biệt quan trọng** giữa hai workflow:
+
+### 📌 Điểm Khác Biệt Số 1: `typeVersion` của HTTP Request Node
+
+| Workflow | typeVersion | Kết quả |
+|----------|-------------|---------|
+| **VEO3_ImageUpload_Fixed_V3** | `3` | ✅ Thành công |
+| **VEO3_V2** | `4.2` | ❌ Lỗi Bad Request |
+
+### 📌 Điểm Khác Biệt Số 2: Xử lý Base64
+
+**VEO3_ImageUpload_Fixed_V3** có bước làm sạch base64:
+```javascript
+// Convert to Base64 node
+const cleanBase64 = base64String.replace(/^data:image\/\w+;base64,/, "");
+```
+
+**VEO3_V2** không có bước này:
+```javascript
+// Convert to Base64 node
+return {
+  json: {
+    base64: base64,  // Base64 thô, chưa được làm sạch
+    length: base64.length
+  }
+};
+```
+
+---
+
+## 📊 So Sánh Chi Tiết Upload Image Node
+
+### ✅ VEO3_ImageUpload_Fixed_V3 (Thành công)
+
+[Upload Image](file:///i:/Workflow/n8n/Test/VEO3/VEO3_ImageUpload_Fixed_V3.json#L91-L111)
+
+```json
+{
+  "parameters": {
+    "method": "POST",
+    "url": "https://aisandbox-pa.googleapis.com/v1:uploadUserImage",
+    "sendHeaders": true,
+    "specifyHeaders": "json",
+    "jsonHeaders": "={{ JSON.stringify({...}) }}",
+    "sendBody": true,
+    "contentType": "raw",
+    "rawContentType": "text/plain",
+    "body": "={{ $json.payload }}",
+    "options": {}
+  },
+  "type": "n8n-nodes-base.httpRequest",
+  "typeVersion": 3  // ← Phiên bản 3
+}
+```
+
+### ❌ VEO3_V2 (Lỗi)
+
+[Upload Image](file:///i:/Workflow/n8n/Test/VEO3/VEO3_V2.json#L631-L650)
+
+```json
+{
+  "parameters": {
+    "method": "POST",
+    "url": "https://aisandbox-pa.googleapis.com/v1:uploadUserImage",
+    "sendHeaders": true,
+    "specifyHeaders": "json",
+    "jsonHeaders": "={{ JSON.stringify({...}) }}",
+    "sendBody": true,
+    "contentType": "raw",
+    "rawContentType": "text/plain",
+    "body": "={{ $json.payload }}",
+    "options": {}
+  },
+  "type": "n8n-nodes-base.httpRequest",
+  "typeVersion": 4.2  // ← Phiên bản 4.2
+}
+```
+
+---
+
+## 🔧 Giải Pháp Sửa Lỗi
+
+### Cách 1: Hạ Phiên Bản HTTP Request Node (Khuyến nghị)
+
+Thay đổi `typeVersion` từ `4.2` xuống `3` trong node **Upload Image** của VEO3_V2:
+
+```json
+"typeVersion": 3
+```
+
+### Cách 2: Cập Nhật Code Làm Sạch Base64
+
+Trong node **Convert to Base64** của VEO3_V2, thay thế code hiện tại:
+
+**Code hiện tại:**
+```javascript
+const binaryData = $input.item.binary.data;
+const base64 = binaryData.data;
+
+return {
+  json: {
+    base64: base64,
+    length: base64.length
+  }
+};
+```
+
+**Code mới (đã làm sạch):**
+```javascript
+const binaryData = $input.item.binary.data;
+const base64String = binaryData.data;
+// Loại bỏ data prefix nếu có
+const cleanBase64 = base64String.replace(/^data:image\/\w+;base64,/, "");
+
+return {
+  json: {
+    base64: cleanBase64,
+    length: cleanBase64.length
+  }
+};
+```
+
+---
+
+## 💡 Giải Thích Kỹ Thuật
+
+### Tại Sao typeVersion 4.2 Gây Lỗi?
+
+n8n HTTP Request node version 4.2 có cách xử lý headers và body khác so với version 3:
+
+- **Version 3**: Xử lý `specifyHeaders: "json"` một cách linh hoạt hơn
+- **Version 4.2**: Strict hơn với format headers, có thể gây conflict khi kết hợp với `jsonHeaders`
+
+### Tại Sao Cần Làm Sạch Base64?
+
+Google AI API yêu cầu base64 **thuần túy** (raw base64), không chấp nhận format:
+```
+data:image/png;base64,iVBORw0KGgoAAAANS...
+```
+
+Chỉ chấp nhận:
+```
+iVBORw0KGgoAAAANS...
+```
+
+---
+
+## ✨ Kết Luận
+
+Lỗi xảy ra do **sự không tương thích** giữa HTTP Request node version 4.2 với cách Google API xử lý request. Workflow Fixed_V3 sử dụng version 3 nên hoạt động ổn định.
+
+**Hành động khuyến nghị**: Hạ `typeVersion` xuống `3` trong node Upload Image của VEO3_V2.

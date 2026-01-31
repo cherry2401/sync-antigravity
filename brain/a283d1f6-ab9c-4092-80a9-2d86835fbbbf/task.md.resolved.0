@@ -1,0 +1,15 @@
+# Task List
+
+- [ ] Analyze [Tiktok.json](file:///c:/Users/Cherry/Clone_facebook/Test%20WF/Tiktok/Tiktok.json) and provided images <!-- id: 0 -->
+- [ ] Create Implementation Plan <!-- id: 1 -->
+- [ ] Wait for user to upload remaining sheet configuration images <!-- id: 2 -->
+- [ ] Refine Implementation Plan based on new images <!-- id: 3 -->
+- [ ] Implement Workflow Fixes/Additions <!-- id: 4 -->
+    - [ ] Configure Google Sheets Trigger/Read node <!-- id: 5 -->
+    - [ ] Implement Video Download/Get logic <!-- id: 6 -->
+    - [ ] Configure Facebook Upload Session node <!-- id: 7 -->
+    - [ ] Configure Facebook Video Upload node <!-- id: 8 -->
+    - [ ] Configure Facebook Publish node <!-- id: 9 -->
+    - [ ] Implement Status Check Loop (Wait, Get Status, If) <!-- id: 10 -->
+    - [ ] Configure Google Sheets Update node <!-- id: 11 -->
+- [ ] Verify Workflow <!-- id: 12 -->

@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "Phân tích chi tiết sự khác biệt giữa node Upload Image trong hai workflow VEO3_ImageUpload_Fixed_V3 và VEO3_V2, giải thích nguyên nhân lỗi 'Bad request' và cung cấp hướng dẫn sửa lỗi",
+  "updatedAt": "2025-12-07T18:07:26.991452300Z"
+}

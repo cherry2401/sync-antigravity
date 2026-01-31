@@ -1,0 +1,98 @@
+# Fix Group Posting Issues
+
+## 1️⃣ FIX "Construct Facebook URL1" (Group Posts)
+
+**Node:** `Construct Facebook URL1` (sau "Create Group Post using Page")
+
+**Thay đổi:**
+```javascript
+// TÌM dòng này:
+const postId = $json.post_id || '';
+
+// ĐỔI THÀNH:
+const postId = $json.id || $json.post_id || '';
+```
+
+✅ **Giống hệt cách fix Page!**
+
+---
+
+## 2️⃣ FIX "Wait Group Delay" - Lỗi Reference
+
+### 🔴 Vấn Đề:
+```
+An expression references 'Split Group Media Batch', 
+but the node is unexecuted.
+```
+
+**Nguyên nhân:** 
+- Khi flow chạy qua **Page** posting → không execute `Split Group Media Batch`
+- Nhưng `Wait Group Delay` vẫn cố gắng lấy data từ node đó → **LỖI**
+
+### ✅ Giải Pháp: 2 options
+
+#### **Option 1: Đơn giản - Fixed Delay** (RECOMMENDED)
+
+**Node:** `Wait Group Delay`
+
+**Thay đổi "Wait Amount":**
+```javascript
+// XÓA expression hiện tại:
+={{ $('Split Group Media Batch').item.json.delay_seconds }}
+
+// ĐỔI THÀNH fixed value:
+180
+```
+
+➡️ **Delay cố định 180 giây (3 phút)**
+
+---
+
+#### **Option 2: Dynamic Delay - Dùng node gần nhất**
+
+**Node:** `Wait Group Delay`
+
+**Thay đổi "Wait Amount":**
+```javascript
+// XÓA:
+={{ $('Split Group Media Batch').item.json.delay_seconds }}
+
+// ĐỔI THÀNH (reference node TRƯỚC nó):
+={{ $('Update Post Completed').item.json.delay_seconds || 180 }}
+```
+
+**NHƯNG** cần thêm field `delay_seconds` vào node `Update Post Completed`:
+- Trong expression của node đó, thêm: `delay_seconds: 180`
+
+---
+
+## 📊 So Sánh 2 Options
+
+| Option | Ưu điểm | Nhược điểm |
+|--------|---------|------------|
+| **1. Fixed Delay** | ✅ Đơn giản<br>✅ Không lỗi | ⚠️ Không linh hoạt |
+| **2. Dynamic** | ✅ Có thể customize<br>✅ Lấy từ config | ⚠️ Phức tạp hơn<br>⚠️ Cần sửa thêm node |
+
+---
+
+## 🎯 Recommendation
+
+**Dùng Option 1 - Fixed Delay:**
+1. Mở node `Wait Group Delay`
+2. Xóa expression
+3. Nhập: `180` (3 phút)
+4. Save
+
+**Lý do:**
+- Đơn giản, không lỗi
+- Delay giữa posts thường cố định
+- Nếu cần customize sau, có thể đổi sang Option 2
+
+---
+
+## ✅ Checklist
+
+- [ ] Fix `Construct Facebook URL1`: `$json.id || $json.post_id`
+- [ ] Fix `Wait Group Delay`: xóa expression, dùng `180`
+- [ ] Test workflow với Page post
+- [ ] Test workflow với Group post

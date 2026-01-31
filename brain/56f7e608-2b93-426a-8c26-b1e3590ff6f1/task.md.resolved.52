@@ -1,0 +1,27 @@
+# Product Listing Page
+
+## 1. Server Action - Filtered Products
+- [ ] Thêm `getFilteredProducts(params)` trong [products.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts)
+- [ ] Thêm mock data 20 sản phẩm
+
+## 2. useProductFilter Hook
+- [ ] Tạo `src/hooks/useProductFilter.ts`
+- [ ] Hàm `setFilter`, `resetFilters`
+
+## 3. ProductFilters Component
+- [ ] Tạo `src/components/shop/ProductFilters.tsx`
+- [ ] Categories list với active state
+- [ ] Price range slider (min-max inputs)
+- [ ] Brand checkboxes
+- [ ] Mobile drawer/sheet
+
+## 4. ProductGrid Component
+- [ ] Tạo `src/components/shop/ProductGrid.tsx`
+- [ ] Top bar: count + sort dropdown
+- [ ] Grid responsive (2/3/4 cols)
+- [ ] Pagination
+
+## 5. Main Page
+- [ ] Tạo `src/app/san-pham/page.tsx`
+- [ ] Read searchParams, call filtered products
+- [ ] Layout 2 cột (sidebar + grid)

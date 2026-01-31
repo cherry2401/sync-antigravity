@@ -1,0 +1,77 @@
+# Hướng dẫn sử dụng Workflow TikTok to Facebook Reels
+
+Tôi đã hoàn thiện workflow n8n của bạn để tự động hóa việc reup video từ TikTok sang Facebook Reels với các tính năng nâng cao.
+
+## Các thay đổi chính
+
+1.  **Token Động (Dynamic Token)**:
+    -   Workflow giờ đây sẽ đọc thông tin `Page đích` từ sheet `Public Reel` và tìm `Access Token` tương ứng trong sheet `Quản Lý Pages`.
+    -   Điều này cho phép bạn đăng lên nhiều page khác nhau mà không cần sửa workflow.
+
+2.  **Vòng lặp kiểm tra trạng thái (Status Loop)**:
+    -   Sau khi đăng, workflow sẽ đợi 1 phút và kiểm tra trạng thái video.
+    -   Nếu video chưa sẵn sàng (`ready`), nó sẽ đợi tiếp.
+    -   Khi video đã sẵn sàng, nó mới cập nhật trạng thái vào sheet.
+
+3.  **Cấu trúc HTTP Request**:
+    -   Thay thế các node Facebook cũ bằng `HTTP Request` để linh hoạt hơn trong việc sử dụng Token động.
+
+## Cấu hình cần thiết
+
+### 1. Google Sheets
+Đảm bảo bạn có 2 sheet với tên chính xác:
+-   **Public Reel**: Chứa link TikTok và cột `Page đích`.
+-   **Quản Lý Pages**: Chứa `Tên Page`, `ID Page`, `Access Token`.
+    -   *Lưu ý*: `Tên Page` trong sheet này phải khớp chính xác với `Page đích` trong sheet `Public Reel`.
+
+### 2. n8n Credentials
+-   Workflow sử dụng credential `Google Sheets account` (đã có sẵn trong file cũ của bạn).
+-   Không cần cấu hình credential Facebook trong n8n nữa vì chúng ta dùng Token từ sheet.
+
+### 3. Kiểm tra API TikTok
+-   Node `Get Video TikTok` đang sử dụng `api.satoru.site`.
+-   Output được mong đợi là JSON có trường `data.play` (link video không logo). Nếu API này thay đổi cấu trúc, bạn cần cập nhật lại expression trong node `Upload Video`.
+
+## Hướng dẫn Cấu hình Thủ công (Sửa lỗi mất data)
+
+Nếu import vào mà thấy các node bị thiếu cấu hình, bạn hãy làm theo các bước sau trên Canvas:
+
+### Bước 1: Node "Read Page Config" (Google Sheets)
+-   **Document**: Chọn file sheet của bạn.
+-   **Sheet**: Chọn sheet `Quản Lý Pages`.
+
+### Bước 2: Node "Merge Data"
+-   **Mode**: Chọn `Combine`.
+-   **Combination Mode**: Chọn `Merge By Fields`.
+-   **Merge By Fields**:
+    -   Input 1: Gõ `Page đích`
+    -   Input 2: Gõ `Tên Page`
+-   *Mục đích*: Để n8n biết dòng nào bên "Public Reel" ứng với dòng nào bên "Quản Lý Pages".
+
+### Bước 3: Node "Filter Processed" (Filter)
+-   **Conditions**:
+    -   Chọn `String`.
+    -   Value 1: Kéo thả trường `Trạng thái` từ cột bên trái vào (hoặc gõ `{{ $json['Trạng thái'] }}`).
+    -   Operation: `Is Empty`.
+-   *Mục đích*: Chỉ xử lý các dòng chưa có chữ "Done".
+
+### Bước 4: Node "If Ready" (If)
+-   **Conditions**:
+    -   Chọn `String`.
+    -   Value 1: `{{ $json.status.video_status.status }}` (đây là kết quả từ node Check Status).
+    -   Operation: `Equal`.
+    -   Value 2: `ready` (hoặc `published` tùy vào API trả về, thường là `ready` khi upload xong).
+
+### Bước 5: Node "Update Sheet" (Google Sheets)
+-   **Operation**: `Update`.
+-   **Sheet**: Chọn `Public Reel`.
+-   **Columns to Match**: Gõ `Post ID` (hoặc cột nào là khóa chính của bạn).
+-   **Columns to Update**:
+    -   `Trạng thái`: Điền `Done`.
+    -   `Link bài đăng`: Điền `https://www.facebook.com/reel/{{ $json.id }}`.
+    -   `Thời gian đăng`: Chọn `Expression` rồi nhập `{{ $now }}`.
+
+## Cách chạy thử
+1.  Điền 1 dòng dữ liệu mẫu vào sheet `Public Reel` (để trống cột `Trạng thái`).
+2.  Bấm **Execute Workflow**.
+3.  Theo dõi quá trình chạy. Nếu thấy node `Wait` chạy lặp lại vài lần, đó là bình thường (đang đợi Facebook xử lý video).

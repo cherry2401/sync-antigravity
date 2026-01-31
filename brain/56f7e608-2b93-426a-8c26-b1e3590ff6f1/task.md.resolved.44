@@ -1,0 +1,21 @@
+# Image Upload for Carousel Slides
+
+## Phase 1: API Route
+- [x] Create `/api/upload` route for file handling
+- [x] Save to `/public/uploads/slides/`
+- [x] Return URL path
+
+## Phase 2: Upload UI Component
+- [x] Create reusable [ImageUploader](file:///i:/Website/MyphamHaKi/app-src/src/components/admin/ImageUploader.tsx#22-241) component
+- [x] Handle file input + drag-drop
+- [x] Show upload progress + preview
+
+## Phase 3: Integrate into Slide Editor
+- [x] Replace placeholder with [ImageUploader](file:///i:/Website/MyphamHaKi/app-src/src/components/admin/ImageUploader.tsx#22-241)
+- [x] Update slide data on upload success
+- [x] Show existing image with delete option
+
+## Verification
+- [x] Upload image → appears in slide list
+- [x] Save config → image persists
+- [x] Banner preview shows uploaded image

@@ -1,0 +1,249 @@
+# OmoCaptcha Integration cho VEO3 Workflow
+
+## Tổng Quan
+
+Google VEO3 API đã thêm reCAPTCHA validation. Plan này integrate OmoCaptcha để tự động solve captcha khi cần.
+
+## Captcha Type
+
+Từ screenshot user, VEO3 dùng **reCAPTCHA (có thể v2 hoặc Enterprise)**. Cần xác định:
+- `websiteURL`: `https://labs.google` hoặc tương tự
+- `websiteKey`: Từ browser DevTools khi inspect captcha element
+
+---
+
+## Proposed Changes
+
+### 1. Thêm OmoCaptcha API Key vào Data Table
+
+#### [MODIFY] Access Token Data Table
+
+Thêm column `OmoCaptcha_API_Key` để lưu API key của OmoCaptcha.
+
+User tự nhập API key vào Data Table (lấy từ https://omocaptcha.com).
+
+---
+
+### 2. Text-to-Video Flow với Captcha Handling
+
+#### [NEW] Node: Solve Captcha (Text Flow)
+
+**Type**: HTTP Request  
+**Position**: Giữa `Edit Fields` và `Create VEO3`  
+**Trigger**: Always run (hoặc conditional nếu detect captcha error)
+
+**Request**:
+```json
+POST https://api.omocaptcha.com/v2/createTask
+{
+  "clientKey": "{{ $('Read Data').first().json.OmoCaptcha_API_Key }}",
+  "task": {
+    "type": "RecaptchaV2TokenTask",
+    "websiteURL": "https://aisandbox-pa.googleapis.com",
+    "websiteKey": "SITE_KEY_HERE"
+  }
+}
+```
+
+**Response**: `{ "success": true, "taskId": "xxx" }`
+
+---
+
+#### [NEW] Node: Wait for Captcha Solution
+
+**Type**: Wait  
+**Duration**: 10-20 seconds (OmoCaptcha thường solve trong 10-30s)
+
+---
+
+#### [NEW] Node: Get Captcha Result
+
+**Type**: HTTP Request  
+**Request**:
+```json
+POST https://api.omocaptcha.com/v2/getTaskResult
+{
+  "clientKey": "{{ $('Read Data').first().json.OmoCaptcha_API_Key }}",
+  "taskId": "{{ $('Solve Captcha (Text Flow)').first().json.taskId }}"
+}
+```
+
+**Response**: 
+```json
+{
+  "success": true,
+  "status": "ready",
+  "solution": {
+    "recaptchaResponse": "03AGdBq24..."
+  }
+}
+```
+
+---
+
+#### [MODIFY] Create VEO3 Node
+
+Thêm `recaptchaToken` vào request body:
+
+**Current Body**:
+```json
+{
+  "clientContext": { ... },
+  "requests": [ ... ]
+}
+```
+
+**New Body**:
+```json
+{
+  "clientContext": {
+    "sessionId": "{{ $json.sessionId }}",
+    "projectId": "{{ $json.projectId }}",
+    "tool": "PINHOLE",
+    "userPaygateTier": "PAYGATE_TIER_ONE",
+    "recaptchaToken": "{{ $('Get Captcha Result').first().json.solution.recaptchaResponse }}"
+  },
+  "requests": [ ... ]
+}
+```
+
+---
+
+### 3. Image-to-Video Flow với Captcha Handling
+
+Tương tự text flow, thêm:
+- **[NEW]** Solve Captcha (Image Flow)
+- **[NEW]** Wait for Captcha Solution (Image)
+- **[NEW]** Get Captcha Result (Image)
+- **[MODIFY]** Generate Video (Image) - Thêm `recaptchaToken`
+
+---
+
+### 4. Error Handling & Retry Logic
+
+#### [NEW] Node: IF Captcha Status Check
+
+Sau `Get Captcha Result`, check:
+- `status === "ready"` → Proceed to Create VEO3
+- `status === "processing"` → Wait thêm và poll lại
+- `status === "failed"` → Retry or notify user
+
+---
+
+## Flow Diagrams
+
+### Flow Hiện Tại (Bị Lỗi Captcha)
+
+```mermaid
+graph TD
+    A[Telegram: Gửi text] --> B[Edit Fields]
+    B --> C[Create VEO3 API]
+    C --> D{Có Captcha?}
+    D -->|Có| E[❌ ERROR: reCAPTCHA evaluation failed]
+    D -->|Không| F[Video Processing]
+    F --> G[Wait → Check Status → Send Video]
+```
+
+---
+
+### Flow Mới (Với OmoCaptcha)
+
+```mermaid
+graph TD
+    A[Telegram: Gửi text] --> B[Edit Fields]
+    B --> C[Solve Captcha - OmoCaptcha API]
+    C --> D[Wait 15s]
+    D --> E[Get Captcha Result]
+    E --> F{Status = ready?}
+    F -->|Yes| G[Create VEO3 với recaptchaToken]
+    F -->|No - processing| H[Wait thêm 10s]
+    H --> E
+    F -->|No - failed| I[Retry hoặc notify user]
+    G --> J[Video Processing]
+    J --> K[Wait → Read Token → Check Status]
+    K --> L[Send Video ✅]
+```
+
+---
+
+### Chi Tiết Nodes Mới
+
+#### 1. **Solve Captcha** (HTTP Request)
+```
+POST https://api.omocaptcha.com/v2/createTask
+Body:
+{
+  "clientKey": "YOUR_API_KEY",
+  "task": {
+    "type": "RecaptchaV2TokenTask",
+    "websiteURL": "https://aisandbox-pa.googleapis.com",
+    "websiteKey": "6Lf..." 
+  }
+}
+
+Response: { "taskId": "abc123" }
+```
+
+#### 2. **Wait 15s** (Wait Node)
+Chờ OmoCaptcha solve captcha (thường mất 10-30s)
+
+#### 3. **Get Captcha Result** (HTTP Request)
+```
+POST https://api.omocaptcha.com/v2/getTaskResult
+Body:
+{
+  "clientKey": "YOUR_API_KEY",
+  "taskId": "abc123"
+}
+
+Response: 
+{
+  "status": "ready",
+  "solution": {
+    "recaptchaResponse": "03AGdBq24PxKfW..."
+  }
+}
+```
+
+#### 4. **Create VEO3 (Modified)**
+Thêm `recaptchaToken` vào `clientContext`:
+```json
+{
+  "clientContext": {
+    "recaptchaToken": "03AGdBq24PxKfW...",
+    ...
+  }
+}
+```
+
+---
+
+## Verification Plan
+
+> [!IMPORTANT]
+> **Cần user cung cấp**:
+> 1. **OmoCaptcha API Key** - Đăng ký tại https://omocaptcha.com
+> 2. **reCAPTCHA Site Key** - Inspect element captcha trên browser để lấy `data-sitekey`
+> 3. **reCAPTCHA Type** - v2, v3, hay Enterprise?
+
+---
+
+## Chi Phí Ước Tính
+
+- **OmoCaptcha**: ~$0.001 - $0.003 per captcha
+- Nếu mỗi video cần solve 1 captcha → ~$0.003/video
+- Nếu tạo 1000 videos/tháng → ~$3/tháng
+
+---
+
+## Verification Plan
+
+### Manual Testing
+1. User cung cấp OmoCaptcha API key + reCAPTCHA site key
+2. Tạo 1 video text-to-video từ Telegram
+3. Verify captcha được solve tự động
+4. Verify video generation thành công
+
+### Monitoring
+- Check OmoCaptcha dashboard để xem success rate
+- Monitor workflow execution time (thêm ~15-30s cho captcha solving)

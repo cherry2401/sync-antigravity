@@ -1,0 +1,16 @@
+# Task: Cải thiện lưu trữ Cookies
+
+## Mục tiêu
+Sửa lỗi extension không lấy được đầy đủ độ dài cookies
+
+## Các bước thực hiện
+
+- [/] Phân tích code hiện tại để tìm vấn đề
+- [ ] Cải thiện phần lấy cookies tự động
+  - [ ] Đảm bảo lấy đủ độ dài cookie value
+  - [ ] Thêm logging để debug
+  - [ ] Kiểm tra giới hạn Chrome storage
+- [ ] Thêm hiển thị thông tin cookies
+  - [ ] Hiển thị số lượng cookies
+  - [ ] Hiển thị độ dài cookie string
+- [ ] Test và verify

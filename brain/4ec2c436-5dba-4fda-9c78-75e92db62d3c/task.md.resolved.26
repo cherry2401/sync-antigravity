@@ -1,0 +1,14 @@
+# Task: MCP Bridge Integration
+
+## Progress
+
+- [ ] Create `electron/services/mcpTransport.ts` - WebSocket transport with auth
+- [ ] Create `electron/services/mcpTools.ts` - Tool registry wrapping CommandExecutor
+- [ ] Create `electron/services/mcpBridge.ts` - Main orchestrator
+- [ ] Create `electron/services/localMcpProvider.ts` - Local MCP provider
+- [ ] Update [electron/main.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/main.ts) - Initialize MCPBridge
+- [ ] Update [package.json](file:///f:/Python/OpenSSH/clawdbot-client/package.json) - Add MCP SDK dependencies
+- [ ] Install dependencies
+- [ ] Run and verify connection
+
+## Status: 🚧 IN PROGRESS

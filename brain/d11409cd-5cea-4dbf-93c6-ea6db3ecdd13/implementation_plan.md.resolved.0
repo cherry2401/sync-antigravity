@@ -1,0 +1,51 @@
+# Implementation Plan - Auto-Refresh & Webhook Upgrade
+
+## Goal Description
+Upgrade the "API Key Capture Tool" extension to support automatic token capturing and forwarding to a webhook (e.g., N8N). This includes a new UI for settings, broadening the capture logic to work without manual video generation, and an auto-refresh mechanism to keep the session alive and the token fresh.
+
+## User Review Required
+> [!IMPORTANT]
+> **Broadened Capture Logic**: I will modify the extension to capture the API Key from *any* request to `aisandbox-pa.googleapis.com` (and potentially `*.googleapis.com` if needed) that contains the `Authorization` header. This should solve the issue of needing to "manually create a video" to get the token.
+
+> [!NOTE]
+> **Auto-Refresh Mechanism**: The extension will reload the target tab at the specified interval to trigger network requests. This requires the tab to be open.
+
+## Proposed Changes
+
+### Manifest
+#### [MODIFY] [manifest.json](file:///d:/EXTENTIONS/Extension_Chrome_Veo-OK_v2/manifest.json)
+- Add `alarms` permission for periodic tasks.
+- Add `scripting` permission (optional, but good for reloading) or just use `tabs.reload`.
+
+### UI (Popup)
+#### [MODIFY] [popup.html](file:///d:/EXTENTIONS/Extension_Chrome_Veo-OK_v2/popup.html)
+- Add a new "Auto-Refresh Settings" section:
+    - Input: Webhook URL
+    - Input: Interval (minutes)
+    - Checkbox: Enable Auto-Refresh
+    - Button: Save Settings
+- Update status display to show "Auto-Refresh Active".
+
+#### [MODIFY] [popup.js](file:///d:/EXTENTIONS/Extension_Chrome_Veo-OK_v2/popup.js)
+- Load/Save settings to `chrome.storage.local`.
+- Send configuration updates to [background.js](file:///d:/EXTENTIONS/Extension_Chrome_Veo-OK_v2/background.js).
+
+### Background Logic
+#### [MODIFY] [background.js](file:///d:/EXTENTIONS/Extension_Chrome_Veo-OK_v2/background.js)
+- **Broaden Filter**: Remove the strict check for `runImageFx` / `batchAsyncGenerateVideoText`. Allow any POST/GET to `aisandbox-pa.googleapis.com` that has `Authorization: Bearer ya29...`.
+- **Webhook Logic**: When a token is captured:
+    - Check if `webhookUrl` is configured.
+    - `fetch(webhookUrl, { method: 'POST', body: JSON.stringify(data) })`.
+- **Alarm/Timer**:
+    - `chrome.alarms.create` based on the interval.
+    - On alarm: Find the target tab and reload it (`chrome.tabs.reload`).
+
+## Verification Plan
+### Automated Tests
+- None (Extension environment).
+
+### Manual Verification
+1.  **UI**: Open popup, enter Webhook URL and Interval, click Save. Re-open to ensure values persist.
+2.  **Capture**: Open `aisandbox-pa.googleapis.com`. Reload the page. Verify that the extension captures the key *without* creating a video.
+3.  **Webhook**: Check the N8N (or a test webhook like webhook.site) to see if the JSON is received.
+4.  **Auto-Refresh**: Set interval to 1 minute. Wait and see if the page reloads and a new webhook event is fired.

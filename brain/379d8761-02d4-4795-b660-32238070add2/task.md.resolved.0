@@ -1,0 +1,6 @@
+# Debugging video_inline post type
+
+- [ ] Analyze workflow file `REPOST FACEBOOK.json` <!-- id: 0 -->
+- [ ] Identify "Switch Post Type" node logic <!-- id: 1 -->
+- [ ] Determine why `video_inline` fails to match video/reel rules <!-- id: 2 -->
+- [ ] Propose and implement a fix <!-- id: 3 -->

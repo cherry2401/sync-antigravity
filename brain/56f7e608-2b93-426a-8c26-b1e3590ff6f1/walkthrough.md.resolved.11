@@ -1,0 +1,49 @@
+# Preview Modal - Implementation Walkthrough
+
+## Summary
+Implemented a full-screen preview modal for the Page Builder, allowing admins to preview their page designs in Desktop and Mobile views before saving.
+
+---
+
+## Components Created
+
+### [PreviewModal.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/admin/PreviewModal.tsx)
+- Full-screen dark overlay (`z-[100]`)
+- Header with Desktop/Mobile toggle buttons
+- Desktop view: renders `BlockRenderer` at full width
+- Mobile view: 375×812px phone frame with notch and home indicator
+- Closes via "Đóng" button or Escape key
+
+---
+
+## Integration Points
+
+### [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/admin/giao-dien/trang-tri/page.tsx)
+- Added `isPreviewOpen` state
+- Converted "Xem trước" link to button with `onClick`
+- Renders [PreviewModal](file:///i:/Website/MyphamHaKi/app-src/src/components/admin/PreviewModal.tsx#27-130) with current `blocks` data
+
+---
+
+## Verification Results
+
+### Desktop View
+![Desktop Preview](C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/preview_modal_desktop.png)
+
+### Mobile View  
+![Mobile Preview](C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/preview_modal_mobile.png)
+
+### Browser Recording
+![Test Recording](C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/preview_modal_test_1768312195632.webp)
+
+---
+
+## Test Results ✅
+| Feature | Status |
+|---------|--------|
+| Preview button opens modal | ✅ Pass |
+| Desktop view renders full-width | ✅ Pass |
+| Mobile view shows phone frame | ✅ Pass |
+| Toggle switches views correctly | ✅ Pass |
+| Escape key closes modal | ✅ Pass |
+| Close button works | ✅ Pass |

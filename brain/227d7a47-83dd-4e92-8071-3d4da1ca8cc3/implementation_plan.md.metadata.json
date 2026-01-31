@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Create a new Clawdbot Skill named 'beads-memory-v2' that implements the Beads Task Management and Memory V2 Knowledge Distillation protocols. This includes a comprehensive SKILL.md, sample configuration files, and a setup guide.",
+  "updatedAt": "2026-01-18T07:32:05.558268400Z"
+}

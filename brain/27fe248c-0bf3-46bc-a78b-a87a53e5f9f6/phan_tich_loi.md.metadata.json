@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "Detailed analysis of Facebook Graph API error 'Object with ID 114993947297504 does not exist'. Explains three main causes: token mismatch (using Page Access Token for wrong page), insufficient permissions, and incorrect endpoint usage. Includes embedded screenshots, comparison tables, and step-by-step solutions for fixing token and permission issues.",
+  "updatedAt": "2025-11-19T08:16:40.451730Z"
+}

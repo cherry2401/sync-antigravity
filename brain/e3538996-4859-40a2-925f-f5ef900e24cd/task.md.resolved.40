@@ -1,0 +1,11 @@
+- [x] Optimize Link Shortener (Cloudflare -> Supabase Direct)
+- [x] Implement QR Code Generation for Short Links
+- [x] Refine QR Code UI (Logo Black + Inline Text)
+- [x] Implement Instagram Download Tool
+    - [x] Create n8n Workflow (`Instagram Download API.json`)
+    - [x] Create Cloudflare Function (`/api/instagram`)
+    - [x] UI: Create Instagram Download Component
+    - [x] Fix: Broken Images (Using wsrv.nl proxy)
+- [x] Mobile UI Optimization
+    - [x] Optimize Header for Mobile (Remove Scroll, Fit Screen)
+    - [x] UX: Explain iOS Download Limitation

@@ -1,0 +1,148 @@
+# Fix VEO3_V2 Telegram Image Upload Error
+
+## 🎯 Cập Nhật: Bạn Đã Sửa Base64 Rồi Nhưng Vẫn Lỗi!
+
+> [!IMPORTANT]
+> Sau khi xem screenshot, bạn **ĐÃ THÊM** code làm sạch base64:
+> ```javascript
+> const cleanBase64 = base64String.replace(/^data:image\/\w+;base64,/, "");
+> ```
+> 
+> **Nhưng vẫn bị lỗi!** Có **2 vấn đề còn lại** cần sửa:
+
+### Screenshots Xác Nhận
+
+![User đã sửa Convert to Base64 với regex cleaning](C:/Users/Cherry/.gemini/antigravity/brain/f8cde13e-9dfb-4dc0-bb84-4eba2f68cca1/uploaded_image_1765131406776.png)
+
+---
+
+## 🔍 Phân Tích Đầy Đủ Tất Cả Sự Khác Biệt
+
+| Khía cạnh | VEO3_ImageUpload_Fixed_V3 ✅ | VEO3_V2 ❌ |
+|-----------|------------------------------|------------|
+| **Base64 cleaning** | ✅ Có regex | ✅ **Bạn đã sửa** |
+| **HTTP typeVersion** | `3` | `4.2` ← **Vấn đề 1** |
+| **mimeType trong Convert** | ❌ Không có | ❌ Không có |
+| **mimeType trong Prepare** | Hardcode `image/png` | Dùng `$json.mimeType` ← **Vấn đề 2** |
+
+---
+
+## ⚠️ Vấn Đề 1: HTTP Request typeVersion 4.2
+
+### Upload Image Node - Khác Biệt Quan Trọng
+
+**VEO3_V2** (Lỗi):
+```json
+{
+  "type": "n8n-nodes-base.httpRequest",
+  "typeVersion": 4.2  // ← Version mới, xử lý headers khác
+}
+```
+
+**VEO3_ImageUpload_Fixed_V3** (Thành công):
+```json
+{
+  "type": "n8n-nodes-base.httpRequest",
+  "typeVersion": 3  // ← Version cũ, ổn định với Google API
+}
+```
+
+> [!WARNING]
+> HTTP Request node **version 4.2** xử lý `specifyHeaders: "json"` strict hơn, gây conflict khi combine với `jsonHeaders`. Google API không chấp nhận format này!
+
+---
+
+## ⚠️ Vấn Đề 2: Missing mimeType Field
+
+### Edit Fields (Image) Node
+
+**VEO3_V2** dòng 574-577:
+```json
+{
+  "id": "img-mimetype-07",
+  "name": "mimeType",
+  "value": "={{ $('Convert to Base64').item.json.mimeType }}",  // ← Nhưng Convert to Base64 KHÔNG TRẢ VỀ mimeType!
+  "type": "string"
+}
+```
+
+**Convert to Base64** CHỈ trả về:
+```javascript
+return {
+  json: {
+    base64: cleanBase64,
+    length: cleanBase64.length
+    // ← THIẾU mimeType!
+  }
+};
+```
+
+→ Kết quả: `$json.mimeType` = `undefined` hoặc empty string  
+→ **Prepare Upload Payload** tạo payload với mimeType rỗng  
+→ **Google API báo lỗi "Invalid argument"**
+
+---
+
+## 📋 Proposed Changes
+
+### 1. [MODIFY] Upload Image Node - Hạ TypeVersion
+
+[Upload Image](file:///i:/Workflow/n8n/Test/VEO3/VEO3_V2.json#L630-L650), dòng 644:
+
+```json
+"typeVersion": 4.2  →  "typeVersion": 3
+```
+
+### 2. [MODIFY] Convert to Base64 Node - Thêm mimeType
+
+[Convert to Base64](file:///i:/Workflow/n8n/Test/VEO3/VEO3_V2.json#L500-L501):
+
+**Code hiện tại:**
+```javascript
+const binaryData = $input.item.binary.data;
+const base64String = binaryData.data;
+const cleanBase64 = base64String.replace(/^data:image\/\w+;base64,/, "");
+
+return {
+  json: {
+    base64: cleanBase64,
+    length: cleanBase64.length
+  }
+};
+```
+
+**Code mới:**
+```javascript
+const binaryData = $input.item.binary.data;
+const base64String = binaryData.data;
+const cleanBase64 = base64String.replace(/^data:image\/\w+;base64,/, "");
+
+// Get mimeType from binary data
+const mimeType = binaryData.mimeType || 'image/png';
+
+return {
+  json: {
+    base64: cleanBase64,
+    mimeType: mimeType,
+    length: cleanBase64.length
+  }
+};
+```
+
+---
+
+## ✅ Verification Plan
+
+### Automated Tests
+1. Upload ảnh test qua Telegram
+2. Kiểm tra output node **Convert to Base64**: 
+   - `base64` không có prefix
+   - `mimeType` có giá trị (ví dụ: `image/jpeg`)
+3. Kiểm tra **Upload Image** response có `mediaGenerationId`
+
+### Manual Verification
+1. Gửi ảnh JPEG qua Telegram bot
+2. Gửi ảnh PNG qua Telegram bot
+3. Xác nhận cả 2 đều tạo video thành công
+
+

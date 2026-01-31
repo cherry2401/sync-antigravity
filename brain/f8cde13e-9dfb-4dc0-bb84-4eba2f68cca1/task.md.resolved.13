@@ -1,0 +1,23 @@
+# Extension Token Capture - Implementation Progress
+
+## Extension Update ✅
+- [x] Created content.js with token capture
+- [x] Updated background.js to handle captured tokens
+- [x] Removed old token endpoint code
+- [x] Updated manifest.json with content_scripts
+
+## Testing Extension
+- [ ] Reload extension in Chrome
+- [ ] Open VEO3 page
+- [ ] Check console for "Token captured" logs
+- [ ] Verify token saved in storage
+
+## Workflow Cleanup
+- [ ] Remove all OmoCaptcha nodes
+- [ ] Remove IF Check Captcha node  
+- [ ] Update Create VEO to use token from Read Data
+- [ ] Test video generation
+
+## Data Table
+- [ ] Add column: VEO3_RecaptchaToken
+- [ ] Token auto-updates from extension

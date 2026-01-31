@@ -1,0 +1,16 @@
+# Token Capture - Diagnosis Phase
+
+## Approach: WebRequest API (background.js)
+- [x] Added detailed logging for token extraction
+- [x] Auto-send to webhook when token found
+- [ ] **TESTING NEEDED** - Reload extension + create video
+- [ ] Check console for exact error
+
+## Possible Issues
+- Body not captured by webRequest
+- Token in different field  
+- Parsing error
+
+## Next After Diagnosis
+- Fix based on console logs
+- Update workflow to use tokens

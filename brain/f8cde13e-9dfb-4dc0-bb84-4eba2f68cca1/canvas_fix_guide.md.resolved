@@ -1,0 +1,182 @@
+# Hướng Dẫn Sửa Trên n8n Canvas (KHÔNG CẦN EDIT FILE)
+
+## 🎯 Vấn Đề Cần Sửa
+
+Sau khi phân tích, workflow của bạn có **3 vấn đề**:
+
+1. ✅ **Base64 cleaning** - Bạn đã sửa rồi
+2. ⚠️ **Thiếu mimeType** trong output của Convert to Base64
+3. ❌ **TypeVersion 4.2** của Upload Image node (KHÔNG THỂ sửa trên canvas)
+
+---
+
+## ✅ Cách Sửa Trên Canvas
+
+### Bước 1: Sửa Node "Convert to Base64"
+
+> Thêm mimeType vào output
+
+1. **Mở workflow VEO3_V2** trong n8n
+2. **Click vào node "Convert to Base64"** (node có icon code)
+3. Bạn sẽ thấy code JavaScript hiện tại:
+
+```javascript
+const binaryData = $input.item.binary.data;
+const base64String = binaryData.data;
+const cleanBase64 = base64String.replace(/^data:image\/\w+;base64,/, "");
+
+return {
+  json: {
+    base64: cleanBase64,
+    length: cleanBase64.length
+  }
+};
+```
+
+4. **Thêm 2 dòng code** (sau dòng `cleanBase64`):
+
+```javascript
+// Lấy mimeType từ binary data
+const mimeType = binaryData.mimeType || 'image/png';
+```
+
+5. **Thêm mimeType vào return**:
+
+```javascript
+return {
+  json: {
+    base64: cleanBase64,
+    mimeType: mimeType,    // ← Thêm dòng này
+    length: cleanBase64.length
+  }
+};
+```
+
+6. **Code hoàn chỉnh sẽ là**:
+
+```javascript
+const binaryData = $input.item.binary.data;
+const base64String = binaryData.data;
+const cleanBase64 = base64String.replace(/^data:image\/\w+;base64,/, "");
+
+// Lấy mimeType từ binary data
+const mimeType = binaryData.mimeType || 'image/png';
+
+return {
+  json: {
+    base64: cleanBase64,
+    mimeType: mimeType,
+    length: cleanBase64.length
+  }
+};
+```
+
+7. **Click "Save"** hoặc đóng node editor
+
+---
+
+### Bước 2: Sửa Node "Prepare Upload Payload"
+
+> Dùng mimeType động thay vì hardcode
+
+1. **Click vào node "Prepare Upload Payload"**
+2. Tìm field **"payload"** trong phần Values
+3. Bạn sẽ thấy expression hiện tại có:
+
+```
+"mimeType": "image/png"
+```
+
+4. **Thay đổi thành**:
+
+```
+"mimeType": {{ $json.mimeType }}
+```
+
+5. **Expression hoàn chỉnh sẽ là**:
+
+```javascript
+{{ JSON.stringify({
+  "imageInput": {
+    "rawImageBytes": $json.base64,
+    "mimeType": $json.mimeType       // ← Đổi từ "image/png" thành $json.mimeType
+  },
+  "clientContext": {
+    "tool": "ASSET_MANAGER"
+  }
+}) }}
+```
+
+6. **Click "Save"** hoặc đóng node editor
+
+---
+
+### ⚠️ Bước 3: Upload Image Node - TypeVersion (VẤN ĐỀ)
+
+> [!WARNING]
+> **Vấn đề typeVersion KHÔNG THỂ sửa trực tiếp trên canvas UI!**
+
+n8n không cho phép thay đổi `typeVersion` qua giao diện. Bạn có **2 lựa chọn**:
+
+#### Lựa chọn A: Xóa và Tạo Lại Node (Khuyến nghị)
+
+1. **Click vào node "Upload Image"**
+2. **Copy/ghi nhớ** cấu hình:
+   - Method: `POST`
+   - URL: `https://aisandbox-pa.googleapis.com/v1:uploadUserImage`
+   - Send Headers: ✅ ON
+   - Specify Headers: `Using JSON`
+   - JSON: 
+     ```json
+     {
+       "Authorization": {{ $json.token }},
+       "Content-Type": "text/plain;charset=UTF-8"
+     }
+     ```
+   - Send Body: ✅ ON
+   - Body Content Type: `Raw`
+   - Content Type: `text/plain`
+   - Body: `{{ $json.payload }}`
+
+3. **Xóa node "Upload Image"**
+4. **Thêm node HTTP Request mới**:
+   - Từ toolbar, kéo "HTTP Request" vào canvas
+   - n8n sẽ tự động tạo với typeVersion mới
+
+5. **Cấu hình lại** theo thông tin đã copy ở bước 2
+6. **Nối lại connections**:
+   - Input: từ "Prepare Upload Payload"
+   - Output: đến "Extract Media ID"
+
+#### Lựa chọn B: Chấp Nhận Sửa File JSON (1 dòng duy nhất)
+
+1. **Đóng workflow** trong n8n
+2. **Mở file [VEO3_V2.json](file:///i:/Workflow/n8n/Test/VEO3/VEO3_V2.json)** trong VS Code
+3. **Tìm dòng 644** (hoặc search "typeVersion": 4.2)
+4. **Sửa**: `"typeVersion": 4.2,` → `"typeVersion": 3,`
+5. **Lưu file** (Ctrl + S)
+6. **Quay lại n8n**, reload workflow
+
+---
+
+## 🧪 Kiểm Tra
+
+Sau khi sửa xong:
+
+1. **Gửi 1 ảnh** qua Telegram bot
+2. **Click vào node "Convert to Base64"** → Tab Output
+   - Phải thấy: `base64`, `mimeType`, `length`
+3. **Click vào node "Upload Image"** → Tab Output
+   - Không còn lỗi "Bad request"
+   - Phải có `mediaGenerationId`
+
+---
+
+## 📌 Tóm Tắt
+
+| Sửa | Nơi | Có thể sửa trên Canvas? |
+|-----|-----|------------------------|
+| Thêm mimeType | Convert to Base64 | ✅ Được - sửa code |
+| Dùng mimeType động | Prepare Upload Payload | ✅ Được - sửa expression |
+| Hạ typeVersion | Upload Image | ❌ Không - phải xóa/tạo lại hoặc edit file |
+

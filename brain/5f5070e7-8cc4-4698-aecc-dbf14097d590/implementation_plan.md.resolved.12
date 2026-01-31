@@ -1,0 +1,67 @@
+# Quản Lý Nội Dung Trang Chủ Từ Admin
+
+## Mục tiêu
+Cho phép admin quản lý các phần trên trang chủ:
+1. Ảnh bìa địa điểm (Location cards)
+2. Tin nổi bật & Tin dành cho bạn (featured/priority)
+3. Ảnh banner trang chủ
+
+---
+
+## Giai Đoạn 1: Database Schema
+
+### Bảng `site_settings`
+| Cột | Loại | Mô tả |
+|-----|------|-------|
+| id | text | Key (banner_image, etc) |
+| value | jsonb | Giá trị cấu hình |
+
+### Bảng `locations`
+| Cột | Loại | Mô tả |
+|-----|------|-------|
+| id | uuid | Primary key |
+| name | text | Tên địa điểm (Đà Nẵng, Hà Nội...) |
+| image_url | text | URL ảnh bìa |
+| display_order | int | Thứ tự hiển thị |
+| is_featured | bool | Card lớn hay nhỏ |
+
+### Cập nhật bảng `listings`
+- Thêm cột `is_featured` (boolean)
+- Thêm cột `featured_order` (int)
+
+---
+
+## Giai Đoạn 2: Admin UI
+
+### [MODIFY] AdminDashboard - Thêm menu "Cấu hình trang chủ"
+
+### [NEW] AdminLocationsPage.tsx
+- Danh sách các địa điểm
+- Upload/đổi ảnh bìa
+- Kéo thả sắp xếp thứ tự
+- Chọn card featured (lớn)
+
+### [NEW] AdminBannerPage.tsx
+- Upload ảnh banner mới
+- Xem preview
+- Lưu vào `site_settings`
+
+### [MODIFY] AdminListingsPage
+- Thêm checkbox "Tin nổi bật"
+- Sắp xếp thứ tự featured
+
+---
+
+## Giai Đoạn 3: Frontend Integration
+
+### [MODIFY] HomePage.tsx
+- Fetch locations từ DB thay vì hardcode
+- Fetch featured listings
+- Sử dụng banner từ settings
+
+---
+
+## Verification
+1. Admin có thể upload ảnh địa điểm
+2. Admin có thể đánh dấu tin nổi bật
+3. Trang chủ hiển thị đúng theo cấu hình

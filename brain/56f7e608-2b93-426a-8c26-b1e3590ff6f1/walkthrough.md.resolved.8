@@ -1,0 +1,73 @@
+# Homepage Refactored for Dynamic Builder ✅
+
+Đã hoàn thành refactoring homepage để tích hợp Page Builder mà **giữ nguyên 100% style** gốc.
+
+## What Was Done
+
+### 1. Extracted Components (với Props + Defaults)
+
+| Component | File | Props Supported |
+|-----------|------|-----------------|
+| ServiceFeaturesBar | [components/sections/ServiceFeaturesBar.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/ServiceFeaturesBar.tsx) | `features[]` |
+| FeaturedProducts | [components/sections/FeaturedProducts.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/FeaturedProducts.tsx) | `title`, `subtitle`, `products[]`, `viewAllLink` |
+| CategoriesGrid | [components/sections/CategoriesGrid.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/CategoriesGrid.tsx) | `title`, `subtitle`, `categories[]` |
+
+> [!NOTE]
+> Các components khác ([HeroBanner](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/HeroBanner.tsx#131-484), [BrandCarousel](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/BrandCarousel.tsx#24-77), [PromoBanner](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/PromoBanner.tsx#10-77), [PromotionalProducts](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/PromotionalProducts.tsx#105-219)) đã tồn tại và được reuse.
+
+---
+
+### 2. BlockRenderer Registry
+
+[BlockRenderer.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/storefront/BlockRenderer.tsx) maps 7 block types → real components:
+
+```tsx
+const BLOCK_COMPONENTS = {
+  HERO_BANNER: HeroBanner,
+  SERVICE_FEATURES: ServiceFeaturesBar,
+  FEATURED_PRODUCTS: FeaturedProducts,
+  BRAND_CAROUSEL: BrandCarousel,
+  PROMO_BANNER: PromoBanner,
+  PROMOTIONAL_PRODUCTS: PromotionalProducts,
+  CATEGORY_GRID: CategoriesGrid,
+};
+```
+
+---
+
+### 3. Homepage Now Uses BlockRenderer
+
+[page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/page.tsx):
+
+```tsx
+const defaultBlocks = [
+  { id: "hero-1", type: "HERO_BANNER", props: {} },
+  { id: "features-1", type: "SERVICE_FEATURES", props: {} },
+  { id: "featured-products-1", type: "FEATURED_PRODUCTS", props: {...} },
+  // ... 7 blocks total
+];
+
+export default function Home() {
+  return <BlockRenderer blocks={defaultBlocks} />;
+}
+```
+
+---
+
+## Visual Verification
+
+````carousel
+![Top: HeroBanner + ServiceFeatures + Products](C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/homepage_top_verified_1768302947910.png)
+<!-- slide -->
+![Bottom: CategoriesGrid + Footer](C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/homepage_bottom_verified_1768302959873.png)
+````
+
+**Result:** Giao diện y hệt trước khi refactor! 🎉
+
+---
+
+## Next Steps (Optional)
+
+- [ ] Connect `savePageConfig` server action to persist admin changes
+- [ ] Update Admin Page Builder to load/save real blocks
+- [ ] Add more block types (Testimonials, Newsletter, etc.)

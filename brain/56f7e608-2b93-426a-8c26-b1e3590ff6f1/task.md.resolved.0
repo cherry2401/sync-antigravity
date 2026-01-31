@@ -1,0 +1,21 @@
+# MyphamHaKi E-commerce Components
+
+## Completed
+- [x] Header component with Mega Menu
+- [x] Design system (globals.css)
+- [x] Utility functions (cn.ts)
+
+## In Progress
+- [/] ProductCard component
+  - [ ] Image with 3:4 aspect ratio + zoom hover
+  - [ ] Quick Add button on hover (Desktop) / visible icon (Mobile)
+  - [ ] Price display with discount styling
+  - [ ] Badges (Best Seller, -20%)
+  - [ ] Wishlist toggle
+
+## Pending
+- [ ] HeroBanner with slider
+- [ ] Footer component
+- [ ] Cart Drawer with Zustand
+- [ ] Skeleton loaders
+- [ ] Product Detail Page (PDP)

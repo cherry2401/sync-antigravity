@@ -1,0 +1,16 @@
+# Fix `spawn` Error on Windows
+
+The installation/dev script [scripts/run-node.mjs](file:///g:/AIHub/clawdbot/scripts/run-node.mjs) fails on Windows with an `EINVAL` error because it attempts to `spawn('pnpm.cmd')` directly without `shell: true`.
+
+## Proposed Changes
+
+### [scripts]
+#### [MODIFY] [run-node.mjs](file:///g:/AIHub/clawdbot/scripts/run-node.mjs)
+- Update `spawn` call at line 117 to use `pnpm` instead of `pnpm.cmd`.
+- Add `shell: true` to the `spawn` options to ensure cross-platform compatibility and correct execution of the npm command.
+
+## Verification Plan
+
+### Automated Tests
+- Run `pnpm dev --help` to verify the script can now execute without error.
+- Verify `pnpm build` still works (though it was working before, this script invokes it when dist is stale).

@@ -1,0 +1,19 @@
+# VEO3 Workflow Fixes
+
+## Current Issue: Check Status Node Error
+
+- [x] Identify the error (Check Status references unexecuted Create VEO3 node)
+- [x] Analyze workflow structure (found two separate flows merging at Check Status)
+- [x] Locate relevant nodes in JSON (Create VEO3: line 93, Generate Video (Image): line 747, Check Status: line 211)
+- [x] Create implementation plan
+- [ ] Update Check Status node's jsonBody with conditional logic
+- [ ] Test Image Upload flow (from Telegram)
+- [ ] Test Text-to-Video flow (from Webhook)
+- [ ] Verify both flows complete successfully
+
+## Previous Issues (Resolved)
+
+- [x] Image upload "Bad Request" error - **RESOLVED** (aspect ratio issue)
+- [x] Base64 encoding fixes
+- [x] MimeType handling
+- [x] HTTP Request typeVersion compatibility

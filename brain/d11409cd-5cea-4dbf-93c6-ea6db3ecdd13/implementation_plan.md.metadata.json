@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Proposes a two-phase approach to handle image-to-video generation: Phase 1 uploads images immediately when received and stores mediaId; Phase 2 retrieves stored mediaId when prompt is sent and generates video. Includes option for caption-based fast path and two-message reliable flow.",
+  "updatedAt": "2025-12-08T08:08:23.715653200Z",
+  "version": "3"
+}

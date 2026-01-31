@@ -1,0 +1,24 @@
+# Phase 2: Connect Admin Builder to Database
+
+## Task Checklist
+
+### Step 1: Server Actions
+- [x] Create [lib/actions/storefront.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/storefront.ts)
+- [x] Implement [savePageConfig()](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/storefront.ts#113-136) with file storage + revalidatePath("/")
+- [x] Implement [getPageConfig()](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/storefront.ts#90-107) with default fallback
+- [x] Create [data/storefront.json](file:///i:/Website/MyphamHaKi/app-src/data/storefront.json) placeholder
+
+### Step 2: Admin Preview Integration
+- [x] Import BlockRenderer into Admin Builder
+- [x] Replace canvas with scaled real preview (Live Preview tab)
+- [x] Add CSS transformation for desktop simulation
+- [x] Wire up load on mount (`useEffect`)
+- [x] Wire up save button to [savePageConfig()](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/storefront.ts#113-136) with loading/success states
+
+### Step 3: Homepage Dynamic Loading
+- [x] Convert [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/page.tsx) to async server component
+- [x] Call [getPageConfig()](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/storefront.ts#90-107) instead of hardcoded blocks
+
+### Step 4: Verification
+- [ ] Test save/load cycle
+- [ ] Verify homepage updates on save

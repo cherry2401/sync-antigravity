@@ -1,0 +1,101 @@
+# OmoCaptcha Integration - Smart Captcha Handling
+
+## Strategy
+
+**Try-Catch Pattern**: Thử tạo video không có captcha → Nếu lỗi captcha → Solve và retry
+
+**Lợi ích**:
+- ✅ Chỉ solve khi cần (~10-30% requests)
+- ✅ Tiết kiệm 70-90% chi phí
+- ✅ Nhanh hơn khi không captcha
+
+---
+
+## Flow Diagram
+
+```mermaid
+graph TD
+    A[Edit Fields] --> B[Create VEO3]
+    B --> C{Error?}
+    C -->|No error| D[Video Processing ✅]
+    C -->|Captcha error| E[Solve Captcha]
+    C -->|Other error| F[Notify user]
+    E --> G[Wait 15s]
+    G --> H[Get Result]
+    H --> I{Ready?}
+    I -->|Yes| J[Retry Create VEO3 + token]
+    I -->|Processing| K[Wait 10s --> Get Result]
+    J --> L{Success?}
+    L -->|Yes| D
+    L -->|No| F
+```
+
+---
+
+## Implementation
+
+### 1. Thêm OmoCaptcha API Key
+
+**Data Table**: Thêm column `OmoCaptcha_API_Key`
+
+---
+
+### 2. Nodes Mới (Text-to-Video)
+
+#### IF: Detect Captcha Error
+```javascript
+{{ $json.error?.message?.includes('reCAPTCHA') || $json.error?.message?.includes('Forbidden') }}
+```
+
+#### Solve Captcha
+```json
+POST https://api.omocaptcha.com/v2/createTask
+{
+  "clientKey": "{{ $('Read Data').first().json.OmoCaptcha_API_Key }}",
+  "task": {
+    "type": "RecaptchaV2TokenTask",
+    "websiteURL": "https://aisandbox-pa.googleapis.com",
+    "websiteKey": "SITE_KEY"
+  }
+}
+```
+
+#### Wait 15s → Get Result
+```json
+POST https://api.omocaptcha.com/v2/getTaskResult
+{
+  "clientKey": "...",
+  "taskId": "{{ $('Solve Captcha').first().json.taskId }}"
+}
+```
+
+#### Retry Create VEO3
+Clone Create VEO3, thêm:
+```json
+{
+  "clientContext": {
+    ...
+    "recaptchaToken": "{{ $('Get Result').first().json.solution.recaptchaResponse }}"
+  }
+}
+```
+
+---
+
+### 3. Image-to-Video (Tương tự)
+
+---
+
+## Cần User Cung Cấp
+
+> [!IMPORTANT]
+> 1. **OmoCaptcha API Key** - https://omocaptcha.com
+> 2. **reCAPTCHA Site Key** - DevTools inspect captcha element
+
+---
+
+## Chi Phí
+
+- Chỉ ~10-30% requests cần captcha
+- ~$0.003 × 0.2 = **$0.0006/video trung bình**
+- 1000 videos → ~$0.6/tháng (thay vì $3)

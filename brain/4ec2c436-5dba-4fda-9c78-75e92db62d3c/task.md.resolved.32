@@ -1,0 +1,15 @@
+# Auto CDP Connector Implementation
+
+## Hướng 1: Auto CDP Port Scanner (Ưu tiên)
+- [ ] Thêm CDP port scanner vào [browserRelay.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/browserRelay.ts) - quét port 9222
+- [ ] Tự động kết nối CDP endpoint khi phát hiện Chrome debugging port
+- [ ] Loại bỏ dependency vào Extension cho use case này
+- [ ] Cập nhật StatusBar indicator 
+
+## Hướng 2: Extension Auto-Attach (Backup)
+- [ ] Sửa [background.js](file:///f:/Python/OpenSSH/chrome-extension/background.js) thêm `chrome.tabs.onUpdated` listener
+- [ ] Tự động attach khi tab load xong 
+- [ ] Luôn hiển thị badge ON
+
+## Tài liệu
+- [ ] Hướng dẫn thêm `--remote-debugging-port=9222` vào Chrome shortcut

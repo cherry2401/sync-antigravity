@@ -1,0 +1,85 @@
+# User Dashboard Implementation
+
+## Goal
+Create a user profile/dashboard page similar to batdongsan.vn/sellernet/dashboard, but without payment-related features (free model initially).
+
+## Features to Implement
+
+### Dashboard Overview (Main Page)
+Feature cards grid:
+1. **Đăng tin mới** - Link to posting form
+2. **Quản lý tin đăng** - User's listings management
+3. **Thông báo** - Notifications (with badge count)
+4. **Tin đã lưu** - Saved/favorite listings
+5. **Trang cá nhân** - View profile page
+6. **Đổi mật khẩu** - Change password
+
+### Sidebar Menu
+- Avatar & User name
+- Tổng quan (Dashboard overview)
+- Tất cả tin đăng (All my listings)
+- Tin đăng chờ duyệt (Pending)
+- Tin đăng đã duyệt (Approved)
+- Tin không được duyệt (Rejected)
+- Thông tin cá nhân (Edit profile)
+- Đăng xuất (Logout)
+
+### Excluded Features (Payment-related)
+- ❌ Nạp tiền vào tài khoản
+- ❌ Lịch sử nạp tiền
+- ❌ Lịch sử thanh toán
+- ❌ Bảng giá dịch vụ
+
+---
+
+## Proposed Changes
+
+### New Components
+
+#### [NEW] `src/components/user/UserDashboardLayout.tsx`
+Shared layout for user dashboard with:
+- Left sidebar (user avatar, menu items)
+- Main content area
+- Responsive design (mobile sidebar toggle)
+
+#### [NEW] `src/pages/UserDashboardPage.tsx`
+Main dashboard grid with feature cards
+
+#### [NEW] `src/pages/UserListingsPage.tsx`
+User's listings management with filters:
+- All listings / Pending / Approved / Rejected
+- Search and filter controls
+- Listing cards with edit/delete actions
+
+#### [NEW] `src/pages/UserProfilePage.tsx`
+Edit profile form:
+- Full name
+- Email (readonly)
+- Phone
+- Zalo
+- Avatar upload
+- Change password section
+
+---
+
+### Routing Updates
+
+#### [MODIFY] [src/App.tsx](file:///i:/Website/BDS/src/App.tsx)
+Add new routes:
+- `/tai-khoan` → UserDashboardPage
+- `/tai-khoan/tin-dang` → UserListingsPage
+- `/tai-khoan/thong-tin` → UserProfilePage
+
+---
+
+## Verification Plan
+
+### Browser Testing
+1. Login as a user
+2. Navigate to `/tai-khoan`
+3. Verify dashboard cards display correctly
+4. Click each card and verify navigation
+5. Test sidebar menu items
+6. Test profile edit form (update name, avatar)
+7. Test listings management (view user's own listings)
+8. Test responsive layout (mobile view)

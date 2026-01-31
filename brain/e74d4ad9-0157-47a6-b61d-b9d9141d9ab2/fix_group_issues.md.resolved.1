@@ -1,0 +1,123 @@
+# Fix Wait Group Delay - Dynamic from Sheet
+
+## 🔴 Vấn đề
+Node `Wait Group Delay` reference sai:
+```javascript
+={{ $('Split Group Media Batch').item.json.delay_seconds }}
+```
+
+❌ **Lỗi:** Page flow KHÔNG chạy qua `Split Group Media Batch` → Node chưa execute
+
+---
+
+## ✅ Giải Pháp: Reference Node Đúng
+
+### Kiểm tra Data Flow
+
+**Page Flow:**
+```
+Update Post Completed → Wait Group Delay1 → Loop Over Items
+```
+
+**Group Flow:**
+```
+... → Update Post Completed1 → Wait Group Delay → Split Group Media Batch
+```
+
+### 🎯 Node cần reference
+
+Cần tìm node MÀ CẢ 2 FLOWS đều execute và CÓ `delay_seconds`
+
+**Options:**
+
+#### **Option 1: Reference `Loop Over Items`** (RECOMMENDED)
+
+```javascript
+={{ $('Loop Over Items').item.json.delay_seconds || 180 }}
+```
+
+**Lý do:**
+- ✅ Cả Page và Group đều chạy qua `Loop Over Items`
+- ✅ Data từ `Combine Post + Groups Data` có `delay_seconds`
+- ✅ Fallback 180 nếu không có
+
+---
+
+#### **Option 2: Reference node POST (tùy flow)**
+
+Nếu Want Group Delay chỉ chạy sau Page posts:
+
+```javascript
+={{ $('Post to Page Timeline (Text)').first().json.delay_seconds || $('Post to Page Timeline (Media)').first().json.delay_seconds || 180 }}
+```
+
+**Nhưng** Page posting nodes KHÔNG có `delay_seconds` trong response!
+
+---
+
+#### **Option 3: Reference `Update Post Completed`**
+
+Nếu node này pass-through data từ trước:
+
+```javascript
+={{ $input.first().json.delay_seconds || 180 }}
+```
+
+**NHƯNG** cần kiểm tra xem `Update Post Completed` có pass data qua không.
+
+---
+
+## 📋 Hướng Dẫn Fix
+
+### 1️⃣ MỞ node `Wait Group Delay`
+
+### 2️⃣ Thay đổi "Wait Amount":
+
+**Xóa:**
+```javascript
+={{ $('Split Group Media Batch').item.json.delay_seconds }}
+```
+
+**Đổi thành (RECOMMENDED):**
+```javascript
+={{ $('Loop Over Items').item.json.delay_seconds || 180 }}
+```
+
+### 3️⃣ Test Execute
+
+- Execute node để verify không còn lỗi
+- Check output có đúng delay value không
+
+---
+
+## 🔍 Verify Data
+
+### Kiểm tra `Loop Over Items` có `delay_seconds`:
+
+1. Execute workflow đến `Loop Over Items`
+2. Check output data:
+   ```json
+   {
+     "delay_seconds": 160,  // ← Cần có field này
+     "post_type": "Page",
+     ...
+   }
+   ```
+
+### Nếu KHÔNG có `delay_seconds`:
+
+Thì vấn đề ở **`Combine Post + Groups Data`** - phải đảm bảo output có field này!
+
+Check code node đó, dòng:
+```javascript
+delay_seconds: parseInt(group.json['Delay (seconds)'] || '0') || 0,
+```
+
+---
+
+## ✅ Expected Result
+
+Sau khi fix:
+- ✅ Page flow: Wait 160s (từ row đầu Page trong sheet)
+- ✅ Group flow: Wait theo delay của từng group (160, 180, 240...)
+- ✅ Không còn lỗi "node is unexecuted"

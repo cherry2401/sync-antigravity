@@ -1,0 +1,20 @@
+# Hướng dẫn hoàn tất cấu hình Claude Code
+
+Tôi đã thiết lập biến môi trường `CLAUDE_BASE_URL` vĩnh viễn trên Windows của bạn.
+
+## Các bước đã thực hiện:
+1. Chạy lệnh: `setx CLAUDE_BASE_URL "http://192.168.1.145:8317/v1"`
+2. Xác nhận hệ thống đã lưu giá trị thành công.
+
+## Bước cuối cùng cần bạn thực hiện:
+> [!IMPORTANT]
+> **Khởi động lại Terminal hoặc VS Code**: Lệnh `setx` thay đổi biến môi trường ở mức hệ thống, nên các cửa sổ Terminal đang mở sẽ chưa nhận được giá trị mới ngay lập tức.
+
+### Cách kiểm tra:
+Sau khi mở Terminal mới, bạn hãy chạy lệnh sau để kiểm tra:
+```powershell
+$env:CLAUDE_BASE_URL
+```
+Nếu hiện ra `http://192.168.1.145:8317/v1` là bạn đã thành công!
+
+Bây giờ bạn có thể dùng lệnh `claude` bình thường, mọi yêu cầu sẽ đi qua proxy của bạn.

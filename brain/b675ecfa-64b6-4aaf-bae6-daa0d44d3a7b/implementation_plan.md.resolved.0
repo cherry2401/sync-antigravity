@@ -1,0 +1,262 @@
+# Extension V2 - N8n Webhook Integration
+
+## Tổng Quan
+Thêm tính năng tự động đồng bộ cookies sang n8n webhook để lưu vào data table.
+
+## Proposed Changes
+
+### 1. UI Updates - Settings Section
+
+#### [MODIFY] [sidebar.html](file:///d:/EXTENTIONS/custome-link_v2/sidebar.html)
+
+Thêm section mới trong Settings:
+
+```html
+<!-- Sau phần Cookie Input -->
+<div class="section">
+  <label>N8N Webhook URL:</label>
+  <input 
+    type="url" 
+    id="webhookInput" 
+    placeholder="https://auto.myphamhaki.id.vn/webhook/api-key-xxx"
+    style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px;"
+  />
+  <p class="tip">💡 Webhook sẽ nhận POST request với cookies data</p>
+  
+  <div style="margin-top: 12px;">
+    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+      <input type="checkbox" id="autoSyncCheckbox" />
+      <span>Tự động đồng bộ sau khi lấy cookies</span>
+    </label>
+  </div>
+</div>
+```
+
+### 2. Storage Updates
+
+#### [MODIFY] [sidebar.js](file:///d:/EXTENTIONS/custome-link_v2/sidebar.js)
+
+**Thêm state variables:**
+```javascript
+let state = {
+  // ... existing state
+  webhookUrl: '',
+  autoSync: false
+};
+```
+
+**Load webhook settings on startup:**
+```javascript
+chrome.storage.local.get(['shopee_affiliate_cookie', 'n8n_webhook_url', 'auto_sync_enabled'], function(result) {
+  if (result.shopee_affiliate_cookie) {
+    state.cookie = result.shopee_affiliate_cookie;
+    state.isConfigured = true;
+  }
+  if (result.n8n_webhook_url) {
+    state.webhookUrl = result.n8n_webhook_url;
+  }
+  if (result.auto_sync_enabled !== undefined) {
+    state.autoSync = result.auto_sync_enabled;
+  }
+  // ... show content
+});
+```
+
+**Save webhook settings:**
+```javascript
+saveCookieBtn.addEventListener('click', function() {
+  const cookie = cookieInput.value.trim();
+  const webhookUrl = webhookInput.value.trim();
+  const autoSync = autoSyncCheckbox.checked;
+  
+  if (!cookie) {
+    alert('Vui lòng nhập Cookie');
+    return;
+  }
+  
+  chrome.storage.local.set({ 
+    shopee_affiliate_cookie: cookie,
+    n8n_webhook_url: webhookUrl,
+    auto_sync_enabled: autoSync
+  }, function() {
+    state.cookie = cookie;
+    state.webhookUrl = webhookUrl;
+    state.autoSync = autoSync;
+    state.isConfigured = true;
+    showMainContent();
+  });
+});
+```
+
+---
+
+### 3. Webhook Sync Function
+
+#### [MODIFY] [sidebar.js](file:///d:/EXTENTIONS/custome-link_v2/sidebar.js)
+
+**Thêm function gửi data đến webhook:**
+
+```javascript
+async function syncToWebhook(cookieString, cookieCount) {
+  if (!state.webhookUrl) {
+    console.log('No webhook URL configured, skipping sync');
+    return { success: false, reason: 'no_url' };
+  }
+  
+  try {
+    console.log('Syncing to webhook:', state.webhookUrl);
+    
+    // Prepare data
+    const payload = {
+      cookies: cookieString,
+      timestamp: new Date().toISOString(),
+      cookie_count: cookieCount,
+      user_id: extractUserId(cookieString), // Extract SPC_U value
+      source: 'chrome_extension_v2'
+    };
+    
+    console.log('Payload:', { ...payload, cookies: payload.cookies.substring(0, 100) + '...' });
+    
+    // Send to webhook
+    const response = await fetch(state.webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Webhook returned status ${response.status}`);
+    }
+    
+    const result = await response.json();
+    console.log('✅ Webhook sync successful:', result);
+    
+    return { success: true, data: result };
+    
+  } catch (error) {
+    console.error('❌ Webhook sync failed:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// Helper function to extract user ID from cookies
+function extractUserId(cookieString) {
+  const match = cookieString.match(/SPC_U=([^;]+)/);
+  return match ? match[1] : 'unknown';
+}
+```
+
+**Gọi sync sau khi lấy cookies thành công:**
+
+Trong auto cookie button handler, sau khi lấy cookies thành công:
+
+```javascript
+// Show success message
+const cookieInfo = `✅ Đã lấy ${shopeeCookies.length} cookies (${cookieString.length} ký tự)`;
+showError(cookieInfo);
+// ... styling
+
+// Auto sync if enabled
+if (state.autoSync && state.webhookUrl) {
+  console.log('Auto-syncing to webhook...');
+  const syncResult = await syncToWebhook(cookieString, shopeeCookies.length);
+  
+  if (syncResult.success) {
+    showError(`✅ Đã lấy ${shopeeCookies.length} cookies và đồng bộ với N8n!`);
+  } else {
+    showError(`✅ Đã lấy ${shopeeCookies.length} cookies (⚠️ Đồng bộ thất bại)`);
+  }
+}
+```
+
+---
+
+### 4. Manual Sync Button (Optional)
+
+#### [MODIFY] [sidebar.html](file:///d:/EXTENTIONS/custome-link_v2/sidebar.html)
+
+Thêm button đồng bộ thủ công trong Settings:
+
+```html
+<button class="btn btn-secondary" id="testWebhookBtn" style="margin-top: 8px;">
+  <span>🔄</span>
+  <span>Test Webhook</span>
+</button>
+```
+
+#### [MODIFY] [sidebar.js](file:///d:/EXTENTIONS/custome-link_v2/sidebar.js)
+
+```javascript
+testWebhookBtn.addEventListener('click', async function() {
+  if (!state.webhookUrl) {
+    alert('Vui lòng nhập Webhook URL trước');
+    return;
+  }
+  
+  if (!state.cookie) {
+    alert('Chưa có cookies để test. Vui lòng lấy cookies trước.');
+    return;
+  }
+  
+  testWebhookBtn.disabled = true;
+  testWebhookBtn.innerHTML = '<span>⏳</span><span>Đang test...</span>';
+  
+  const result = await syncToWebhook(state.cookie, 0);
+  
+  if (result.success) {
+    alert('✅ Test webhook thành công!');
+  } else {
+    alert(`❌ Test webhook thất bại: ${result.error || result.reason}`);
+  }
+  
+  testWebhookBtn.disabled = false;
+  testWebhookBtn.innerHTML = '<span>🔄</span><span>Test Webhook</span>';
+});
+```
+
+---
+
+## Verification Plan
+
+### Manual Testing
+
+1. **Cấu hình webhook:**
+   - Settings → Nhập webhook URL
+   - Check "Tự động đồng bộ"
+   - Lưu
+
+2. **Test auto-sync:**
+   - Lấy cookies tự động
+   - Kiểm tra n8n có nhận được data không
+   - Verify data structure đúng
+
+3. **Test manual sync:**
+   - Nhấn "Test Webhook"
+   - Verify thông báo success/error
+
+4. **Error handling:**
+   - Test với URL sai → Should show error
+   - Test khi n8n offline → Should handle gracefully
+
+### N8n Webhook Setup
+
+Bạn cần tạo webhook node trong n8n với structure:
+
+```json
+{
+  "cookies": "string",
+  "timestamp": "string (ISO)",
+  "cookie_count": "number",
+  "user_id": "string",
+  "source": "string"
+}
+```
+
+## Notes
+
+- Webhook URL được lưu trong `chrome.storage.local`
+- Auto-sync chỉ chạy khi có webhook URL và checkbox enabled
+- Sync failures không block extension hoạt động
+- Console log đầy đủ để debug

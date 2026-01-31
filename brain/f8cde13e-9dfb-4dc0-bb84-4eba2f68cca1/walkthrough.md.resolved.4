@@ -1,0 +1,144 @@
+# Test Extension recaptchaToken Capture
+
+## Bước 1: Reload Extension
+
+1. Mở Chrome → `chrome://extensions/`
+2. Tìm "API Key Capture Tool"
+3. Click **Reload** (icon mũi tên tròn)
+
+**→ Extension đã load code mới!**
+
+---
+
+## Bước 2: Configure Webhook
+
+### Tạo Webhook trong n8n
+
+1. Tạo workflow mới: "Extension Webhook"
+2. Thêm node **Webhook**:
+   - **Method**: POST
+   - **Path**: `extens
+
+ion-veo`
+3. Thêm node **Set** để format data:
+   ```javascript
+   {
+     "Access_Token": "{{ $json.header.authorization }}",
+     "projectId": "{{ $json.api_key.split('|')[1] }}",
+     "recaptchaToken": "{{ $json.recaptchaToken }}"
+   }
+   ```
+4. **Test webhook** để lấy URL
+
+### Config Extension
+
+1. Mở extension popup
+2. Settings → **Webhook URL**: `https://your-n8n.com/webhook/extension-veo`
+3. Save
+
+---
+
+## Bước 3: Test Capture
+
+### Trong Extension:
+1. Click **Start Capture** (One-Shot mode)
+
+### Trong Browser:
+1. Mở https://labs.google/fx/tools/veo3
+2. **Tạo 1 video** (prompt bất kỳ, ví dụ: "test robot")
+3. Click "Generate"
+
+### Kết Quả Expected:
+- Extension popup hiển thị "Captured!"
+- Console log (F12): `recaptchaToken captured: 03...`
+- **Webhook nhận data** với `recaptchaToken` field
+
+---
+
+## Bước 4: Verify Token
+
+### Check Console Logs:
+```
+F12 → Console → Filter: "recaptchaToken"
+```
+
+Sẽ thấy:
+```
+recaptchaToken captured: 03APcPBne...
+Extracted recaptchaToken: YES (03APcPBne...)
+Webhook sent: 200
+```
+
+### Check Webhook n8n:
+Response sẽ có:
+```json
+{
+  "Access_Token": "Bearer ya29...",
+  "projectId": "80afb1dc...",
+  "recaptchaToken": "03APcPBne..."
+}
+```
+
+---
+
+## Bước 5: Update Data Table
+
+### Add Column:
+1. Mở Data Table trong n8n
+2. Thêm column: **recaptchaToken** (Text)
+
+### Update Webhook Workflow:
+Thêm node **Update Data Table**:
+```javascript
+{
+  "Access_Token": "{{ $json.Access_Token }}",
+  "projectId": "{{ $json.projectId }}",
+  "recaptchaToken": "{{ $json.recaptchaToken }}"
+}
+```
+
+Mode: **Upsert** (update if exists, insert if not)
+
+Match on: **projectId**
+
+---
+
+## Bước 6: Test VEO3 Workflow
+
+### Update Workflow VEO3.1_v3:
+
+**Read Data** → Sẽ có `recaptchaToken`
+
+**Create VEO3** → JSON Body:
+```javascript
+{
+  "clientContext": {
+    ...
+    "recaptchaToken": $('Read Data').first().json.recaptchaToken || ""
+  }
+}
+```
+
+### Test:
+1. Mở VEO3 web, tạo 1 video → Token captured
+2. Gửi Telegram: "test video"
+3. **Expected**: Video được tạo thành công ✅
+
+---
+
+## Troubleshooting
+
+### Extension không capture token:
+- ✅ Reload extension
+- ✅ Check console có log "recaptchaToken captured" không
+- ✅ Verify tạo video trên VEO3 (không phải site khác)
+
+### Webhook không nhận token:
+- ✅ Check Webhook URL đúng
+- ✅ Test webhook trong n8n
+- ✅ Check console: "Webhook sent: 200"
+
+### Workflow vẫn lỗi captcha:
+- ✅ Token có được lưu vào Data Table không?
+- ✅ Token có hết hạn không? (refresh = tạo video mới)
+- ✅ Check `userPaygateTier` = "PAYGATE_TIER_TWO"

@@ -1,0 +1,71 @@
+- [x] Optimize Link Shortener (Cloudflare -> Supabase Direct)
+- [x] Implement QR Code Generation for Short Links
+- [x] Refine QR Code UI (Logo Black + Inline Text)
+- [x] Implement Instagram Download Tool
+    - [x] Create n8n Workflow (`Instagram Download API.json`)
+    - [x] Create Cloudflare Function (`/api/instagram`)
+    - [x] UI: Create Instagram Download Component
+    - [x] Fix: Broken Images (Using wsrv.nl proxy)
+- [x] Mobile UI Optimization
+    - [x] Optimize Header for Mobile (Remove Scroll, Fit Screen)
+    - [x] UX: Explain iOS Download Limitation
+    - [x] UI: Feature Section Horizontal Layout (3 cols) on Mobile
+    - [x] Fix: Mobile Video Download (Click event blocked)
+
+    - [x] UI: Update App.tsx with Tool Tabs (Insta/Zing)
+
+- [ ] Xvideos Tool Integration
+    - [x] Create n8n Workflow (`Xvideos Download API.json`)
+    - [x] Create Cloudflare Function (`/api/xvideos`)
+    - [x] UI: Create XvideosDownload Component (Search + Download)
+    - [x] UI: Update App.tsx with Xvideos Tab
+
+- [x] SoundCloud Tool Integration
+    - [x] Create n8n Workflow (`SoundCloud Download API.json`)
+    - [x] Create Cloudflare Function (`/api/soundcloud`)
+    - [x] UI: Create SoundCloudDownload Component
+    - [x] UI: Update App.tsx with SoundCloud Tab (Before Xvideos)
+
+- [x] Mobile Optimization
+    - [x] [Header.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/Header.tsx): Implement Hamburger Menu (Mobile Only)
+    - [x] [Header.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/Header.tsx): Refactor Layout (Row layout on mobile)
+    - [x] [App.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/App.tsx): Optimize Tool Switcher (Horizontal Scroll)
+    - [x] [App.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/App.tsx): Refine Typography (Smaller headings on mobile)
+
+- [x] AI Writer Deployment
+    - [x] Create n8n Workflow ([AiWriter_Workflow.json](file:///i:/Workflow/n8n/Workflow/Backups/AiWriter_Workflow.json))
+    - [x] Update Frontend ([AiWriter.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/AiWriter.tsx), [Header.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/Header.tsx), [translations.ts](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/utils/translations.ts))
+    - [x] Implement Advanced Options (Genre, Style, Platform, Upload)
+    - [x] Rename "AI Writer" navigation item to "AI Tool"
+    - [x] Implement Mobile Shopee Redirect (1st click + every 10th click) on 'Download Video' and 'Generate Content' buttons
+
+- [x] Client-Side Routing Implementation
+    - [x] Install `react-router-dom`
+    - [x] Refactor [App.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/App.tsx) to use `Routes` and `Route`
+    - [x] Update [Header.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/Header.tsx) and [Footer.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/Footer.tsx) to use [Link](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/XvideosDownload.tsx#68-105)
+    - [x] Create [_redirects](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/dist/_redirects) for Cloudflare SPA support
+    - [x] Fix TypeScript errors in [translations.ts](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/utils/translations.ts)
+
+- [x] Deploy to Cloudflare
+- [x] Deploy to Cloudflare
+    - [x] Build Project (`npm run build`)
+    - [x] Deploy Project (`wrangler pages deploy dist`)
+
+- [x] Security Implementation (Phase 1)
+    - [x] Implement Global CORS Middleware ([functions/api/_middleware.ts](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/functions/api/_middleware.ts))
+    - [x] Whitelist domains (localhost, tai-video.pages.dev, taivideo.io.vn)
+    - [x] Remove ad-hoc CORS from individual API files
+
+- [x] Analytics & Reporting (Hybrid: Supabase + Charts)
+    - [x] Setup Supabase DB (`analytics_events` table)
+    - [x] Create [analyticsService.ts](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/services/analyticsService.ts) for event logging
+    - [x] Create [AdminDashboard.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/AdminDashboard.tsx) with Charts (Recharts)
+    - [x] Add `/admin` route to [App.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/App.tsx)
+- [x] Analytics Enhancement
+    - [x] Admin Dashboard: Remove default password text, Add Eye Icon
+    - [x] Admin Dashboard: Add "Remember Me"
+    - [x] Admin Dashboard: Add Data Filters
+    - [x] Track: Link Shortener
+    - [x] Track: Instagram, Zing, SoundCloud, XVideos
+    - [x] Admin Dashboard: Add Tool Usage Breakdown (Pie Chart/Table by Provider)
+    - [x] Admin Dashboard: Add "Check Connection" button (Diagnostic) - [x] REMOVED after fixing

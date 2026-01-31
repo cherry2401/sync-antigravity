@@ -1,0 +1,20 @@
+# Token Capture - Debugging Request Body
+
+## Current Status
+- [x] Added detailed logging to [formatRequestBody()](file:///d:/EXTENTIONS/Chrome%20VEO%203.1/background.js#81-125)
+- [ ] **TESTING NEEDED** - User to reload extension + create video
+- [ ] Analyze console logs to see requestBody structure
+- [ ] Fix based on actual data structure
+
+## Expected Console Output
+```
+[formatRequestBody] requestBody keys: [...]
+[formatRequestBody] has formData? ...
+[formatRequestBody] has raw? ...
+[formatRequestBody] Decoded text preview: ...
+```
+
+## Next Steps After Logs
+- Fix formatRequestBody based on actual structure
+- Extract token correctly
+- Auto-send to webhook

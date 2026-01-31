@@ -1,0 +1,57 @@
+# Context Menu Implementation Plan
+
+## Goal
+Implement a right-click Context Menu in the File Explorer to provide common file operations.
+
+## User Review Required
+> [!IMPORTANT]
+> **Delete Action**: Should "Delete" move files to the Recycle Bin (safer) or permanently delete them?
+> *Recommendation*: Use `shell.trashItem()` to move to Recycle Bin.
+
+## Proposed Features
+
+### 1. Menu Structure
+
+#### **For Files**
+| Menu Item | Icon | Action |
+| :--- | :--- | :--- |
+| **Open** | `VscOpenPreview` | Open in the main preview area. |
+| **Reveal in Explorer** | `VscFolder` | Open the file's location in Windows Explorer. |
+| **Copy Path** | `VscCopy` | Copy absolute path to clipboard. |
+| **Rename** | `VscEdit` | Trigger inline rename input. |
+| **Delete** | `VscTrash` | Move to Recycle Bin (with confirmation). |
+
+#### **For Directories**
+| Menu Item | Icon | Action |
+| :--- | :--- | :--- |
+| **New File** | `VscNewFile` | Create a new file inside this folder. |
+| **New Folder** | `VscNewFolder` | Create a new subfolder. |
+| **Reveal in Explorer** | `VscFolder` | Open folder in Windows Explorer. |
+| **Copy Path** | `VscCopy` | Copy absolute path. |
+| **Rename** | `VscEdit` | Trigger inline rename. |
+| **Delete** | `VscTrash` | Move folder to Recycle Bin. |
+
+#### **For Empty Area (Background)**
+- **Refresh**: Reload file tree.
+- **New File**: Create file in current root/drive.
+- **New Folder**: Create folder in current root/drive.
+
+### 2. UI Implementation
+- **Library**: Install `@radix-ui/react-context-menu` for accessible, native-feeling menus.
+- **Styling**: Tailwind CSS (Dark mode consistent with VS Code theme).
+
+### 3. Backend (Electron IPC)
+Need to add the following IPC handlers in [main.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/main.ts):
+- `fs:reveal`: Use `shell.showItemInFolder(path)`.
+- `fs:delete`: Use `shell.trashItem(path)`.
+- `fs:rename`: Use `fs.rename(oldPath, newPath)`.
+- `fs:createFile`: Use `fs.writeFile(path, '')`.
+- `fs:createDirectory`: Use `fs.mkdir(path)`.
+
+## Verification Plan
+1. **Test Actions**:
+   - Right-click a file -> Menu appears.
+   - Click "Reveal in Explorer" -> Windows Explorer opens selecting the file.
+   - Click "Copy Path" -> Paste into Notepad to verify.
+   - Click "Delete" -> File disappears from tree and appears in Recycle Bin.
+   - Click "Rename" -> Rename a file and verify change.

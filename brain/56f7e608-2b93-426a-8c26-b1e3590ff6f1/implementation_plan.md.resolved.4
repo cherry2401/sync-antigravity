@@ -1,0 +1,80 @@
+# Phase 2: Connect Admin Builder to Database
+
+## Overview
+
+Integrate Admin Page Builder với real BlockRenderer và persistent storage.
+
+> [!NOTE]
+> Project hiện không có Supabase/Prisma. Sẽ dùng **file-based JSON storage** (`data/storefront.json`) - dễ dàng migrate sang DB sau.
+
+---
+
+## Proposed Changes
+
+### Server Actions
+
+#### [NEW] [storefront.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/storefront.ts)
+
+```ts
+"use server";
+
+export async function savePageConfig(blocks: BlockConfig[]) {
+  // Save to data/storefront.json
+  // Call revalidatePath("/") to update homepage
+  return { success: true };
+}
+
+export async function getPageConfig(): Promise<BlockConfig[]> {
+  // Read from data/storefront.json
+  // If empty, return defaultBlocks
+}
+```
+
+---
+
+### Admin Builder Preview
+
+#### [MODIFY] [trang-tri/page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/admin/giao-dien/trang-tri/page.tsx)
+
+1. Import [BlockRenderer](file:///i:/Website/MyphamHaKi/app-src/src/components/storefront/BlockRenderer.tsx#59-81)
+2. Replace canvas area with scaled real components:
+```tsx
+<div className="origin-top scale-[0.4] w-[250%] pointer-events-none">
+  <BlockRenderer blocks={blocks} />
+</div>
+```
+3. Load data on mount via `getPageConfig()`
+4. Save on button click via `savePageConfig(blocks)`
+
+---
+
+### Homepage Dynamic Loading
+
+#### [MODIFY] [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/page.tsx)
+
+```tsx
+// Convert to async server component
+export default async function Home() {
+  const blocks = await getPageConfig();
+  return <BlockRenderer blocks={blocks} />;
+}
+```
+
+---
+
+## Files to Create/Modify
+
+| Action | File | Description |
+|--------|------|-------------|
+| NEW | `lib/actions/storefront.ts` | Server actions save/load |
+| NEW | `data/storefront.json` | JSON storage file |
+| MODIFY | [admin/giao-dien/trang-tri/page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/admin/giao-dien/trang-tri/page.tsx) | Add BlockRenderer preview |
+| MODIFY | [app/page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/page.tsx) | Dynamic loading from storage |
+
+---
+
+## Verification
+
+1. Admin Builder loads existing blocks
+2. Drag to reorder → Save → Reload page → Order persists
+3. Homepage reflects saved configuration

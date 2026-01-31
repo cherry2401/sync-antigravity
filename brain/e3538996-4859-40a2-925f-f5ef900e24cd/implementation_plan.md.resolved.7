@@ -1,0 +1,38 @@
+# Implement Zing MP3 Downloader
+
+## Goal
+Add a new tool to download high-quality music from Zing MP3, accessible within the "Tool" section of the web app.
+
+## Architecture
+Reusing the successful pattern from Instagram Downloader:
+`Frontend Component` -> `Cloudflare Function` -> `n8n Webhook` -> `External API (api.satoru.click)`
+
+## Components
+
+### 1. n8n Workflow (`Zing MP3 Download API.json`)
+- **Trigger**: Webhook POST `/zing-download`
+- **Action**: HTTP Request GET `https://api.satoru.click/api/zingmp3?link={link}`
+- **Response**: JSON data from Satoru API.
+
+### 2. Cloudflare Function (`functions/api/zingmp3.ts`)
+- Proxy endpoint that forwards requests from Frontend to n8n.
+- Securely manages the n8n webhook URL via environment variables.
+
+### 3. Frontend Component (`src/components/ZingMp3Download.tsx`)
+- UI Input for Zing MP3 URL.
+- Display Result:
+    - Song Title & Artist
+    - Thumbnail (Square)
+    - Audio Player (Preview)
+    - Download Button (Force Download)
+
+### 4. App Integration ([src/App.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/App.tsx))
+- Refactor `NavItem.TOOL` view.
+- Introduce a "Tool Switcher" (Tabs) to toggle between:
+    - Instagram Downloader
+    - Zing MP3 Downloader
+
+## Verification
+- Test inputting a valid Zing MP3 URL.
+- Verify Audio plays in browser.
+- Verify "Download" button saves the `.mp3` file correctly (handling CORS/Blob if needed).

@@ -1,0 +1,16 @@
+# Extension Token Capture - Final Fix
+
+## Extension Update ✅  
+- [x] Updated content.js to intercept requests
+- [x] Captures token from actual VEO3 API calls
+- [x] Auto-sends to webhook
+
+## Testing
+- [ ] Reload extension  
+- [ ] Mở VEO3 + tạo video
+- [ ] Token captured từ request
+- [ ] Check webhook nhận token
+
+## Workflow Cleanup (After Testing)
+- [ ] Remove OmoCaptcha nodes
+- [ ] Simplify to: Read Data → Create VEO

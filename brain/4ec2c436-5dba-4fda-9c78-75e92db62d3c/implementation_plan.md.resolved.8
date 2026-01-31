@@ -1,0 +1,170 @@
+# Implementation Plan: Toggleable BrowserView Integration
+
+## Goal
+Add a "Browser" mode to the Electron app where a WebContentsView occupies the Middle + Right pane when active, with seamless toggle back to the React UI.
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Electron Version**: App uses Electron **40.0.0**, which means `BrowserView` is deprecated. We'll use the new **`WebContentsView`** API instead.
+
+> [!WARNING]
+> **Security**: The BrowserView will have `nodeIntegration: false` and `contextIsolation: true` for security when browsing external sites.
+
+---
+
+## Architecture Overview
+
+```mermaid
+graph LR
+    subgraph React Renderer
+        Sidebar[Sidebar Tabs] --> |Click Browser| IPC1[toggleBrowserView true]
+        Sidebar --> |Click Explore| IPC2[toggleBrowserView false]
+    end
+    
+    subgraph Electron Main
+        IPC1 --> BVM[BrowserView Manager]
+        IPC2 --> BVM
+        BVM --> |Attach/Detach| WCV[WebContentsView]
+        MainWin[mainWindow resize] --> BVM
+    end
+```
+
+---
+
+## Proposed Changes
+
+### Electron Main Process
+
+#### [NEW] `electron/services/browserViewManager.ts`
+
+New service to manage WebContentsView lifecycle:
+
+```typescript
+// Key functionality:
+- createBrowserView(): Create WebContentsView with secure settings
+- show(sidebarWidth): Attach view and set bounds
+- hide(): Remove view from window
+- navigate(url): Load URL
+- control(action): back/forward/reload
+- updateBoundsForWindow(): Recalculate on resize
+```
+
+---
+
+#### [MODIFY] [main.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/main.ts)
+
+1. Import new BrowserViewManager service
+2. Add state variable for current sidebar width
+3. Register IPC handlers:
+   - `browser:toggle(isVisible, sidebarWidth)`
+   - `browser:navigate(url)`
+   - `browser:control(action)`
+   - `browser:getUrl()` - Return current URL
+4. Listen to `mainWindow.on('resize')` to update bounds
+
+---
+
+### Electron Preload
+
+#### [MODIFY] [preload.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/preload.ts)
+
+Add new browser control methods:
+
+```typescript
+// New API methods:
+toggleBrowserView: (isVisible: boolean, sidebarWidth: number) => Promise<void>
+browserNavigate: (url: string) => Promise<void>
+browserControl: (action: 'back' | 'forward' | 'reload') => Promise<void>
+getBrowserUrl: () => Promise<string | null>
+```
+
+Update type definitions for [ElectronAPI](file:///f:/Python/OpenSSH/clawdbot-client/electron/preload.ts#72-92).
+
+---
+
+### React Renderer
+
+#### [MODIFY] [App.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/App.tsx)
+
+1. Add state: `activeTab: 'explore' | 'browser'`
+2. Add state: `sidebarWidth: number` (track from PanelGroup)
+3. When `activeTab` changes, call `toggleBrowserView()`
+4. Conditionally render Middle+Right panels only when `activeTab === 'explore'`
+
+---
+
+#### [MODIFY] [FileExplorer.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/FileExplorer.tsx)
+
+1. Add prop: `activeTab`, `onTabChange`
+2. Add tab icons at top: "Explore" (current) + "Browser" (new Globe icon)
+3. When "Browser" clicked → `onTabChange('browser')`
+
+---
+
+#### [NEW] `src/components/BrowserControls.tsx`
+
+Toolbar with:
+- Back/Forward/Reload buttons
+- URL input field
+- Go button
+
+Only visible when `activeTab === 'browser'`.
+
+---
+
+## Implementation Checklist
+
+- [ ] Create `electron/services/browserViewManager.ts`
+- [ ] Update [electron/main.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/main.ts) with IPC handlers + resize listener
+- [ ] Update [electron/preload.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/preload.ts) with browser API
+- [ ] Update [src/App.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/App.tsx) with tab state and toggle logic
+- [ ] Update [src/components/FileExplorer.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/FileExplorer.tsx) with tab switch
+- [ ] Create `src/components/BrowserControls.tsx`
+- [ ] Test toggle between Explore/Browser modes
+- [ ] Test window resize updates bounds correctly
+- [ ] Test navigation (URL, back, forward, reload)
+
+---
+
+## Verification Plan
+
+### Manual Testing
+
+Since this involves Electron native views and visual layout, manual testing is required:
+
+1. **Toggle Test**
+   - Run `npm run electron:dev`
+   - In sidebar, click "Browser" tab
+   - ✅ Verify: Middle + Right pane replaced by browser view
+   - Click "Explore" tab
+   - ✅ Verify: React UI (Viewer + ChatPanel) visible again
+
+2. **Navigation Test**
+   - While in Browser mode, enter `https://google.com` in URL bar
+   - ✅ Verify: Google loads in the browser view
+   - Click Back/Forward/Reload buttons
+   - ✅ Verify: Navigation works
+
+3. **Resize Test**
+   - While Browser mode is active, resize the window
+   - ✅ Verify: Browser view resizes correctly, no gaps
+
+4. **Security Test**
+   - In Browser view, open DevTools (Ctrl+Shift+I)
+   - In console, try `require('fs')` or `window.electronAPI`
+   - ✅ Verify: Both should be undefined (isolated)
+
+---
+
+## Tech Notes
+
+| Item | Value |
+|------|-------|
+| Electron API | `WebContentsView` (not deprecated `BrowserView`) |
+| Default URL | `about:blank` or configurable |
+| User Agent | Custom agent to avoid bot detection |
+| Sidebar Width | Passed from React via IPC |
+
+---
+*Ready for review. After approval, run `/code` to start implementation.*

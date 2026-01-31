@@ -1,0 +1,18 @@
+# Walkthrough - Fixed Title Bar Logo
+
+I have replaced the placeholder `Zap` icon in the title bar with the actual project logo asset.
+
+## Changes Made
+
+### [clawdbot-client](file:///f:/Python/OpenSSH/clawdbot-client)
+
+- **Logo Asset**: Created the `src/assets` folder and copied `icon128.png` from the `chrome-extension` folder as `logo.png`.
+- **TitleBar Update**: Modified `TitleBar.tsx` to import and display the new logo image.
+
+## Verification Results
+
+### Manual Verification
+- The app was restarted and the title bar now correctly displays the logo.
+
+> [!NOTE]
+> The logo fits perfectly within the title bar height and maintains its aspect ratio.

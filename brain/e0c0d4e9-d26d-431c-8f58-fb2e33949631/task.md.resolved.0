@@ -1,0 +1,6 @@
+# Task: Configure Claude Code with cliproxy
+
+- [ ] Identify the proxy URL and authentication for cliproxy <!-- id: 0 -->
+- [ ] Set up environment variables (CLAUDE_BASE_URL) <!-- id: 1 -->
+- [ ] Verify connection to the proxy <!-- id: 2 -->
+- [ ] Create a permanent configuration (optional) <!-- id: 3 -->

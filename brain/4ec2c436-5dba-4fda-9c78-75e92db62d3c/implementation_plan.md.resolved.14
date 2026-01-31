@@ -1,0 +1,33 @@
+# Plan - Fix File Watcher HMR Loop 🚁🔄
+
+The App is currently experiencing an infinite "Start/Stop" loop for the file watcher in [ChatPanel.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/ChatPanel.tsx). This is caused by Vite's Hot Module Replacement (HMR) triggering every time the app writes to `src/inbound_chat.json` or `src/outbound_chat.json`.
+
+## Proposed Changes
+
+### 1. Create Data Directory
+Create a `data/` directory at the project root to house all JSON communication files.
+
+### 2. Update [ChatPanel.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/ChatPanel.tsx)
+- Move `INBOUND_FILE` and `OUTBOUND_FILE` constants out of the [ChatPanel](file:///f:/Python/OpenSSH/clawdbot-client/src/components/ChatPanel.tsx#183-532) component.
+- Update paths to use the new `data/` directory.
+- Use `process.cwd()` or a relative path that points outside of `src`.
+
+### 3. Update [browserRelay.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/browserRelay.ts)
+- Update `CDP_INBOUND_FILE` and `CDP_OUTBOUND_FILE` paths to point to the `data/` directory.
+
+### 4. Update [ChopperLogs.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/ChopperLogs.tsx)
+- Update `LOG_FILE_PATH` to point to the `data/` directory for consistency.
+
+### 5. Update [CHOPPER_GUIDE.md](file:///f:/Python/OpenSSH/clawdbot-client/CHOPPER_GUIDE.md)
+- Inform Chopper about the new folder location for communication scripts.
+
+## Verification Plan
+
+### Automated Tests
+- Run `npm run electron:dev`.
+- Observe the console to ensure the "Starting inbound file watcher" log appears only once and doesn't loop.
+
+### Manual Verification
+- Send a message from the Chat UI and verify it appears in `data/outbound_chat.json`.
+- Manually edit `data/inbound_chat.json` to simulate a Chopper response and verify it appears in the Chat UI.
+- Verify browser control commands still work via `data/cdp_inbound.json`.

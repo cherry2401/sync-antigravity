@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "Hướng dẫn chi tiết từng bước để sửa lỗi Upload Image trên n8n canvas, bao gồm thêm mimeType vào Convert to Base64 node và hạ typeVersion của Upload Image node, với hướng dẫn test và troubleshooting",
+  "updatedAt": "2025-12-07T18:19:51.387140300Z"
+}

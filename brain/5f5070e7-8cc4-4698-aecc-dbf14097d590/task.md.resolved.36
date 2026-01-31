@@ -1,0 +1,22 @@
+# User Dashboard Task
+
+## Phase 1: Core Layout & Dashboard
+- [ ] Create `UserDashboardLayout.tsx` (sidebar + main content)
+- [ ] Create `UserDashboardPage.tsx` (feature cards grid)
+- [ ] Add routes in [App.tsx](file:///i:/Website/BDS/src/App.tsx)
+
+## Phase 2: User Listings Management
+- [ ] Create `UserListingsPage.tsx`
+- [ ] Filter by status (all/pending/approved/rejected)
+- [ ] Search functionality
+- [ ] Edit/Delete actions
+
+## Phase 3: Profile Management
+- [ ] Create `UserProfilePage.tsx`
+- [ ] Edit profile form (name, phone, avatar)
+- [ ] Change password section
+
+## Phase 4: Testing & Polish
+- [ ] Browser testing all flows
+- [ ] Responsive design check
+- [ ] Final adjustments

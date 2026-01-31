@@ -1,0 +1,423 @@
+# MCP Client Integration - Implementation Plan
+
+## 1. Executive Summary
+
+Tích hợp **Model Context Protocol (MCP)** vào Clawdbot Desktop Client để cho phép Gateway gọi các "Tools" chạy trực tiếp trên máy local của user, sử dụng giao thức chuẩn hóa MCP thay vì HTTP polling hiện tại.
+
+> [!IMPORTANT]
+> **Yêu cầu bảo mật:** Chỉ cho phép lệnh từ Gateway đã xác thực. Mọi dữ liệu xử lý và lưu trữ tại Client, không gửi log lên Server.
+
+---
+
+## 2. Overlap Analysis (Phân tích Trùng lặp)
+
+### Hiện tại App đã có:
+
+| Feature | Hiện tại | MCP sẽ thay thế? |
+|---------|----------|------------------|
+| **Command Execution** | `CommandExecutor.execute()` với shell, readFile, writeFile, listDir | ✅ MCP Tools sẽ wrap các method này |
+| **Gateway Communication** | HTTP Polling mỗi 2s via [GatewayClient](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/client.ts#37-282) | ✅ MCP WebSocket Transport thay thế |
+| **Authentication** | Bearer Token trong HTTP headers | ✅ Giữ nguyên - truyền vào MCP Transport |
+| **File System Access** | IPC handlers (`fs:listDir`, `fs:readFile`) | ⚠️ Giữ cho UI local, MCP dùng cho Gateway |
+| **Screen Capture** | `captureScreen()` + HTTP POST | ✅ MCP Tool mới |
+| **Automation** | [AutomationService](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/automation.ts#3-113) (Puppeteer) | ✅ MCP Tool mới |
+
+### Kết luận:
+- **Không xóa code cũ** - HTTP polling vẫn dùng làm fallback
+- Thêm **MCP layer** song song, ưu tiên MCP khi kết nối WebSocket thành công
+
+---
+
+## 3. Proposed Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         Clawdbot Gateway (Server)                        │
+│    ┌────────────────────────────────────────────────────────────┐       │
+│    │              MCP Client (gọi Tools từ xa)                  │       │
+│    │    - Gửi tool call request qua WebSocket                   │       │
+│    │    - Nhận kết quả từ Desktop Client                        │       │
+│    └────────────────────────────────────────────────────────────┘       │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │ WebSocket (wss://)
+                                    │ + Bearer Token Auth
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    Clawdbot Desktop Client (Local)                       │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                        MCPBridge (NEW)                            │   │
+│  │   ┌─────────────────┐    ┌─────────────────┐                     │   │
+│  │   │ WebSocket       │    │ MCP Server      │                     │   │
+│  │   │ Transport       │───▶│ (Local Instance)│                     │   │
+│  │   │ + Auth Layer    │    │                 │                     │   │
+│  │   └─────────────────┘    └────────┬────────┘                     │   │
+│  │                                   │                               │   │
+│  │   ┌───────────────────────────────┼───────────────────────────┐  │   │
+│  │   │              MCP Tools Registry                           │  │   │
+│  │   │   ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────┐ │  │   │
+│  │   │   │ Shell    │ │ FileRead │ │ FileWrite│ │ Automation   │ │  │   │
+│  │   │   │ Execute  │ │          │ │          │ │ (Puppeteer)  │ │  │   │
+│  │   │   └──────────┘ └──────────┘ └──────────┘ └──────────────┘ │  │   │
+│  │   │   ┌──────────┐ ┌──────────┐ ┌──────────┐                  │  │   │
+│  │   │   │ ListDir  │ │ SysInfo  │ │ Screen   │                  │  │   │
+│  │   │   │          │ │          │ │ Capture  │                  │  │   │
+│  │   │   └──────────┘ └──────────┘ └──────────┘                  │  │   │
+│  │   └───────────────────────────────────────────────────────────┘  │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                  Existing Services (Reuse)                        │   │
+│  │   CommandExecutor │ AutomationService │ Database │ Monitor       │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 4. Proposed Changes
+
+### 4.1. New Files
+
+---
+
+#### [NEW] [mcpBridge.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/mcpBridge.ts)
+
+Main orchestrator class:
+
+```typescript
+// electron/services/mcpBridge.ts
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { WebSocketServerTransport } from "./mcpTransport";
+import { registerAllTools } from "./mcpTools";
+import { CommandExecutor } from "./executor";
+import { Database } from "./database";
+
+export class MCPBridge {
+    private server: McpServer;
+    private transport: WebSocketServerTransport | null = null;
+    private executor: CommandExecutor;
+    private authToken: string;
+    
+    constructor(database: Database, authToken: string) {
+        this.authToken = authToken;
+        this.executor = new CommandExecutor(database);
+        this.server = new McpServer({ name: "clawdbot-local", version: "1.0.0" });
+        registerAllTools(this.server, this.executor);
+    }
+    
+    async connect(gatewayUrl: string): Promise<void> {
+        // Convert HTTP URL to WebSocket URL
+        const wsUrl = gatewayUrl.replace(/^http/, 'ws') + '/mcp';
+        this.transport = new WebSocketServerTransport(wsUrl, this.authToken);
+        await this.server.connect(this.transport);
+    }
+    
+    disconnect(): void {
+        this.transport?.close();
+    }
+}
+```
+
+---
+
+#### [NEW] [mcpTransport.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/mcpTransport.ts)
+
+Custom WebSocket transport with token authentication:
+
+```typescript
+// electron/services/mcpTransport.ts
+import { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
+import WebSocket from "ws";
+
+export class WebSocketServerTransport implements Transport {
+    private ws: WebSocket | null = null;
+    private url: string;
+    private authToken: string;
+    
+    onmessage?: (message: JSONRPCMessage) => void;
+    onerror?: (error: Error) => void;
+    onclose?: () => void;
+    
+    constructor(url: string, authToken: string) {
+        this.url = url;
+        this.authToken = authToken;
+    }
+    
+    async start(): Promise<void> {
+        this.ws = new WebSocket(this.url, {
+            headers: { 'Authorization': `Bearer ${this.authToken}` }
+        });
+        
+        this.ws.on('message', (data) => {
+            const message = JSON.parse(data.toString());
+            this.onmessage?.(message);
+        });
+        
+        this.ws.on('error', (err) => this.onerror?.(err));
+        this.ws.on('close', () => this.onclose?.());
+        
+        await new Promise<void>((resolve, reject) => {
+            this.ws!.once('open', resolve);
+            this.ws!.once('error', reject);
+        });
+    }
+    
+    async send(message: JSONRPCMessage): Promise<void> {
+        this.ws?.send(JSON.stringify(message));
+    }
+    
+    async close(): Promise<void> {
+        this.ws?.close();
+    }
+}
+```
+
+---
+
+#### [NEW] [mcpTools.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/mcpTools.ts)
+
+Tool registration - wraps existing [CommandExecutor](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/executor.ts#53-342):
+
+```typescript
+// electron/services/mcpTools.ts
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
+import { CommandExecutor } from "./executor";
+
+export function registerAllTools(server: McpServer, executor: CommandExecutor) {
+    
+    // Tool: shell_execute
+    server.tool(
+        "shell_execute",
+        { command: z.string(), cwd: z.string().optional() },
+        async ({ command, cwd }) => {
+            const result = await executor.execute({
+                id: crypto.randomUUID(),
+                type: "shell",
+                payload: { command, cwd }
+            });
+            return { content: [{ type: "text", text: result.output || result.error || "" }] };
+        }
+    );
+    
+    // Tool: read_file  
+    server.tool(
+        "read_file",
+        { path: z.string() },
+        async ({ path }) => {
+            const result = await executor.execute({
+                id: crypto.randomUUID(),
+                type: "readFile",
+                payload: { path }
+            });
+            return { content: [{ type: "text", text: result.data || result.error || "" }] };
+        }
+    );
+    
+    // Tool: write_file
+    server.tool(
+        "write_file",
+        { path: z.string(), content: z.string() },
+        async ({ path, content }) => {
+            const result = await executor.execute({
+                id: crypto.randomUUID(),
+                type: "writeFile",
+                payload: { path, content }
+            });
+            return { content: [{ type: "text", text: result.output || result.error || "" }] };
+        }
+    );
+    
+    // Tool: list_directory
+    server.tool(
+        "list_directory",
+        { path: z.string() },
+        async ({ path }) => {
+            const result = await executor.execute({
+                id: crypto.randomUUID(),
+                type: "listDir",
+                payload: { path }
+            });
+            return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
+        }
+    );
+    
+    // Tool: get_system_info
+    server.tool(
+        "get_system_info",
+        {},
+        async () => {
+            const result = await executor.execute({
+                id: crypto.randomUUID(),
+                type: "getSystemInfo",
+                payload: {}
+            });
+            return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
+        }
+    );
+    
+    // Tool: browser_automation
+    server.tool(
+        "browser_automation",
+        { 
+            action: z.enum(["navigate", "click", "type", "screenshot", "evaluate"]),
+            url: z.string().optional(),
+            selector: z.string().optional(),
+            text: z.string().optional(),
+            script: z.string().optional()
+        },
+        async (params) => {
+            const result = await executor.execute({
+                id: crypto.randomUUID(),
+                type: "automation",
+                payload: params
+            });
+            return { content: [{ type: "text", text: JSON.stringify(result.data) }] };
+        }
+    );
+}
+```
+
+---
+
+### 4.2. Modified Files
+
+---
+
+#### [MODIFY] [main.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/main.ts)
+
+Add MCP Bridge initialization alongside existing services:
+
+```diff
++ import { MCPBridge } from './services/mcpBridge';
+
+  let gatewayClient: GatewayClient | null = null;
++ let mcpBridge: MCPBridge | null = null;
+
+  async function reloadGatewayClient() {
+      // ... existing code ...
+      
++     // Initialize MCP Bridge if configured
++     if (gatewayUrl && gatewayToken) {
++         try {
++             mcpBridge = new MCPBridge(database, gatewayToken);
++             await mcpBridge.connect(gatewayUrl);
++             console.log('MCP Bridge connected');
++         } catch (error) {
++             console.error('MCP Bridge failed, falling back to HTTP polling:', error);
++         }
++     }
+  }
+```
+
+---
+
+#### [MODIFY] [package.json](file:///f:/Python/OpenSSH/clawdbot-client/package.json)
+
+Add MCP SDK dependencies:
+
+```diff
+  "dependencies": {
++   "@modelcontextprotocol/sdk": "^1.12.1",
++   "zod": "^3.24.4",
++   "ws": "^8.18.0",
+    // ... existing deps
+  },
+  "devDependencies": {
++   "@types/ws": "^8.5.16",
+    // ... existing devDeps
+  }
+```
+
+---
+
+## 5. LocalFileSystemProvider (Bonus Task)
+
+Để sử dụng MCP internally (không qua Gateway), tạo module sau:
+
+#### [NEW] [localMcpProvider.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/localMcpProvider.ts)
+
+```typescript
+// electron/services/localMcpProvider.ts
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { registerAllTools } from "./mcpTools";
+import { CommandExecutor } from "./executor";
+import { Database } from "./database";
+
+export class LocalMcpProvider {
+    private client: Client;
+    private server: McpServer;
+    
+    constructor(database: Database) {
+        const executor = new CommandExecutor(database);
+        
+        // Create server with tools
+        this.server = new McpServer({ name: "local-fs", version: "1.0.0" });
+        registerAllTools(this.server, executor);
+        
+        // Create client connected via in-memory transport
+        this.client = new Client({ name: "local-client", version: "1.0.0" });
+        const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+        
+        this.server.connect(serverTransport);
+        this.client.connect(clientTransport);
+    }
+    
+    async listFiles(path: string): Promise<any> {
+        return this.client.callTool("list_directory", { path });
+    }
+    
+    async readFile(path: string): Promise<string> {
+        const result = await this.client.callTool("read_file", { path });
+        return result.content[0].text;
+    }
+}
+```
+
+---
+
+## 6. Security Considerations
+
+| Threat | Mitigation |
+|--------|------------|
+| Unauthorized tool calls | WebSocket requires Bearer token in handshake headers |
+| Dangerous shell commands | Existing `BLOCKED_COMMANDS` list in [CommandExecutor](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/executor.ts#53-342) |
+| File system access | Existing security config (`allowFileWrite`, `allowShellCommands`) |
+| Data leakage to server | MCP Server runs locally; only tool results sent back |
+| Log storage | No logs sent to Gateway - only stored locally in [database.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/database.ts) |
+
+---
+
+## 7. Verification Plan
+
+### Automated Tests
+```bash
+# Install dependencies
+npm install @modelcontextprotocol/sdk zod ws @types/ws
+
+# Run TypeScript check
+npx tsc --noEmit
+
+# Test MCP connection
+npm run electron:dev
+# Then trigger tool call from Gateway
+```
+
+### Manual Verification
+1. Start app, verify "MCP Bridge connected" in console
+2. From Gateway, call `list_directory` tool with path `/`
+3. Verify result returns file list
+4. Disconnect network, verify fallback to HTTP polling still works
+
+---
+
+## 8. Next Steps
+
+```
+1️⃣ OK với Plan? Gõ /code để bắt đầu implement
+2️⃣ Muốn xem UI trước? /visualize  
+3️⃣ Cần chỉnh sửa Plan? Tiếp tục thảo luận
+```

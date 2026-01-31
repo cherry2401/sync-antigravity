@@ -1,0 +1,210 @@
+# SORA Video Generation Workflow - Implementation Plan
+
+Tạo workflow n8n để tự động hóa việc tạo video từ SORA (OpenAI) sử dụng phương pháp giả lập người dùng thông qua API endpoints.
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Authentication Token**: Bearer token trong ví dụ đã được hard-code. Bạn cần cung cấp cách lấy token mới hoặc có muốn sử dụng n8n credentials để quản lý token?
+
+> [!WARNING]
+> **Rate Limits**: API có giới hạn `estimated_num_videos_remaining: 10` videos. Workflow cần xử lý trường hợp hết quota.
+
+> [!NOTE]
+> **Workflow sẽ test với Image to Video trước**, sau đó mới implement Text to Video.
+
+## Proposed Changes
+
+### SORA Image to Video Workflow
+
+Workflow này sẽ bao gồm các bước sau:
+
+#### 1. **Trigger Node** (Manual Trigger hoặc Webhook)
+- Cho phép khởi chạy workflow thủ công hoặc tự động
+- Input: đường dẫn file ảnh hoặc binary data
+
+---
+
+#### 2. **Read Image File** (Read Binary Files Node)
+- Đọc file ảnh từ local hoặc URL
+- Output: binary data của ảnh
+
+---
+
+#### 3. **Upload Image to SORA** (HTTP Request Node)
+
+**Endpoint**: `https://sora.chatgpt.com/backend/project_y/file/upload`
+
+**Method**: POST
+
+**Headers**:
+```json
+{
+  "authorization": "Bearer {{$credentials.soraToken}}",
+  "accept": "*/*"
+}
+```
+
+**Body** (Form Data):
+- `file`: binary image data
+- `use_case`: `inpaint_safe`
+
+**Output cần lấy**:
+- `file_id`: ID của file đã upload (ví dụ: `file_00000000fb5071f585fae749a9f5b38f`)
+- `asset_pointer`: Pointer của asset
+- `url`: URL của file đã upload
+
+---
+
+#### 4. **Wait Node** (Optional)
+- Đợi 2-3 giây để đảm bảo file đã được xử lý
+
+---
+
+#### 5. **Create Video Request** (HTTP Request Node)
+
+**Endpoint**: `https://sora.chatgpt.com/backend/nf/create`
+
+**Method**: POST
+
+**Headers**:
+```json
+{
+  "authorization": "Bearer {{$credentials.soraToken}}",
+  "accept": "*/*",
+  "content-type": "application/json"
+}
+```
+
+**Body** (JSON):
+```json
+{
+  "kind": "video",
+  "prompt": "{{$json.prompt}}",
+  "title": null,
+  "audio_caption": null,
+  "audio_transcript": null,
+  "cameo_ids": null,
+  "cameo_replacements": null,
+  "inpaint_items": [
+    {
+      "kind": "file",
+      "file_id": "{{$json.file_id}}"
+    }
+  ],
+  "metadata": null,
+  "model": "sy_8",
+  "n_frames": 300,
+  "orientation": "portrait",
+  "remix_target_id": null,
+  "size": "small",
+  "storyboard_id": null,
+  "style_id": null,
+  "video_caption": null
+}
+```
+
+**Output cần lấy**:
+- `id`: Task ID (ví dụ: `task_01kcxvng92fvka5x9r15f3atgd`)
+- `rate_limit_and_credit_balance`: Thông tin quota còn lại
+
+---
+
+#### 6. **Check Rate Limit** (IF Node)
+- Kiểm tra `rate_limit_reached` và `estimated_num_videos_remaining`
+- Nếu hết quota → dừng và thông báo
+- Nếu còn quota → tiếp tục
+
+---
+
+#### 7. **Poll Video Status** (Loop với HTTP Request)
+
+Cần tạo endpoint để check status của task (endpoint này cần được tìm hiểu thêm hoặc polling):
+
+**Possible endpoint**: `https://sora.chatgpt.com/backend/nf/task/{task_id}`
+
+**Logic**:
+- Poll mỗi 10-15 giây
+- Kiểm tra status: `pending`, `processing`, `completed`, `failed`
+- Timeout sau 5-10 phút
+
+---
+
+#### 8. **Download Video** (HTTP Request Node)
+- Khi video completed, download về
+- Lưu binary data
+
+---
+
+#### 9. **Save Video** (Write Binary File Node)
+- Lưu video vào local filesystem
+- Format: `sora_video_{timestamp}.mp4`
+
+---
+
+### SORA Text to Video Workflow
+
+Workflow tương tự Image to Video, nhưng:
+
+#### Khác biệt:
+- **Bỏ qua bước Upload Image**
+- **Bước Create Video** sẽ không có `inpaint_items`:
+
+```json
+{
+  "kind": "video",
+  "prompt": "{{$json.prompt}}",
+  "model": "sy_8",
+  "n_frames": 300,
+  "orientation": "portrait",
+  "size": "small"
+}
+```
+
+---
+
+## Thông tin cần bổ sung
+
+### 1. **API endpoint để lấy video đã tạo**
+Từ các file tài liệu, tôi chưa thấy endpoint để:
+- Check status của task
+- Download video khi hoàn thành
+
+> [!IMPORTANT]
+> **Cần làm rõ**: Bạn có thêm file tài liệu nào về endpoint để get video status hoặc download không?
+
+### 2. **Authentication**
+Có 3 options:
+- **Option A**: Hard-code Bearer token (không khuyến khích)
+- **Option B**: Sử dụng n8n Credentials để lưu token
+- **Option C**: Implement flow để login + lấy token tự động
+
+> [!IMPORTANT]
+> **Cần quyết định**: Bạn muốn dùng phương pháp nào?
+
+### 3. **Parameters có thể tùy chỉnh**
+Workflow nên cho phép config:
+- `prompt`: Text mô tả video
+- `orientation`: `portrait`, `landscape`, `square`
+- `n_frames`: Số frames (default: 300)
+- `size`: `small`, `medium`, `large`
+- `model`: Model version (default: `sy_8`)
+
+## Verification Plan
+
+### Test Image to Video:
+1. Chuẩn bị 1 ảnh test
+2. Chạy workflow với prompt đơn giản
+3. Verify upload thành công (có `file_id`)
+4. Verify video creation request thành công (có `task_id`)
+5. Verify video được download về local
+
+### Test Text to Video:
+1. Chạy workflow với prompt mô tả video
+2. Verify video creation request thành công
+3. Verify video được download về local
+
+### Error Handling:
+- Test với rate limit exceeded
+- Test với invalid image format
+- Test với timeout scenario

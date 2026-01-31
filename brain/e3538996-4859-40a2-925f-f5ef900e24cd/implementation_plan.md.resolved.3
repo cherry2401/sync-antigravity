@@ -1,0 +1,78 @@
+# Secure API with Cloudflare Functions
+
+## Goal Description
+Hide the n8n backend webhook URL from the public client-side code by proxying requests through a Cloudflare Function. This prevents users from seeing and potentially abusing reuse of the direct n8n webhook URL.
+
+## User Review Required
+> [!IMPORTANT]
+> **Environment Variable Change**: You will need to add `N8N_WEBHOOK_URL` to your Cloudflare Pages project settings (Settings -> Environment variables). This replaces `VITE_N8N_WEBHOOK_URL` in the frontend code.
+
+## Proposed Changes
+
+### Optimization Steps
+#### [MODIFY] [ShortenForm.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/ShortenForm.tsx)
+#### [NEW] [functions/api/shortener.ts](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/functions/api/shortener.ts)
+#### [NEW] [functions/s.ts](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/functions/s.ts)
+- [x] Implement direct Supabase query for instant 301 redirects.
+- [x] Bypass n8n for read operations to reduce latency.
+
+### [web-fontend-v2] Cloudflare Functions
+
+#### [NEW] [functions/api/video-download.ts](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/functions/api/video-download.ts)
+Create a new serverless function to handle the API proxying.
+```typescript
+interface Env {
+  N8N_WEBHOOK_URL: string;
+}
+
+export const onRequestPost: PagesFunction<Env> = async (context) => {
+  const { request, env } = context;
+
+  try {
+    const body = await request.json();
+    
+    // Forward the request to n8n
+    const n8nResponse = await fetch(env.N8N_WEBHOOK_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    const data = await n8nResponse.json();
+
+    return new Response(JSON.stringify(data), {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: true, message: 'Server proxy error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+}
+```
+
+### [web-fontend-v2] Frontend Service
+
+#### [MODIFY] [src/services/n8nService.ts](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/services/n8nService.ts)
+Update the service to call the local Cloudflare Function endpoint instead of the external URL.
+
+```typescript
+const N8N_CONFIG = {
+  // Use relative path for Cloudflare Functions
+  WEBHOOK_URL: '/api/video-download', 
+  TIMEOUT: 30000, 
+};
+```
+
+## Verification Plan
+
+### Manual Verification
+1. **Deploy**: Push changes to Cloudflare Pages.
+2. **Configure**: User adds `N8N_WEBHOOK_URL` in Cloudflare Dashboard.
+3. **Test**: Use the web app to download a video.
+4. **Verify**: Check Network tab -> Request should go to `https://tai-video.pages.dev/api/video-download` instead of `auto.myphamhaki.id.vn`.

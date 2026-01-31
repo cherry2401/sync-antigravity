@@ -1,0 +1,50 @@
+# Carousel Slide Editor Feature ✅
+
+Đã upgrade Admin Builder để quản lý nhiều slides trong Hero Banner carousel.
+
+---
+
+## What Changed
+
+### 1. Schema với Array Type
+
+[block-schemas.ts](file:///i:/Website/MyphamHaKi/app-src/src/config/block-schemas.ts):
+- `HERO_BANNER.slides` có `type: 'array'`
+- `itemSchema` định nghĩa fields per slide
+
+---
+
+### 2. Settings Panel UI
+
+[trang-tri/page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/admin/giao-dien/trang-tri/page.tsx):
+- **List View**: Danh sách slides với thumbnail, title, subtitle
+- **Edit View**: Form chi tiết khi click vào slide
+- Add/Delete/Move slide functions
+
+---
+
+## Verified Screenshot
+
+![Slide Edit Form](C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/hero_banner_edit_form_1768306732148.png)
+
+**Fields trong Edit View:**
+- Tag/Badge (Mới, Hot, Sale)  
+- Tiêu đề lớn + nhỏ
+- Mô tả
+- Ảnh nền (Mobile)
+- **Ảnh sản phẩm nổi (PNG)** ✅
+- Chữ nút + Link
+
+---
+
+## Demo Recording
+
+![Slide Editor Demo](C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/slide_editor_test_1768306713761.webp)
+
+---
+
+## ⚠️ Remaining Work
+
+> [!NOTE]
+> Upload image chưa hoạt động thực tế - chỉ là UI placeholder.
+> Cần implement file upload logic để lưu ảnh vào server.

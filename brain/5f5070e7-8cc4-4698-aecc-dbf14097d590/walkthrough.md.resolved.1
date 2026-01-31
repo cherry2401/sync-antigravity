@@ -1,0 +1,51 @@
+# Walkthrough: Tính năng mới cho BDS Website
+
+Tôi đã hoàn thành việc nâng cấp website với các tính năng sau, giúp trang web hoạt động giống thật hơn và giữ lại dữ liệu của bạn.
+
+## 0. Hướng dẫn chạy dự án (Development)
+Để vừa code vừa xem giao diện (Hot Reload), hãy chạy lệnh:
+```bash
+npm run dev
+```
+Trang web sẽ chạy tại: **http://localhost:3000**
+
+## 1. Các thay đổi chính
+
+### 💾 Tự động lưu dữ liệu (Persistence)
+- **Trước đây**: Khi bạn reload trang, mọi tin đăng mới hoặc tin đã sửa đều biến mất.
+- **Hiện tại**: Trang web sử dụng `localStorage` để lưu trữ:
+    - Danh sách tin đăng (`listings`)
+    - Tin tức (`news`)
+    - Danh sách yêu thích (`savedListings`)
+- **Cách kiểm tra**: Thử đăng một tin mới, sau đó F5 (tải lại trang). Tin đó vẫn sẽ còn ở đó.
+
+### 🔍 Bộ lọc tìm kiếm nâng cao (Filters)
+- Đã thay thế các nút tĩnh bằng bộ lọc hoạt động thực tế.
+- **Khu vực**: Lọc theo Thành phố (Hà Nội, TP.HCM, vv).
+- **Mức giá**: Lọc theo khoảng giá (Dưới 1 tỷ, 1-3 tỷ, vv). Logic lọc tự động xử lý các đơn vị "tỷ", "triệu".
+- **Diện tích**: Lọc theo khoảng diện tích.
+
+### ❤️ Tính năng Yêu thích (Favorites)
+- **Thả tim**: Nút trái tim trên mỗi bài đăng giờ đã hoạt động. Khi bấm vào, nó sẽ chuyển sang màu đỏ.
+- **Xem tin đã lưu**: Đã thêm biểu tượng trái tim vào **Header**. Bấm vào đó để xem danh sách các tin bạn đã lưu.
+
+## 2. Hướng dẫn kiểm tra (Verification)
+
+### Bước 1: Test Bộ lọc
+1. Tại trang chủ (Hero Section), bấm vào nút **"Mức giá"**.
+2. Chọn **"1 - 3 tỷ"**.
+3. Danh sách bên dưới sẽ chỉ hiện các tin trong khoảng giá này.
+
+### Bước 2: Test Yêu thích
+1. Bấm vào icon **Trái tim** ở góc ảnh của bất kỳ tin đăng nào.
+2. Kiểm tra trên Header, số lượng tin đã lưu sẽ tăng lên.
+3. Bấm vào icon **Trái tim trên Header** để vào trang "Tin đã lưu".
+4. Bạn sẽ thấy tin vừa chọn xuất hiện tại đó.
+
+### Bước 3: Test Lưu trữ
+1. Đăng một tin mới qua nút "Đăng tin".
+2. Tải lại trang (Refresh).
+3. Tin đăng của bạn vẫn được hiển thị.
+
+> [!NOTE]
+> Do đây là môi trường Frontend thuần túy, hình ảnh bạn upload từ máy tính (blob URL) sẽ mất khi reload (do tính chất bảo mật của trình duyệt). Tuy nhiên, các dữ liệu văn bản (tiêu đề, giá, mô tả...) sẽ được giữ nguyên.

@@ -1,0 +1,100 @@
+# Test Token Service - Quick Start
+
+## 1. Test Endpoint Của Người Kia (Ngay Lập Tức)
+
+### URL
+```
+http://103.163.24.92:3000/get-token?api_key=ak_E8VwFEsLzF5Cjj3aIsmbJsQwDjnBXJNN
+```
+
+### Test Trong Browser
+Mở browser: http://103.163.24.92:3000/get-token?api_key=ak_E8VwFEsLzF5Cjj3aIsmbJsQwDjnBXJNN
+
+### Hoặc Test Bằng CMD
+```bash
+curl "http://103.163.24.92:3000/get-token?api_key=ak_E8VwFEsLzF5Cjj3aIsmbJsQwDjnBXJNN"
+```
+
+### Expected Response
+```json
+{
+  "success": true,
+  "token": "03APcPBne..."
+}
+```
+
+---
+
+## 2. Setup Workflow VEO3.1_v3
+
+### Thêm Node: Get Token (HTTP Request)
+
+**Position**: Giữa `Read Data` và `Create VEO3`
+
+**Config**:
+- **Method**: GET
+- **URL**: `http://103.163.24.92:3000/get-token?api_key=ak_E8VwFEsLzF5Cjj3aIsmbJsQwDjnBXJNN`
+- **Timeout**: 10000
+
+**Output**: `{{ $json.token }}`
+
+---
+
+### Update Node: Create VEO3
+
+**JSON Body - Thêm recaptchaToken**:
+
+```javascript
+{{
+  JSON.stringify({
+    "clientContext": {
+      "sessionId": ";" + $json.sessionId,
+      "projectId": $json.projectId,
+      "tool": "PINHOLE",
+      "userPaygateTier": "PAYGATE_TIER_ONE",
+      "recaptchaToken": $('Get Token').first().json.token  // ← THÊM
+    },
+    "requests": [{
+      "aspectRatio": $json.aspectRatio,
+      "seed": Math.floor(Math.random() * 10000),
+      "textInput": {
+        "prompt": $json.prompt
+      },
+      "videoModelKey": $json.videoModelKey,
+      "metadata": {
+        "sceneId": $json.sceneId
+      }
+    }]
+  })
+}}
+```
+
+---
+
+## 3. Flow Mới
+
+```
+Read Data → Get Token → Edit Fields → Create VEO3 (+ token) → ...
+```
+
+---
+
+## 4. Test Workflow
+
+1. Gửi Telegram: `"test video"`
+2. Workflow sẽ:
+   - Get token từ endpoint người kia
+   - Gửi request Create VEO3 kèm token
+   - ✅ Nếu OK → Video được tạo!
+   - ❌ Nếu lỗi → Token hết hạn hoặc không hợp lệ
+
+---
+
+## 5. Sau Khi Puppeteer Install Xong
+
+Thay URL thành localhost:
+```
+http://localhost:3000/get-token
+```
+
+(Không cần api_key vì là service của mình)

@@ -1,0 +1,31 @@
+# Clawdbot Desktop - System Monitor Implementation
+
+## Phase 1: Dependencies & Setup
+- [ ] Install required packages (systeminformation, screenshot-desktop, axios)
+- [ ] Create .env file with gateway URL config
+- [ ] Update tsconfig for new modules
+
+## Phase 2: Monitor Module
+- [ ] Create electron/monitor.ts
+- [ ] Implement getSystemInfo() - CPU, RAM, Disk
+- [ ] Implement captureScreen() - Screenshot with JPEG compression
+- [ ] Add machine-id generation
+
+## Phase 3: Client Module  
+- [ ] Create electron/client.ts
+- [ ] Setup Axios instance with gateway config
+- [ ] Implement pollCommands() - GET /api/client/commands
+- [ ] Implement sendSystemTelemetry() - POST /api/client/telemetry/system
+- [ ] Implement sendScreenCapture() - POST /api/client/telemetry/screen
+- [ ] Implement handleCommand() for new commands
+
+## Phase 4: Integration
+- [ ] Update executor.ts to handle new commands
+- [ ] Add command types: getSystemInfo, streamScreen
+- [ ] Integrate telemetry sender into main.ts
+- [ ] Add screen streaming start/stop logic
+
+## Phase 5: UI Updates
+- [ ] Add connection indicator to StatusBar
+- [ ] Show telemetry status (system/screen)
+- [ ] Add toggle for screen streaming in Settings

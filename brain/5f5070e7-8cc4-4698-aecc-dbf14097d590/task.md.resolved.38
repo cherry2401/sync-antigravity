@@ -1,0 +1,20 @@
+# Công Việc: Trang Tài Khoản Người Dùng
+
+## Giai đoạn 1: Layout & Dashboard
+- [x] Tạo [UserDashboardLayout.tsx](file:///i:/Website/BDS/src/components/user/UserDashboardLayout.tsx) (sidebar + nội dung)
+- [x] Tạo [UserDashboardPage.tsx](file:///i:/Website/BDS/src/pages/UserDashboardPage.tsx) (lưới ô tính năng)
+- [x] Thêm routes trong [App.tsx](file:///i:/Website/BDS/src/App.tsx)
+
+## Giai đoạn 2: Quản Lý Tin Đăng
+- [x] Tạo [UserListingsPage.tsx](file:///i:/Website/BDS/src/pages/UserListingsPage.tsx)
+- [x] Lọc theo trạng thái (tất cả/chờ duyệt/đã duyệt/từ chối)
+- [x] Tìm kiếm & hành động sửa/xoá
+
+## Giai đoạn 3: Thông Tin Cá Nhân
+- [x] Tạo [UserProfilePage.tsx](file:///i:/Website/BDS/src/pages/UserProfilePage.tsx)
+- [x] Form sửa thông tin (tên, SĐT, avatar)
+- [ ] Đổi mật khẩu
+
+## Giai đoạn 4: Kiểm Thử
+- [/] Test trên trình duyệt
+- [ ] Kiểm tra responsive

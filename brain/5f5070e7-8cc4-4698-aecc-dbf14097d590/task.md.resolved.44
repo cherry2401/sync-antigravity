@@ -1,0 +1,12 @@
+# Task: Triển khai Hệ thống Địa chỉ Việt Nam
+
+## Implementation
+- [x] Tạo [lib/vietnamAddress.ts](file:///i:/Website/BDS/src/lib/vietnamAddress.ts) - API helper cho provinces.open-api.vn
+- [x] Tạo [hooks/useVietnamAddress.ts](file:///i:/Website/BDS/src/hooks/useVietnamAddress.ts) - Custom hook quản lý cascading địa chỉ
+- [x] Cập nhật [PostingForm.tsx](file:///i:/Website/BDS/src/components/property/PostingForm.tsx) - Thay mock data bằng API thực
+
+## Verification
+- [x] Test dropdown Tỉnh/Thành (63 tỉnh) ✅
+- [x] Test cascading Quận/Huyện ✅
+- [x] Test cascading Phường/Xã ✅
+- [x] Đường/Phố: nhập tay (Google Places có thể tích hợp sau)

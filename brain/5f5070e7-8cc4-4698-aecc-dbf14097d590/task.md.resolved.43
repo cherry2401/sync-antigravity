@@ -1,0 +1,13 @@
+# Task: Triển khai Hệ thống Địa chỉ Việt Nam
+
+## Implementation
+- [ ] Tạo `lib/vietnamAddress.ts` - API helper cho provinces.open-api.vn
+- [ ] Tạo `hooks/useVietnamAddress.ts` - Custom hook quản lý cascading địa chỉ
+- [ ] Tích hợp Google Places Autocomplete cho Đường/Phố
+- [ ] Cập nhật [PostingForm.tsx](file:///i:/Website/BDS/src/components/property/PostingForm.tsx) - Thay mock data bằng API thực
+
+## Verification
+- [ ] Test dropdown Tỉnh/Thành (63 tỉnh)
+- [ ] Test cascading Quận/Huyện
+- [ ] Test cascading Phường/Xã
+- [ ] Test Google Places cho Đường/Phố

@@ -1,0 +1,58 @@
+# Shop Features Tasks
+
+## Product Listing Page ✅
+- [x] [getFilteredProducts(params)](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts#162-263) server action
+- [x] [useProductFilter](file:///i:/Website/MyphamHaKi/app-src/src/hooks/useProductFilter.ts#20-147) hook with debounce
+- [x] [ProductFilters](file:///i:/Website/MyphamHaKi/app-src/src/components/shop/ProductFilters.tsx#33-203) sidebar component
+- [x] [ProductGrid](file:///i:/Website/MyphamHaKi/app-src/src/components/shop/ProductGrid.tsx#33-215) with pagination
+- [x] Mobile filter drawer
+- [x] URL-based filtering
+
+## Live Search ✅
+- [x] [searchProducts(keyword)](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts#85-133) server action
+- [x] Vietnamese normalization search
+- [x] 300ms debounce
+- [x] 5 result limit
+- [x] Sale price display (red + strikethrough)
+- [x] Keyboard navigation (↑↓ Enter)
+- [x] Recent searches localStorage
+
+## User Authentication 🔒
+- [x] Install dependencies (`next-auth`, `bcryptjs`) & Update Schema
+- [x] Configure NextAuth ([auth.ts](file:///i:/Website/MyphamHaKi/app-src/src/auth.ts), [auth.config.ts](file:///i:/Website/MyphamHaKi/app-src/src/auth.config.ts))
+- [x] Implement Server Actions ([register](file:///i:/Website/MyphamHaKi/app-src/src/actions/auth-actions.ts#21-69), [login](file:///i:/Website/MyphamHaKi/app-src/src/actions/auth-actions.ts#70-106))
+- [x] Update Login/Register UI
+- [x] Link Order to User
+
+## Wishlist Feature ❤️
+- [ ] Database Schema ([Wishlist](file:///i:/Website/MyphamHaKi/app-src/src/app/yeu-thich/page.tsx#17-210) model)
+- [ ] Server Actions ([toggleWishlist](file:///i:/Website/MyphamHaKi/app-src/src/actions/wishlist.ts#11-56), [getWishlist](file:///i:/Website/MyphamHaKi/app-src/src/actions/wishlist.ts#61-81))
+- [ ] [WishlistButton](file:///i:/Website/MyphamHaKi/app-src/src/components/product/WishlistButton.tsx#16-81) component (Optimistic UI)
+- [ ] Wishlist Page (`/tai-khoan/yeu-thich`)
+- [ ] Wishlist Page (`/tai-khoan/yeu-thich`)
+- [ ] Integrate with [ProductCard](file:///i:/Website/MyphamHaKi/app-src/src/components/product/ProductCard.tsx#88-324)
+
+## Address Book Feature 📍
+- [x] Database Schema ([Address](file:///i:/Website/MyphamHaKi/app-src/src/components/address/AddressBookClient.tsx#9-19) model)
+- [x] Server Actions (`CRUD Address`)
+- [x] [AddressForm](file:///i:/Website/MyphamHaKi/app-src/src/components/address/AddressForm.tsx#49-217) component (Reuse location selectors)
+- [x] Address Book Page (`/tai-khoan/dia-chi`)
+
+## Checkout Address Integration 🛒
+- [x] Fetch saved addresses in Checkout page
+- [x] Display address selection in CheckoutForm
+- [x] Auto-fill form with selected address
+- [x] Default selection for isDefault address
+- [x] Shopee-style Address UI (Compact Card + Modal)
+
+## Payment Flow Integration 💸
+- [x] VietQR Bank Config ([src/lib/bank-config.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/bank-config.ts))
+- [x] Payment Page with QR (`/thanh-toan/payment/[id]`)
+- [x] Redirect Checkout -> Payment Page
+- [x] Clean Success Page (Pure Thank You)
+
+## Bug Fixes & Refinement 🐛
+- [x] Fix PrismaClient types
+- [x] Fix TypeScript errors in Product pages (rating/toast)
+- [x] Fix TypeScript errors in Product pages (rating/toast)
+- [x] Fix Login Redirect Issue (Server Component Refactor)

@@ -1,0 +1,12 @@
+# Task: Thêm Tính Năng Tải Video Shopee
+
+## Checklist
+
+- [ ] Đọc và phân tích workflow V2
+- [ ] Cập nhật node `Extract URL` - thêm Shopee platform detection
+- [ ] Tạo node `Switch Platform` để phân luồng
+- [ ] Tạo node `Call Shopee API`
+- [ ] Tạo node `Parse Shopee Response`
+- [ ] Sửa node `Download Video` để dùng dynamic URL
+- [ ] Kết nối các node theo đúng flow
+- [ ] Review và test logic

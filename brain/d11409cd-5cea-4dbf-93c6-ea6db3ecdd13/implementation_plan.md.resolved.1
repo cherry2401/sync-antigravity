@@ -1,0 +1,48 @@
+# Kế hoạch Triển khai - Nâng cấp Auto-Refresh & Webhook
+
+## Mục tiêu
+Nâng cấp extension "API Key Capture Tool" để hỗ trợ tự động bắt token và gửi về Webhook (ví dụ: N8N). Bao gồm giao diện cài đặt mới, mở rộng khả năng bắt token mà không cần tạo video thủ công, và cơ chế tự động làm mới trang để duy trì kết nối.
+
+## Yêu cầu Người dùng Xem xét
+> [!IMPORTANT]
+> **Mở rộng logic bắt Token**: Tôi sẽ sửa đổi extension để bắt API Key từ *bất kỳ* request nào gửi đến `aisandbox-pa.googleapis.com` (hoặc `*.googleapis.com` nếu cần) có chứa `Authorization` header. Điều này giải quyết vấn đề phải "tạo video thủ công" mới lấy được token.
+
+> [!NOTE]
+> **Cơ chế Tự động làm mới (Auto-Refresh)**: Extension sẽ tải lại (reload) tab mục tiêu theo khoảng thời gian đã cài đặt để kích hoạt request mạng. Yêu cầu tab này phải đang mở.
+
+## Các thay đổi đề xuất
+
+### Manifest (Cấu hình)
+#### [SỬA] [manifest.json](file:///d:/EXTENTIONS/Extension_Chrome_Veo-OK_v2/manifest.json)
+- Thêm quyền `alarms` cho các tác vụ định kỳ.
+- Thêm quyền `scripting` (tùy chọn, hoặc dùng `tabs.reload`).
+
+### Giao diện (Popup)
+#### [SỬA] [popup.html](file:///d:/EXTENTIONS/Extension_Chrome_Veo-OK_v2/popup.html)
+- Thêm phần "Cài đặt Tự động làm mới" (Auto-Refresh Settings):
+    - Ô nhập: Webhook URL
+    - Ô nhập: Khoảng thời gian (phút)
+    - Checkbox: Bật Tự động làm mới
+    - Nút: Lưu cài đặt
+- Cập nhật hiển thị trạng thái khi Auto-Refresh đang chạy.
+
+#### [SỬA] [popup.js](file:///d:/EXTENTIONS/Extension_Chrome_Veo-OK_v2/popup.js)
+- Lưu/Tải cài đặt vào `chrome.storage.local`.
+- Gửi cập nhật cấu hình xuống [background.js](file:///d:/EXTENTIONS/Extension_Chrome_Veo-OK_v2/background.js).
+
+### Logic Nền (Background)
+#### [SỬA] [background.js](file:///d:/EXTENTIONS/Extension_Chrome_Veo-OK_v2/background.js)
+- **Mở rộng bộ lọc**: Bỏ kiểm tra chặt chẽ `runImageFx` / `batchAsyncGenerateVideoText`. Cho phép bắt mọi request đến `aisandbox-pa.googleapis.com` có chứa `Authorization: Bearer ya29...`.
+- **Logic Webhook**: Khi bắt được token:
+    - Kiểm tra xem `webhookUrl` có được cấu hình không.
+    - Gửi dữ liệu: `fetch(webhookUrl, { method: 'POST', body: JSON.stringify(data) })`.
+- **Hẹn giờ (Alarm)**:
+    - Tạo `chrome.alarms.create` dựa trên khoảng thời gian cài đặt.
+    - Khi đến giờ: Tìm tab mục tiêu và reload nó (`chrome.tabs.reload`).
+
+## Kế hoạch Kiểm tra
+### Kiểm tra Thủ công
+1.  **Giao diện**: Mở popup, nhập Webhook URL và Thời gian, nhấn Lưu. Mở lại để đảm bảo giá trị được lưu.
+2.  **Bắt Token**: Mở trang `aisandbox-pa.googleapis.com`. Reload trang. Kiểm tra xem extension có bắt được key mà *không cần* tạo video không.
+3.  **Webhook**: Kiểm tra N8N (hoặc webhook.site) xem có nhận được JSON không.
+4.  **Tự động làm mới**: Đặt thời gian 1 phút. Đợi xem trang có tự reload và webhook mới có được gửi đi không.

@@ -1,0 +1,15 @@
+# Nhiệm vụ: Cấu hình và Cài đặt Claude-ws
+
+## Cấu hình đã hoàn tất
+- [x] Cấu hình Claude Code CLI & VS Code Extension <!-- id: 0 -->
+- [x] Chạy claude-ws tại Local (Windows) <!-- id: 1 -->
+- [x] Thiết lập Cloudflare Tunnel truy cập từ xa <!-- id: 2 -->
+- [x] Sửa lỗi 502 và thông khớp cổng 8556 <!-- id: 3 -->
+- [x] Chạy ngầm vĩnh viễn (Persistence) thành công <!-- id: 4 -->
+
+## Debug lỗi Model ID (Hardcoded/Database)
+- [x] Sửa mã nguồn model-selector.tsx <!-- id: 5 -->
+- [x] Rebuild ứng dụng để áp dụng thay đổi UI <!-- id: 6 -->
+- [x] Sửa hardcoded model trong agent-manager.ts <!-- id: 7 -->
+- [x] Xác minh Claude đã trả lời thành công <!-- id: 8 -->
+

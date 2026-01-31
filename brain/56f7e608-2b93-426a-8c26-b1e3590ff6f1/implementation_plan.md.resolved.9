@@ -1,0 +1,56 @@
+# Address Book Feature Implementation Plan
+
+## Goal Description
+Implement an "Address Book" feature allowing users to manage multiple shipping addresses and set a default one. This enhances the user experience by speeding up the checkout process.
+
+## Proposed Changes
+
+### Database Schema
+#### [MODIFY] [schema.prisma](file:///i:/Website/MyphamHaKi/app-src/prisma/schema.prisma)
+- Add `Address` model:
+    - [id](file:///i:/Website/MyphamHaKi/app-src/src/components/shop/ProductGrid.tsx#33-215): Unique identifier
+    - `userId`: Relation to User
+    - `fullName`: String
+    - `phone`: String
+    - `province`: String
+    - `district`: String
+    - `ward`: String
+    - `specificAddress`: String
+    - `isDefault`: Boolean (default false)
+    - `createdAt`: Timestamp
+
+### Server Actions
+#### [NEW] [src/actions/address.ts](file:///i:/Website/MyphamHaKi/app-src/src/actions/address.ts)
+- `getAddresses()`: Fetch user addresses, sorted by `isDefault` desc.
+- `addAddress(data)`: Create new address. Logic: if first address, set `isDefault` = true. If new `isDefault` is true, unset others.
+- `updateAddress(id, data)`: Update address. Handle default toggle logic.
+- `deleteAddress(id)`: Remove address.
+- `setDefaultAddress(id)`: Set specific address as default, unset others.
+
+### Components
+#### [NEW] [src/components/address/AddressForm.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/address/AddressForm.tsx)
+- Reusable form component with:
+    - Inputs: Full Name, Phone, Specific Address.
+    - Selectors: Province, District, Ward (Need to extract or reuse data fetching logic for locations).
+    - Checkbox: "Set as default".
+- Props: `initialData?`, `onSubmit`, `onCancel`.
+
+#### [NEW] [src/components/address/AddressCard.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/address/AddressCard.tsx)
+- Displays address info.
+- Shows "Mặc định" badge.
+- Buttons: "Thiết lập mặc định" (if not default), "Sửa", "Xóa".
+
+### Pages
+#### [NEW] [src/app/tai-khoan/dia-chi/page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/tai-khoan/dia-chi/page.tsx)
+- Server Component.
+- Fetches addresses via `getAddresses`.
+- Renders list of `AddressCard`.
+- "Thêm địa chỉ mới" button opens `AddressForm` in a Modal/Dialog.
+
+## Verification Plan
+### Manual Verification
+1.  **Add Address**: Add a new address -> Confirm it appears in the list.
+2.  **Default Logic**: Add first address -> Check if auto-default. Add second address as default -> Check if first one is unset.
+3.  **Edit**: Edit an address -> Confirm changes saved.
+4.  **Delete**: Delete an address -> Confirm removed.
+5.  **Set Default**: Click "Set Default" on a non-default address -> Confirm status updates.

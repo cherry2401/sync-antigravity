@@ -1,0 +1,27 @@
+# Enhancing File Icons
+
+## Goal
+Replace generic file icons with "IDE-like" icons (VS Code style) for better visual recognition of file types (React, TypeScript, JSON, etc.).
+
+## Proposed Changes
+
+### Dependencies
+- Install `react-icons` to access standard brand icons (Simple Icons [si](file:///f:/Python/OpenSSH/clawdbot-client/src/vite-env.d.ts#22-28), VS Code Icons `vsc`).
+
+### Components
+#### [FileExplorer.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/FileExplorer.tsx)
+- Import icons from `react-icons/si` (e.g., `SiReact`, `SiTypescript`, `SiJavascript`, `SiHtml5`, `SiCss3`, `SiJson`, `SiMarkdown`, `SiPython`) and `react-icons/vsc` (e.g., `VscFolder`, `VscFolderOpened`).
+- Create a `getFileIcon` function that maps file extensions to these icons with appropriate colors.
+- Update [FileIcon](file:///f:/Python/OpenSSH/clawdbot-client/src/components/FileExplorer.tsx#11-23) component to use this new mapping.
+- Update folder icons to be more distinct if needed (or stick to colorful standard folders).
+
+## Verification Plan
+### Manual Verification
+1. Restart the app.
+2. Open the File Explorer.
+3. Verify that:
+   - [.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/FileExplorer.tsx) files show a blue React icon.
+   - [.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/main.ts) files show a blue TypeScript icon.
+   - [.json](file:///f:/Python/OpenSSH/clawdbot-client/package.json) files show a specific JSON icon (often yellow).
+   - `.css` files show a blue CSS3 icon.
+   - Directories show folder icons.

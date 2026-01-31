@@ -1,0 +1,39 @@
+# Instagram Download Feature Implementation Plan
+
+## Goal Description
+Implement a feature to download Instagram media (Images/Videos/Stories) using an n8n workflow that interfaces with `api.satoru.click`, and expose it via the web frontend.
+
+## User Review Required
+> [!NOTE]
+> The n8n workflow must be imported manually by the user into their n8n instance.
+
+## Proposed Changes
+
+### n8n Workflow
+#### [NEW] [Instagram Download API.json](file:///i:/Workflow/n8n/Workflow/Backups/Instagram%20Download%20API.json)
+- **Trigger**: Webhook (POST) receiving `{ "url": "..." }`.
+- **Action**: HTTP Request GET to `https://api.satoru.click/api/instagram/download?url={{url}}`.
+- **Response**: Return the JSON from the API.
+
+### Cloudflare Functions
+#### [NEW] [functions/api/instagram.ts](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/functions/api/instagram.ts)
+- Proxy request from Frontend -> n8n Webhook.
+- Security: Hide n8n webhook URL.
+- Method: POST (body: `{ url }`).
+
+### Frontend
+#### [NEW] [src/components/InstagramDownload.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/components/InstagramDownload.tsx)
+- UI input for Instagram URL.
+- Display results (images/videos) from the API response.
+- Download buttons.
+
+#### [MODIFY] [src/App.tsx](file:///i:/Workflow/n8n/Workflow/Backups/web-fontend-v2/src/App.tsx)
+- Add route/tab for Instagram.
+
+## Verification Plan
+### Automated Tests
+- None.
+
+### Manual Verification
+1.  **n8n**: Test the workflow with a sample Instagram URL.
+2.  **Frontend**: Input Instagram URL, verify preview and download links work.

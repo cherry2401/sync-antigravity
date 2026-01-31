@@ -1,0 +1,222 @@
+# Kế hoạch: Tạo Workflow Đăng Bài Theo Lịch Vào Nhóm Facebook
+
+## Mục tiêu
+
+Tạo một workflow n8n mới với chức năng đăng bài tự động theo lịch vào **nhóm Facebook** bằng **Page**, sử dụng node custom đã có.
+
+## Phân tích từ workflows hiện có
+
+Sau khi phân tích các workflow [REUP_FACEBOOK_V3.json](file:///i:/Workflow/n8n/Workflow/Backups/REUP_FACEBOOK_V3.json) và `TikTok to Reel.json`, tôi đã xác định được các patterns chính:
+
+### Patterns chính:
+1. **Schedule Trigger**: Chạy tự động theo lịch (mỗi 30-60 phút)
+2. **Google Sheets**: 
+   - Sheet cấu hình: chứa thông tin Page, Group, credentials
+   - Sheet nội dung: chứa bài viết cần đăng với status tracking
+3. **Loop Processing**: Dùng `splitInBatches` để xử lý từng item
+4. **Filter**: Lọc bài chưa đăng (`Status = "Chưa đăng"`)
+5. **Posting Logic**: Đăng bài và update status
+6. **Wait nodes**: Delay giữa các lần đăng để tránh spam
+
+## Thiết kế Workflow Mới
+
+### 1. Cấu trúc Google Sheets
+
+Workflow sẽ cần **2 sheets**:
+
+#### Sheet 1: `Cau_Hinh_Group_Post` (Cấu hình đăng)
+| Tên Page | Page ID | Group ID | Credential | Trạng thái |
+|----------|---------|----------|------------|------------|
+| Page A   | 123...  | 789...   | NTLV       | ON         |
+
+#### Sheet 2: `Noi_Dung_Dang_Nhom` (Nội dung đăng)
+| Post ID | Nội dung | Media Type | Media IDs | Page ID | Group ID | Thời gian tạo | Status | Link bài đăng | Thời gian đăng |
+|---------|----------|------------|-----------|---------|----------|---------------|--------|---------------|----------------|
+| 1       | Text...  | Text with Media | [obj]  | 123...  | 789...   | 2025-...      | Chưa đăng | | |
+
+### 2. Luồng xử lý (Workflow Flow)
+
+```mermaid
+graph LR
+    A[Schedule Trigger] --> B[Read Noi_Dung_Dang_Nhom]
+    B --> C[Filter: Status = Chưa đăng]
+    C --> D[Loop Over Posts]
+    D --> E[Read Cau_Hinh_Group_Post]
+    E --> F[Match Page + Group]
+    F --> G[Create Group Post using Page]
+    G --> H[Update Status = Đã đăng]
+    H --> I[Wait 60s]
+    I --> D
+```
+
+### 3. Chi tiết các Nodes
+
+#### Node 1: Schedule Trigger
+- **Type**: `n8n-nodes-base.scheduleTrigger`
+- **Cấu hình**: Chạy mỗi 30 phút
+- **Mục đích**: Tự động kiểm tra và đăng bài
+
+#### Node 2: Read Noi_Dung_Dang_Nhom
+- **Type**: `n8n-nodes-base.googleSheets`
+- **Operation**: Read rows
+- **Mục đích**: Lấy danh sách bài cần đăng
+
+#### Node 3: Filter Chua Dang
+- **Type**: `n8n-nodes-base.filter`
+- **Condition**: `Status === "Chưa đăng"`
+- **Mục đích**: Chỉ xử lý bài chưa đăng
+
+#### Node 4: Giờ làm việc (Optional)
+- **Type**: `n8n-nodes-base.code`
+- **Logic**: Kiểm tra giờ (6h-23h theo VN timezone)
+- **Mục đích**: Tránh đăng ngoài giờ
+
+#### Node 5: Loop Over Posts
+- **Type**: `n8n-nodes-base.splitInBatches`
+- **Batch size**: 1
+- **Mục đích**: Xử lý từng bài một
+
+#### Node 6: Read Cau_Hinh_Group_Post
+- **Type**: `n8n-nodes-base.googleSheets`
+- **Operation**: Read rows
+- **Mục đích**: Lấy thông tin Page, Group, Credential
+
+#### Node 7: Match Configuration
+- **Type**: `n8n-nodes-base.code`
+- **Logic**: Match Page ID và Group ID từ nội dung với cấu hình
+- **Output**: Credential name, Page ID, Group ID
+
+#### Node 8: Create Group Post using Page (CUSTOM NODE)
+- **Type**: `n8n-nodes-social-facebook.createGroupPost` (node custom của bạn)
+- **Cấu hình**:
+  - **Credential**: Từ sheet cấu hình
+  - **Resource**: Group
+  - **Operation**: Create Group Post using Page
+  - **Page ID**: `={{ $json['Page ID'] }}`
+  - **Group ID**: `={{ $json['Group ID'] }}`
+  - **Content Type**: `={{ $json['Media Type'] }}`
+  - **Text**: `={{ $json['Nội dung'] }}`
+  - **Media IDs**: `={{ $json['Media IDs'] }}`
+
+#### Node 9: Update Status
+- **Type**: `n8n-nodes-base.googleSheets`
+- **Operation**: Update row
+- **Update**: 
+  - `Status = "Đã đăng"`
+  - `Link bài đăng = {{ response.post_url }}`
+  - `Thời gian đăng = {{ $now.toISO() }}`
+
+#### Node 10: Wait
+- **Type**: `n8n-nodes-base.wait`
+- **Duration**: 60 seconds
+- **Mục đích**: Delay giữa các bài để tránh spam
+
+### 4. Xử lý Media
+
+Dựa vào hình ảnh bạn cung cấp, node custom hỗ trợ:
+- **Content Type**: Text with Media
+- **Media IDs**: Format `[object Object]` (có thể là JSON array)
+
+Workflow cần:
+1. Có node upload media trước (nếu chưa có Media IDs)
+2. Hoặc yêu cầu user chuẩn bị sẵn Media IDs trong sheet
+
+### 5. Error Handling
+
+- **Try-Catch**: Wrap posting node để bắt lỗi
+- **Error logging**: Ghi lỗi vào cột `Error Message` trong sheet
+- **Status**: Update `Status = "Lỗi"` nếu đăng thất bại
+
+## Proposed Changes
+
+### [NEW] [Group_Post_Schedule.json](file:///i:/Workflow/n8n/Workflow/Backups/Group_Post_Schedule.json)
+
+Tạo workflow mới với cấu trúc:
+- 10-12 nodes như thiết kế trên
+- Tích hợp với Google Sheets
+- Sử dụng node custom "Create Group Post using Page"
+- Có error handling
+- Có logging và status tracking
+
+### Các tính năng bổ sung (Optional)
+
+1. **Giờ đăng tùy chỉnh**: Thêm cột `Scheduled Time` để đăng đúng giờ
+2. **Priority**: Thêm cột `Priority` để ưu tiên bài quan trọng
+3. **Multi-group**: Cho phép đăng 1 bài vào nhiều group
+4. **Template**: Hỗ trợ template nội dung với biến thế
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Cần xác nhận từ USER:**
+> 
+> 1. **Media IDs**: Bạn đã có sẵn Media IDs hay cần tôi thêm node upload media?
+> 2. **Google Sheet**: Bạn muốn tạo sheet mới hay dùng sheet hiện có?
+> 3. **Credential**: Node custom sử dụng credential nào? (Tôi thấy trong hình là "NTLV")
+> 4. **Frequency**: Bao lâu check 1 lần? (30 phút, 1 giờ?)
+> 5. **Working hours**: Có cần giới hạn giờ đăng không?
+> 6. **Số lượng**: Mỗi lần chạy đăng tối đa bao nhiêu bài?
+
+## Verification Plan
+
+### Automated Tests
+Không có unit tests (vì đây là n8n workflow), nhưng sẽ test bằng cách:
+
+1. **Test với 1 bài mẫu**:
+   - Tạo 1 row trong sheet với `Status = "Chưa đăng"`
+   - Chạy workflow manually
+   - Kiểm tra:
+     - ✅ Bài được đăng vào group
+     - ✅ Status update thành "Đã đăng"
+     - ✅ Link bài đăng được ghi vào sheet
+     - ✅ Thời gian đăng được ghi đúng
+
+2. **Test loop processing**:
+   - Tạo 3 bài trong sheet
+   - Chạy workflow
+   - Kiểm tra 3 bài được đăng tuần tự với delay 60s
+
+3. **Test filter**:
+   - Tạo bài đã có `Status = "Đã đăng"`
+   - Chạy workflow
+   - Kiểm tra bài này KHÔNG bị đăng lại
+
+### Manual Verification
+
+**USER cần thực hiện sau khi import workflow:**
+
+1. **Chuẩn bị Google Sheet**:
+   - Tạo 2 sheets như mô tả ở trên
+   - Điền 1-2 row dữ liệu mẫu
+
+2. **Cấu hình Credential**:
+   - Đảm bảo credential Facebook đã được setup trong n8n
+   - Node custom "Create Group Post using Page" đã được install
+
+3. **Test thủ công**:
+   - Click "Execute Workflow" trong n8n
+   - Quan sát từng node chạy
+   - Kiểm tra group Facebook có bài mới
+   - Kiểm tra sheet được update
+
+4. **Test Schedule**:
+   - Activate workflow
+   - Đợi 30 phút (hoặc thời gian đã set)
+   - Kiểm tra workflow tự động chạy
+
+## Câu hỏi cần làm rõ
+
+Trước khi triển khai, tôi cần bạn trả lời:
+
+1. **Media upload**: Bạn có cần tôi thêm node upload ảnh/video không? Hay bạn sẽ tự upload và điền Media IDs vào sheet?
+
+2. **Sheet structure**: Bạn có muốn thay đổi cấu trúc sheet tôi đề xuất không?
+
+3. **Error handling**: Khi đăng lỗi, bạn muốn workflow làm gì?
+   - Retry?
+   - Skip và đánh dấu lỗi?
+   - Gửi notification?
+
+4. **Credential name**: Tên credential trong n8n của bạn là gì? (để tôi cấu hình đúng)
+
+5. **Additional features**: Bạn có cần tính năng nào trong danh sách "Optional" không?

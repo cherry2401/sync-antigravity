@@ -1,0 +1,18 @@
+# Add Image-to-Video to n8n Workflow
+
+- [ ] Planning & Design
+    - [x] Create Implementation Plan
+- [ ] Implementation
+    - [ ] Add Photo Detection IF node
+    - [ ] Create Image Download nodes
+        - [ ] Get Telegram File Info (HTTP Request)
+        - [ ] Download Photo Binary (HTTP Request)
+    - [ ] Add Convert to Base64 (Code node)
+    - [ ] Add Upload Image to Google (HTTP Request)
+    - [ ] Add Edit Fields for I2V
+    - [ ] Add Create Video from Image (HTTP Request)
+    - [ ] Connect to existing Wait → Check Status → Send Video flow
+- [ ] Verification
+    - [ ] Test with portrait image + #doc
+    - [ ] Test with image + no caption
+    - [ ] Test text message still works

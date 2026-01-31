@@ -1,0 +1,3 @@
+- [x] Optimize Link Shortener (Cloudflare -> Supabase Direct)
+- [x] Implement QR Code Generation for Short Links
+- [x] Refine QR Code UI (Logo Black + Inline Text)

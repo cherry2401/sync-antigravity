@@ -1,0 +1,21 @@
+# Homepage Sections Implementation
+
+## 1. Featured Products (Nổi bật nhất)
+- [x] Tạo Server Action fetch sản phẩm từ DB
+- [x] Cập nhật component nhận data từ props
+
+## 2. Promotional Products (Ưu đãi đặc biệt)
+- [x] Tạo Server Action fetch sản phẩm giảm giá
+- [x] Cập nhật component với data thực
+
+## 3. Categories Grid (Danh mục nổi bật)
+- [x] Tạo categories.json và Server Actions
+- [x] Cập nhật component với product count
+
+## 4. Promo Banner (Banner khuyến mãi)
+- [ ] Thêm PromoBannerSettings trong Page Builder
+
+## 5. Brand Carousel (Thương hiệu)
+- [/] Tạo brands.json và Server Actions
+- [ ] Tạo trang admin `/admin/thuong-hieu`
+- [ ] Cập nhật BrandCarousel fetch từ DB

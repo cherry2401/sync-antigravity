@@ -1,0 +1,59 @@
+# HaKi Beauty Website Development
+
+## Phase 1: Core Features
+- [x] **Trang chi tiết sản phẩm** (`/san-pham/[slug]`)
+  - [x] Layout với hình ảnh gallery
+  - [x] Thông tin sản phẩm, giá, rating
+  - [x] Nút thêm vào giỏ hàng
+  - [x] Sản phẩm liên quan
+
+- [x] **Footer**
+  - [x] Thông tin liên hệ
+  - [x] Links chính sách
+  - [x] Social media links
+  - [x] Newsletter signup
+
+## Phase 2: Shopping Features
+- [x] **Giỏ hàng (Cart)**
+  - [x] State management với Zustand
+  - [x] Cart drawer/sidebar
+  - [x] Cập nhật số lượng, xóa sản phẩm
+
+- [x] **Trang danh sách sản phẩm** (`/san-pham`)
+  - [x] Grid sản phẩm
+  - [x] Filter theo danh mục, giá, thương hiệu
+  - [x] Sắp xếp sản phẩm
+  - [x] Pagination
+
+## Phase 3: Checkout & Auth
+- [x] **Trang Checkout**
+  - [x] Form thông tin khách hàng
+  - [x] Phương thức thanh toán
+  - [x] Order summary
+
+- [x] **Authentication**
+  - [x] Đăng nhập/đăng ký
+  - [x] Quản lý tài khoản
+
+## Phase 4: Search & UX
+- [x] **Search Modal**
+  - [x] Search component with real-time results
+  - [x] Keyboard navigation
+- [x] **Wishlist**
+  - [x] Zustand store
+  - [x] Wishlist page (`/yeu-thich`)
+- [x] **User Dashboard** (`/tai-khoan/dashboard`)
+
+## Phase 5: Content Pages
+- [x] **Blog/Tin tức** (`/blog`)
+  - [x] Blog listing page
+  - [x] Blog detail page
+- [x] **Contact page** (`/lien-he`)
+- [x] **About page** (`/gioi-thieu`)
+
+## Phase 6: Advanced Features
+- [/] **Product Reviews**
+  - [ ] Review component on product detail
+  - [ ] Review form with rating stars
+- [ ] **Brand Pages** (`/thuong-hieu/[slug]`)
+- [ ] **Promotions Page** (`/khuyen-mai`)

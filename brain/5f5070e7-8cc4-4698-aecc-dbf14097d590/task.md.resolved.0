@@ -1,0 +1,8 @@
+# BDS Website Development Tasks
+
+- [ ] Analyze current codebase [/]
+    - [x] List files
+    - [x] Read index.html
+    - [ ] Read index.tsx and other components
+- [ ] Determine next steps with user
+- [ ] Implement new features (TBD)

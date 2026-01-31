@@ -1,0 +1,16 @@
+# Task: Fix VEO3_V2 Telegram Image Upload
+
+## Investigation
+- [x] Compare VEO3_ImageUpload_Fixed_V3 (working) vs VEO3_V2 (failing)
+- [x] Identify root cause: Telegram binary data includes data URI prefix in base64
+- [x] Create implementation plan
+
+## Implementation
+- [ ] Update Convert to Base64 node in VEO3_V2.json
+- [ ] Add regex to remove data URI prefix from base64 string
+
+## Verification
+- [ ] Test with Telegram image upload
+- [ ] Verify base64 is clean (no prefix)
+- [ ] Verify Upload Image returns mediaGenerationId
+- [ ] Verify video generation completes successfully

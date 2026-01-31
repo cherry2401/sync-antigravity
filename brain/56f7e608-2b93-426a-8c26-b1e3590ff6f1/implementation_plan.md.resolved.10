@@ -1,0 +1,71 @@
+# Address Book Feature Implementation Plan
+
+## Goal Description
+Implement an "Address Book" feature allowing users to manage multiple shipping addresses and set a default one. This enhances the user experience by speeding up the checkout process.
+
+## Proposed Changes
+
+### Database Schema
+#### [MODIFY] [schema.prisma](file:///i:/Website/MyphamHaKi/app-src/prisma/schema.prisma)
+- Add [Address](file:///i:/Website/MyphamHaKi/app-src/src/components/address/AddressCard.tsx#10-20) model:
+    - [id](file:///i:/Website/MyphamHaKi/app-src/src/components/shop/ProductGrid.tsx#33-215): Unique identifier
+    - `userId`: Relation to User
+    - `fullName`: String
+    - `phone`: String
+    - `province`: String
+    - `district`: String
+    - `ward`: String
+    - `specificAddress`: String
+    - `isDefault`: Boolean (default false)
+    - `createdAt`: Timestamp
+
+### Server Actions
+#### [NEW] [src/actions/address.ts](file:///i:/Website/MyphamHaKi/app-src/src/actions/address.ts)
+- [getAddresses()](file:///i:/Website/MyphamHaKi/app-src/src/actions/address.ts#11-30): Fetch user addresses, sorted by `isDefault` desc.
+- [addAddress(data)](file:///i:/Website/MyphamHaKi/app-src/src/actions/address.ts#35-93): Create new address. Logic: if first address, set `isDefault` = true. If new `isDefault` is true, unset others.
+- [updateAddress(id, data)](file:///i:/Website/MyphamHaKi/app-src/src/actions/address.ts#98-153): Update address. Handle default toggle logic.
+- [deleteAddress(id)](file:///i:/Website/MyphamHaKi/app-src/src/actions/address.ts#158-178): Remove address.
+- [setDefaultAddress(id)](file:///i:/Website/MyphamHaKi/app-src/src/actions/address.ts#183-210): Set specific address as default, unset others.
+
+### Components
+#### [NEW] [src/components/address/AddressForm.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/address/AddressForm.tsx)
+- Reusable form component with:
+    - Inputs: Full Name, Phone, Specific Address.
+    - Selectors: Province, District, Ward (Need to extract or reuse data fetching logic for locations).
+    - Checkbox: "Set as default".
+- Props: `initialData?`, [onSubmit](file:///i:/Website/MyphamHaKi/app-src/src/components/address/AddressForm.tsx#93-127), `onCancel`.
+
+#### [NEW] [src/components/address/AddressCard.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/address/AddressCard.tsx)
+- Displays address info.
+- Shows "Mặc định" badge.
+- Buttons: "Thiết lập mặc định" (if not default), "Sửa", "Xóa".
+
+### Pages
+#### [NEW] [src/app/tai-khoan/dia-chi/page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/tai-khoan/dia-chi/page.tsx)
+- Server Component.
+- Fetches addresses via [getAddresses](file:///i:/Website/MyphamHaKi/app-src/src/actions/address.ts#11-30).
+- Renders list of [AddressCard](file:///i:/Website/MyphamHaKi/app-src/src/components/address/AddressCard.tsx#26-116).
+- "Thêm địa chỉ mới" button opens [AddressForm](file:///i:/Website/MyphamHaKi/app-src/src/components/address/AddressForm.tsx#49-217) in a Modal/Dialog.
+
+## Payment Flow Implementation 💸
+### Payment Page
+#### [NEW] [src/app/thanh-toan/payment/[id]/page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/thanh-toan/payment/[id]/page.tsx)
+- Displays Order Info + VietQR.
+- "Tôi đã chuyển khoản" button -> Redirect to `/checkout/success`.
+
+### Redirect Logic
+#### [MODIFY] [src/app/thanh-toan/CheckoutClient.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/thanh-toan/CheckoutClient.tsx)
+- Change redirect after order creation: `/checkout/success` -> `/checkout/payment/[id]`.
+
+### Success Page
+#### [MODIFY] [src/app/thanh-toan/thanh-cong/page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/thanh-toan/thanh-cong/page.tsx)
+- Remove QR Code section.
+- Keep as pure "Thank You" page.
+- Show Order Details.
+
+## Verification Plan
+1.  **Checkout**: Create order with Bank Transfer.
+2.  **Redirect**: Verify redirect to `/payment/[id]`.
+3.  **QR Display**: Verify QR code generation and bank info.
+4.  **Confirm**: Click "Confirm" -> Redirect to `/success`.
+

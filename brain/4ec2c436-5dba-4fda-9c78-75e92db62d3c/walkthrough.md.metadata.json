@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary": "Final walkthrough for Watcher Stability & Persistence. The application now uses the system AppData folder for all transient communication files, completely bypassing Vite's HMR. The inbound watcher is global and stable across tab switches, and the Chrome extension automatically reconnects on app restart. Fixed chat message race conditions for a smoother startup experience.",
+  "updatedAt": "2026-01-20T05:44:45.137911500Z",
+  "version": "9"
+}

@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_TASK",
+  "summary": "Task checklist for adding Image-to-Video capability to the n8n Telegram bot workflow, including photo detection, image download/upload, and integration with existing video creation flow.",
+  "updatedAt": "2025-12-06T21:18:17.503777100Z",
+  "version": "6"
+}

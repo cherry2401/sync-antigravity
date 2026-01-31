@@ -1,0 +1,83 @@
+# Homepage Sections Implementation - Walkthrough
+
+## Tổng quan
+Đã triển khai đầy đủ 5 section trên trang chủ với data từ JSON files, Server Actions, và Page Builder settings.
+
+---
+
+## Files đã tạo
+
+### Data Files
+| File | Mô tả |
+|------|-------|
+| [products.json](file:///i:/Website/MyphamHaKi/app-src/data/products.json) | 8 sản phẩm mẫu với `isFeatured`, `salePrice` |
+| [categories.json](file:///i:/Website/MyphamHaKi/app-src/data/categories.json) | 6 danh mục với icon và image |
+| [brands.json](file:///i:/Website/MyphamHaKi/app-src/data/brands.json) | 8 thương hiệu với logo field |
+
+### Server Actions
+| File | Functions |
+|------|-----------|
+| [products.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts) | [getFeaturedProducts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts#75-97), [getPromotionalProducts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts#103-125) |
+| [categories.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/categories.ts) | [getCategoriesWithCount](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/categories.ts#71-93) |
+| [brands.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/brands.ts) | [getBrands](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/brands.ts#49-60), [saveBrand](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/brands.ts#81-128), [deleteBrand](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/brands.ts#133-161) |
+
+### Client Components với Mock Data
+| Component | Mock Items |
+|-----------|------------|
+| [FeaturedProductsClient.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/FeaturedProductsClient.tsx) | 8 sản phẩm mặc định |
+| [PromotionalProductsClient.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/PromotionalProductsClient.tsx) | 5 sản phẩm khuyến mãi |
+| [BrandCarouselClient.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/BrandCarouselClient.tsx) | 6 thương hiệu |
+| [CategoriesGridClient.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/CategoriesGridClient.tsx) | 6 danh mục |
+
+---
+
+## Page Builder Settings
+
+Đã thêm 4 settings panels mới trong `/admin/giao-dien/trang-tri`:
+
+| Section | Settings có thể tùy chỉnh |
+|---------|--------------------------|
+| **Featured Products** | Tiêu đề, tiêu đề phụ, số lượng, nút xem tất cả |
+| **Promotional Products** | Tiêu đề, số lượng hiển thị |
+| **Brand Carousel** | Tiêu đề, mô tả + link đến trang quản lý thương hiệu |
+| **Promo Banner** | Tiêu đề, mô tả, CTA button, màu nền |
+
+---
+
+## Admin Pages
+
+| Trang | Mô tả |
+|-------|-------|
+| [/admin/thuong-hieu](http://localhost:3006/admin/thuong-hieu) | Quản lý thương hiệu (CRUD + logo upload) |
+
+---
+
+## Cách test
+
+1. **Homepage** tại `localhost:3006` - Các section hiển thị mock data mặc định
+2. **Page Builder** tại `/admin/giao-dien/trang-tri` - Click vào các section để thấy settings panel
+3. **Admin Thương hiệu** tại `/admin/thuong-hieu` - Thêm/sửa/xóa thương hiệu
+
+---
+
+## Kết cấu hoạt động
+
+```mermaid
+graph TD
+    A[Homepage] --> B[BlockRenderer]
+    B --> C[FeaturedProductsClient]
+    B --> D[PromotionalProductsClient]
+    B --> E[BrandCarouselClient]
+    B --> F[CategoriesGridClient]
+    
+    C --> G[Mock Data Default]
+    D --> G
+    E --> G
+    F --> G
+    
+    H[Page Builder] --> I[Settings Panel]
+    I --> J[Props saved to storefront.json]
+    J --> B
+```
+
+Các Client components có mock data mặc định và sẽ sử dụng props từ Page Builder khi được truyền vào.

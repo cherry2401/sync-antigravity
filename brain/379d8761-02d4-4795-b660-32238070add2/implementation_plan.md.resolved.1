@@ -1,0 +1,30 @@
+# Fix video_inline post type routing
+
+The `post_type` "video_inline" is currently failing to route to the "video" output because the "Switch Post Type" node uses a strict equality check for the string "video".
+
+## User Review Required
+> [!IMPORTANT]
+> I will map `video_inline` to the **video** output. If you prefer it to be mapped to **reel**, please let me know.
+
+## Proposed Changes
+
+### Workflow
+#### [MODIFY] [REPOST FACEBOOK.json](file:///c:/Users/Cherry/Clone_facebook/Test%20WF/REPOST%20FACEBOOK.json)
+- Update the "Switch Post Type" node (id: `ba65b030-2b44-4010-9fc8-82a7ba609c43`)
+- Change the condition for the "video" output to accept both `video` and `video_inline`.
+- I will use an expression-based condition: `{{ $json.post_type === 'video' || $json.post_type === 'video_inline' }}` equals `true`.
+
+#### [MODIFY] [Process Post Data](file:///c:/Users/Cherry/Clone_facebook/Test%20WF/REPOST%20FACEBOOK.json)
+- Update the logic in `Process Post Data` node (id: `755ada06-1e81-4ecb-b0d7-99ed155552c7`).
+- Current logic: `else if (postType === 'video' && attachments.media?.source)`
+- New logic: `else if ((postType === 'video' || postType === 'video_inline') && attachments.media?.source)`
+- This ensures that for `video_inline` posts, we extract the video source URL instead of falling back to the image URL.
+
+## Verification Plan
+
+### Automated Tests
+- I cannot run the workflow directly as it requires webhook triggers and external credentials.
+- I will verify the file content changes to ensure the JSON structure is correct and the logic is implemented as intended.
+
+### Manual Verification
+- The user should trigger the workflow with a `video_inline` post and verify it follows the "video" path.

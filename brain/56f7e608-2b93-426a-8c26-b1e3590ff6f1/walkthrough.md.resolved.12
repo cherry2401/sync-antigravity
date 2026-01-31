@@ -1,0 +1,51 @@
+# Homepage Sections Implementation - Walkthrough
+
+## Tổng quan
+Đã triển khai đầy đủ 5 section trên trang chủ với data từ JSON files và Server Actions.
+
+---
+
+## Các file đã tạo
+
+### Data Files
+| File | Mô tả |
+|------|-------|
+| [data/products.json](file:///i:/Website/MyphamHaKi/app-src/data/products.json) | 8 sản phẩm mẫu với `isFeatured`, `salePrice` |
+| [data/categories.json](file:///i:/Website/MyphamHaKi/app-src/data/categories.json) | 6 danh mục với icon và image field |
+| [data/brands.json](file:///i:/Website/MyphamHaKi/app-src/data/brands.json) | 8 thương hiệu với logo field |
+
+### Server Actions
+| File | Functions |
+|------|-----------|
+| [lib/actions/products.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts) | [getProducts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts#58-69), [getFeaturedProducts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts#75-97), [getPromotionalProducts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts#103-125), [saveProduct](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts#144-187), [deleteProduct](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts#192-220) |
+| [lib/actions/categories.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/categories.ts) | [getCategories](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/categories.ts#55-66), [getCategoriesWithCount](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/categories.ts#71-93), [saveCategory](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/categories.ts#98-143), [deleteCategory](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/categories.ts#148-176) |
+| [lib/actions/brands.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/brands.ts) | [getBrands](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/brands.ts#49-60), [getAllBrands](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/brands.ts#65-76), [saveBrand](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/brands.ts#81-128), [deleteBrand](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/brands.ts#133-161) |
+
+### Components (Server + Client pattern)
+| Server Component | Client Component |
+|------------------|------------------|
+| [FeaturedProducts.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/FeaturedProducts.tsx) | [FeaturedProductsClient.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/FeaturedProductsClient.tsx) |
+| [PromotionalProducts.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/PromotionalProducts.tsx) | [PromotionalProductsClient.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/PromotionalProductsClient.tsx) |
+| [CategoriesGrid.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/CategoriesGrid.tsx) | (pure server) |
+| [BrandCarousel.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/BrandCarousel.tsx) | [BrandCarouselClient.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/sections/BrandCarouselClient.tsx) |
+
+### Admin Pages
+| Trang | Mô tả |
+|-------|-------|
+| `/admin/thuong-hieu` | Quản lý thương hiệu (CRUD + logo upload) |
+
+---
+
+## Cách test
+
+1. **Homepage**: Mở `localhost:3006` - các section sẽ fetch data từ JSON files
+2. **Admin Thương hiệu**: Mở `localhost:3006/admin/thuong-hieu` - thêm/sửa/xóa thương hiệu với upload logo
+3. **Sản phẩm nổi bật**: Hiển thị sản phẩm có `isFeatured: true`
+4. **Ưu đãi đặc biệt**: Hiển thị sản phẩm có `salePrice < price`
+5. **Danh mục**: Hiển thị số lượng sản phẩm trong mỗi danh mục
+
+---
+
+## Còn lại (tùy chọn)
+- Page Builder settings cho các section (tùy chỉnh tiêu đề, số lượng)
+- PromoBanner customization trong Page Builder

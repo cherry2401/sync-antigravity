@@ -1,0 +1,31 @@
+# Shop Features Tasks
+
+## Product Listing Page ✅
+- [x] [getFilteredProducts(params)](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts#162-263) server action
+- [x] [useProductFilter](file:///i:/Website/MyphamHaKi/app-src/src/hooks/useProductFilter.ts#20-147) hook with debounce
+- [x] [ProductFilters](file:///i:/Website/MyphamHaKi/app-src/src/components/shop/ProductFilters.tsx#33-203) sidebar component
+- [x] [ProductGrid](file:///i:/Website/MyphamHaKi/app-src/src/components/shop/ProductGrid.tsx#32-209) with pagination
+- [x] Mobile filter drawer
+- [x] URL-based filtering
+
+## Live Search ✅
+- [x] [searchProducts(keyword)](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts#85-133) server action
+- [x] Vietnamese normalization search
+- [x] 300ms debounce
+- [x] 5 result limit
+- [x] Sale price display (red + strikethrough)
+- [x] Keyboard navigation (↑↓ Enter)
+- [x] Recent searches localStorage
+
+## User Authentication 🔒
+- [x] Install dependencies (`next-auth`, `bcryptjs`) & Update Schema
+- [x] Configure NextAuth ([auth.ts](file:///i:/Website/MyphamHaKi/app-src/src/auth.ts), [auth.config.ts](file:///i:/Website/MyphamHaKi/app-src/src/auth.config.ts))
+- [x] Implement Server Actions ([register](file:///i:/Website/MyphamHaKi/app-src/src/actions/auth-actions.ts#21-69), [login](file:///i:/Website/MyphamHaKi/app-src/src/actions/auth-actions.ts#70-106))
+- [x] Update Login/Register UI
+- [x] Link Order to User
+
+## Bug Fixes & Refinement 🐛
+- [x] Fix PrismaClient types
+- [x] Fix TypeScript errors in Product pages (rating/toast)
+- [x] Fix TypeScript errors in Product pages (rating/toast)
+- [x] Fix Login Redirect Issue (Server Component Refactor)

@@ -1,0 +1,25 @@
+# Adding User Profile Support
+
+- [x] Analyze `REPOST FACEBOOK.json` for destination logic <!-- id: 0 -->
+- [x] Verify data availability for distinguishing Page vs User <!-- id: 1 -->
+- [x] Update `Combine Data` node to read "Loại" column <!-- id: 4 -->
+- [x] Implement `IF` logic for destination routing (Page vs Group/User) <!-- id: 2 -->
+- [x] Configure `Upload Media` node <!-- id: 5 -->
+# Adding User Profile Support
+
+- [x] Analyze `REPOST FACEBOOK.json` for destination logic <!-- id: 0 -->
+- [x] Verify data availability for distinguishing Page vs User <!-- id: 1 -->
+- [x] Update `Combine Data` node to read "Loại" column <!-- id: 4 -->
+- [x] Implement `IF` logic for destination routing (Page vs Group/User) <!-- id: 2 -->
+- [x] Configure `Upload Media` node <!-- id: 5 -->
+- [x] Configure `Create User Post` node to use Uploaded ID <!-- id: 3 -->
+- [/] Debug and Verify full workflow execution <!-- id: 6 -->
+    - [x] Identify syntax error in Group ID
+    - [x] Identify missing connection to Merge Post Result
+    - [x] Handle `video_direct_response` post type
+    - [x] Fix missing sound (Implemented Separate API Call)
+    - [x] Fix Upload Video URL (Changed to `me/videos`)
+    - [x] **Fix Syntax Error**: Corrected `groupId` in `Publish Video Group` node.
+    - [ ] Verify successful Group post and log (Blocked by Permission Error)
+- [ ] **User Action**: Update Page Access Token with `publish_video` permission.
+- [ ] **Verify**: Run workflow with new token to confirm Page posting works.

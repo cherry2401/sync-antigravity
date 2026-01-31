@@ -1,0 +1,7 @@
+# Telegram Order Notification
+
+## Progress
+- [ ] Create API route `/api/order`
+- [ ] Update checkout to call API
+- [ ] Add .env.local reminder
+- [ ] Testing

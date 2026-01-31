@@ -1,0 +1,17 @@
+# Upgrade Extension: Auto-Refresh & Webhook
+
+- [x] Planning & Design <!-- id: 0 -->
+    - [x] Create Implementation Plan <!-- id: 1 -->
+- [x] Implementation <!-- id: 2 -->
+    - [x] Update [manifest.json](file:///d:/EXTENTIONS/Extension_Chrome_Veo-OK_v2/manifest.json) (permissions: alarms, scripting/content_scripts) <!-- id: 3 -->
+    - [x] Update [popup.html](file:///d:/EXTENTIONS/Extension_Chrome_Veo-OK_v2/popup.html) (Add Webhook UI, Interval, Enable Checkbox) <!-- id: 4 -->
+    - [x] Update [popup.js](file:///d:/EXTENTIONS/Extension_Chrome_Veo-OK_v2/popup.js) (Handle UI logic, Save/Load settings) <!-- id: 5 -->
+    - [x] Refactor [background.js](file:///d:/EXTENTIONS/Extension_Chrome_Veo-OK_v2/background.js) <!-- id: 6 -->
+        - [x] Broaden request filter (capture any `ya29.` token from target domain) <!-- id: 7 -->
+        - [x] Implement `chrome.alarms` for auto-refresh interval <!-- id: 8 -->
+        - [x] Implement Webhook posting logic <!-- id: 9 -->
+        - [x] Implement page reload/keep-alive logic <!-- id: 10 -->
+- [x] Verification <!-- id: 11 -->
+    - [x] Verify UI matches design <!-- id: 12 -->
+    - [x] Verify settings are saved <!-- id: 13 -->
+    - [x] Verify webhook is triggered <!-- id: 14 -->

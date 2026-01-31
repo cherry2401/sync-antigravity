@@ -1,0 +1,28 @@
+# Hướng dẫn kiểm tra tính năng Đăng nhập (Authentication)
+
+Đã hoàn thành việc tích hợp tính năng đăng nhập và bảo mật cho trang Admin.
+
+## Các thay đổi chính
+1.  **Trang Đăng nhập mới (`/admin/login`)**: Giao diện đăng nhập hiện đại.
+2.  **Bảo vệ Admin**: Truy cập `/admin` sẽ bị chuyển hướng nếu chưa đăng nhập.
+3.  **Hiển thị thông tin**: Header hiển thị Email người dùng thay vì "Demo User".
+
+## Các bước kiểm tra
+
+### 1. Tạo tài khoản Admin (Nếu chưa có)
+Vì chưa có tính năng "Đăng ký" (để bảo mật), anh vui lòng tạo tài khoản trực tiếp trên Supabase:
+1.  Vào [Supabase Dashboard](https://supabase.com/dashboard) > Project > **Authentication**.
+2.  Chọn **Users** > **Add User**.
+3.  Nhập Email & Mật khẩu muốn dùng.
+4.  Bấm **Create User**.
+
+### 2. Đăng nhập thử
+1.  Truy cập vào trang Admin: `http://localhost:5173/admin`
+2.  Hệ thống sẽ tự chuyển hướng sang `/admin/login`.
+3.  Nhập Email & Mật khẩu vừa tạo.
+4.  Bấm **Đăng nhập**.
+
+### 3. Kết quả mong đợi
+- [x] Đăng nhập thành công và chuyển hướng vào Dashboard.
+- [x] Trên góc phải Header hiển thị đúng Email của anh.
+- [x] Bấm nút **Đăng xuất** sẽ quay lại trang chủ/đăng nhập.

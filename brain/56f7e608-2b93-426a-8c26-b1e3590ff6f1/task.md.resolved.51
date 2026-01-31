@@ -1,0 +1,25 @@
+# Homepage Sections Implementation
+
+## Data & Server Actions ✅
+- [x] [products.json](file:///i:/Website/MyphamHaKi/app-src/data/products.json) + [products.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/products.ts) (getProducts, getFeatured, getPromotional)
+- [x] [categories.json](file:///i:/Website/MyphamHaKi/app-src/data/categories.json) + [categories.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/categories.ts) (getCategories, getAllCategories, save, delete)
+- [x] [brands.json](file:///i:/Website/MyphamHaKi/app-src/data/brands.json) + [brands.ts](file:///i:/Website/MyphamHaKi/app-src/src/lib/actions/brands.ts) (getBrands, getAllBrands, save, delete)
+
+## Homepage Sections ✅
+- [x] FeaturedProducts - Server fetch + Client display
+- [x] PromotionalProducts - Server fetch + Client display  
+- [x] CategoriesGrid - Server fetch + Client display
+- [x] BrandCarousel - Server fetch + Client display
+- [x] PromoBanner - Props từ Page Builder
+
+## Page Builder Settings ✅
+- [x] FeaturedProductsSettings (title, subtitle, limit, viewAll)
+- [x] PromotionalProductsSettings (title, limit)
+- [x] CategoryGridSettings (title, columns, link to admin)
+- [x] BrandCarouselSettings (title, subtitle, link to admin)
+- [x] PromoBannerSettings (title, desc, CTA, color)
+
+## Admin Pages ✅
+- [x] `/admin/thuong-hieu` - Quản lý thương hiệu + logo upload
+- [x] `/admin/danh-muc` - Quản lý danh mục + icon picker + image upload
+- [x] Menu sidebar có links đến cả 2 trang admin trên

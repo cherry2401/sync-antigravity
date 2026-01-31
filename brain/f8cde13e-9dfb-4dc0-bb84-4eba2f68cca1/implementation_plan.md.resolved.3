@@ -1,0 +1,73 @@
+# Fix Check Status Node - Conditional Flow Support
+
+## Problem Analysis
+
+The **"Check Status"** node currently only references `$('Create VEO3')`, which causes an error when running the **Image Upload flow** from Telegram because "Create VEO3" is never executed in that flow.
+
+### Current Workflow Flows:
+
+1. **Text-to-Video Flow** (from Webhook):
+   - [Webhook](file:///d:/EXTENTIONS/Extension_Chrome_Veo-OK_v2/background.js#249-276) → `Get Access Token` → ... → **`Create VEO3`** → `Wait` → `Check Status`
+
+2. **Image-to-Video Flow** (from Telegram):
+   - `Telegram Trigger` → `Download Photo` → ... → `Upload Image1` → `Extract Media ID` → **`Generate Video (Image)`** → `Wait` → `Check Status`
+
+Both flows converge at `Wait` and then `Check Status`, but `Check Status` only knows how to read from `Create VEO3`.
+
+## Proposed Solution
+
+Update the **"Check Status"** node's `jsonBody` expression to use **conditional logic** that checks which upstream node has been executed:
+
+- If `$('Create VEO3')` exists → use its data
+- Otherwise, if `$('Generate Video (Image)')` exists → use its data
+
+### Implementation
+
+Change the `jsonBody` in **"Check Status"** node from:
+
+```javascript
+{
+  "operations": [
+    {
+      "operation": {
+        "name": "{{ $('Create VEO3').item.json.operations[0].operation.name }}"
+      },
+      "sceneId": "{{ $('Create VEO3').item.json.operations[0].sceneId }}",
+      "status": "{{ $('Create VEO3').item.json.operations[0].status }}"
+    }
+  ]
+}
+```
+
+To:
+
+```javascript
+{{
+  const createVeo3 = $('Create VEO3').first();
+  const generateVideoImage = $('Generate Video (Image)').first();
+  
+  // Pick whichever node was executed
+  const videoNode = createVeo3 || generateVideoImage;
+  
+  return JSON.stringify({
+    "operations": [
+      {
+        "operation": {
+          "name": videoNode.json.operations[0].operation.name
+        },
+        "sceneId": videoNode.json.operations[0].sceneId,
+        "status": videoNode.json.operations[0].status
+      }
+    ]
+  });
+}}
+```
+
+> [!IMPORTANT]
+> This fix ensures that "Check Status" can handle both text-to-video and image-to-video workflows seamlessly.
+
+## Verification Plan
+
+1. **Test Image Upload Flow**: Send an image via Telegram and verify the workflow completes without the "unexecuted node" error.
+2. **Test Text-to-Video Flow**: Send a text prompt via Webhook and verify it still works correctly.
+3. **Check both flows** reach the Check Status node successfully and retrieve the correct operation data.

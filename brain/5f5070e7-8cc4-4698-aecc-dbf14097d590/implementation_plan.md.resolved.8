@@ -1,0 +1,47 @@
+# Redesigning Interest Rate Tool
+
+## Goal
+Overhaul the UI of [InterestRateTool.tsx](file:///i:/Website/BDS/src/components/tools/InterestRateTool.tsx) to match the design of [batdongsan.com.vn](https://batdongsan.com.vn/ho-tro-tien-ich/ht-tinh-lai-suat). The user explicitly requested an exact visual match due to dissatisfaction with the current "clean" design.
+
+## User Review Required
+> [!IMPORTANT]
+> This redesign moves away from the modern, clean style used elsewhere in the clone to closely mimic the denser, specific style of the reference site, including button colors, borders, and font sizing.
+
+## Proposed Changes
+
+### [src/components/tools/InterestRateTool.tsx](file:///i:/Website/BDS/src/components/tools/InterestRateTool.tsx)
+- **Structure**:
+    - **Header**: Tab-like header "Tính lãi suất" centered with specific styling.
+    - **Section 1: Bank Interest Lookup**:
+        - Title "Tìm lãi suất ngân hàng".
+        - Radio buttons: VND (checked), USD (disabled).
+        - Dropdowns: "Ngân hàng", "Kỳ hạn".
+        - Result text: "Lãi suất tham khảo: 7.5% /năm" (Red, bold).
+    - **Section 2: Loan Calculator**:
+        - Introductory text: "Bảng này giúp bạn tính toán..."
+        - **Input Rows**: using a grid layout with labels on the left (or top on mobile) and inputs on the right.
+        - **Fields**:
+            - Amount: Input with "VND" suffix inside the field. Helper text below showing full number? (Optional)
+            - Duration: Input + Select (Tháng/Năm) combo.
+            - Rate: Input with "% / năm" suffix.
+            - Type: Dropdown (Dư nợ giảm dần / Dư nợ ban đầu).
+        - **Button**: "Xem kết quả" (Red background, centered).
+    - **Section 3: Result Table**:
+        - Summary block above table: Total Principal, Total Interest (Red), Total Payment (Blue).
+        - Table Columns: Kỳ, Dư nợ đầu kỳ, Gốc trả, Lãi trả, Tổng trả.
+        - Styling: Light gray header, borders between rows.
+
+- **Logic**:
+    - Keep existing logic for "Declining Balance" and "Flat Rate".
+    - Populate mock data for bank lookup.
+
+## Verification Plan
+
+### Manual Verification
+- **Browser Test**:
+    1. Navigate to `/lai-suat`.
+    2. Verify the layout matches the screenshot (dense information, specific colors).
+    3. Input values (e.g., 2 billion, 20 years, Declining).
+    4. Click "Xem kết quả".
+    5. Verify the table appears and calculations are correct.
+    6. Verify the bank lookup dropdown updates the "Lãi suất tham khảo".

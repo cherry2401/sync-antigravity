@@ -1,0 +1,274 @@
+# Clawdbot Desktop Client - Implementation Plan
+
+Build a desktop application using Electron + React that connects to Clawdbot Gateway, enabling bidirectional chat with AI and remote command execution capabilities.
+
+## Tech Stack Overview
+
+| Component | Technology |
+|-----------|------------|
+| Framework | Electron 28+ |
+| Frontend | React 18 + TypeScript |
+| Styling | TailwindCSS + shadcn/ui |
+| State | Zustand |
+| Storage | better-sqlite3 |
+| Terminal | xterm.js |
+
+---
+
+## Proposed Changes
+
+### Core Project Structure
+
+```
+clawdbot-client/
+├── package.json
+├── electron.vite.config.ts
+├── electron/
+│   ├── main.ts              # Main process
+│   ├── preload.ts           # Preload scripts (IPC bridge)
+│   └── services/
+│       ├── executor.ts      # Command executor
+│       └── database.ts      # SQLite operations
+├── src/
+│   ├── App.tsx
+│   ├── main.tsx
+│   ├── index.css            # Tailwind + theme
+│   ├── components/
+│   │   ├── Sidebar/
+│   │   ├── ChatArea/
+│   │   ├── InputArea/
+│   │   ├── StatusBar/
+│   │   └── Settings/
+│   ├── services/
+│   │   └── gateway.ts       # WebSocket connector
+│   ├── stores/
+│   │   ├── chatStore.ts
+│   │   └── configStore.ts
+│   └── lib/
+│       └── utils.ts
+└── README.md
+```
+
+---
+
+### Electron Main Process
+
+#### [NEW] [main.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/main.ts)
+
+Main Electron process handling:
+- Window creation with dark theme
+- IPC handlers for command execution
+- File system operations
+- Database initialization
+
+#### [NEW] [preload.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/preload.ts)
+
+Context bridge exposing safe APIs:
+- `executeCommand(cmd)` - Run shell commands
+- `readFile(path)` - Read file contents
+- `writeFile(path, content)` - Write files
+- `listDir(path)` - List directory contents
+- Database operations for chat history
+
+---
+
+### Core Services
+
+#### [NEW] [executor.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/executor.ts)
+
+Command executor supporting:
+- `shell` - Run shell commands via child_process
+- `readFile` - Read file content
+- `writeFile` - Write file content
+- `listDir` - List directory contents
+- Security checks (path whitelist, command blacklist)
+
+#### [NEW] [database.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/database.ts)
+
+SQLite operations:
+- Sessions table (id, title, createdAt, updatedAt)
+- Messages table (id, sessionId, role, content, timestamp, metadata)
+- Config table (key, value)
+
+#### [NEW] [gateway.ts](file:///f:/Python/OpenSSH/clawdbot-client/src/services/gateway.ts)
+
+WebSocket connector:
+- Connect to gateway URL with auth token
+- Send chat messages
+- Receive and handle command requests
+- Auto-reconnect on disconnect
+- Connection status events
+
+---
+
+### State Management
+
+#### [NEW] [chatStore.ts](file:///f:/Python/OpenSSH/clawdbot-client/src/stores/chatStore.ts)
+
+Zustand store managing:
+- Current session and message list
+- Session CRUD operations
+- Message sending/receiving
+- Loading states
+
+#### [NEW] [configStore.ts](file:///f:/Python/OpenSSH/clawdbot-client/src/stores/configStore.ts)
+
+Configuration store:
+- Gateway URL and token
+- Theme preferences
+- Security settings (allowed paths, confirm before execute)
+
+---
+
+### UI Components
+
+#### [NEW] Sidebar Component
+- Session list grouped by date
+- New session button
+- Session selection/deletion
+
+#### [NEW] ChatArea Component
+- Message list with virtual scrolling
+- Markdown rendering (react-markdown)
+- Code syntax highlighting (react-syntax-highlighter)
+- Command execution indicators
+
+#### [NEW] InputArea Component
+- Multi-line textarea with auto-resize
+- Ctrl+Enter to send
+- File drag & drop support
+
+#### [NEW] StatusBar Component
+- Connection status indicator
+- Gateway URL display
+- Settings button
+
+#### [NEW] Settings Modal
+- Gateway configuration
+- Theme selection
+- Security preferences (path whitelist, confirm dialogs)
+
+---
+
+### Styling
+
+#### [NEW] [index.css](file:///f:/Python/OpenSSH/clawdbot-client/src/index.css)
+
+Dark theme with:
+- Background: `#0d1117` (GitHub dark)
+- Accent: `#58a6ff`
+- Success: `#3fb950`
+- Error: `#f85149`
+- Font: JetBrains Mono for code
+
+---
+
+## Security Features
+
+| Feature | Description |
+|---------|-------------|
+| **Path Whitelist** | Only allow file access to configured directories |
+| **Command Blacklist** | Block dangerous commands (rm -rf, format, etc.) |
+| **Confirmation Dialog** | Optional prompt before executing commands |
+| **Audit Log** | Log all executed commands to database |
+
+---
+
+## Message Protocol
+
+### Client → Gateway
+```json
+{
+  "type": "chat",
+  "sessionId": "uuid",
+  "content": "User message"
+}
+```
+
+### Gateway → Client (Command Request)
+```json
+{
+  "type": "command",
+  "id": "cmd-123",
+  "command": {
+    "type": "writeFile",
+    "payload": { "path": "...", "content": "..." }
+  }
+}
+```
+
+### Client → Gateway (Command Result)
+```json
+{
+  "type": "commandResult",
+  "id": "cmd-123",
+  "result": { "success": true, "output": "..." }
+}
+```
+
+---
+
+## Verification Plan
+
+### Development Testing
+```bash
+# Start development server
+cd f:\Python\OpenSSH\clawdbot-client
+npm run dev
+```
+
+1. **Window Creation**: App should open with dark themed window
+2. **UI Rendering**: All components (sidebar, chat, input, status bar) visible
+3. **Settings Modal**: Should open/close, save configuration
+4. **Message Input**: Type and send messages (local echo)
+5. **WebSocket**: Connect to gateway URL (test with mock server if needed)
+
+### Build Testing
+```bash
+# Build Windows executable
+npm run build:win
+```
+
+1. **Executable Created**: Check `dist/` for `.exe` file
+2. **App Launches**: Run executable, verify window opens
+3. **Persistence**: Close and reopen, check session/config persisted
+
+### Manual Testing
+- User should verify WebSocket connection to their Clawdbot Gateway
+- User should test command execution (shell, file read/write)
+- User should verify security confirmations appear when enabled
+
+---
+
+## Dependencies
+
+```json
+{
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "zustand": "^4.5.0",
+    "react-markdown": "^9.0.0",
+    "react-syntax-highlighter": "^15.5.0",
+    "xterm": "^5.3.0",
+    "xterm-addon-fit": "^0.8.0",
+    "better-sqlite3": "^9.2.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-vite": "^2.0.0",
+    "electron-builder": "^24.0.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.0.0"
+  }
+}
+```
+
+---
+
+> [!IMPORTANT]
+> Since the workspace is empty, I will scaffold the entire Electron + React project from scratch using `electron-vite` for optimal development experience.
+
+> [!NOTE]
+> The app requires connection to your Clawdbot Gateway server. Make sure the gateway is running before testing WebSocket functionality.

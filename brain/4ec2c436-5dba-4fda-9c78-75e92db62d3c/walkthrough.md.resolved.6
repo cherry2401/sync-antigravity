@@ -1,0 +1,188 @@
+# Auto CDP Connector - Hoàn thành! 🎯
+
+## Tổng quan
+
+Đã triển khai tính năng **Auto CDP Connector** cho phép App Client tự động kết nối tới Chrome qua port 9222, loại bỏ bước bấm "Attach" thủ công.
+
+---
+
+## Kiến trúc mới
+
+```mermaid
+graph LR
+    A[Chrome :9222] -->|WebSocket| B[App Client<br/>CDP Scanner]
+    B -->|CDP Events| C[Gateway/SSH]
+    C --> D[Chopper]
+    
+    E[Extension<br/>Port 18792] -.->|Backup| B
+```
+
+---
+
+## Thay đổi chính
+
+### [MODIFY] [browserRelay.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/browserRelay.ts)
+
+**Tính năng mới:**
+- [startCDPScanner()](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/browserRelay.ts#147-165) - Quét port 9222 mỗi 3 giây
+- [fetchCDPTargets()](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/browserRelay.ts#193-228) - Lấy danh sách targets từ `http://localhost:9222/json`
+- [connectToCDP()](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/browserRelay.ts#229-301) - Kết nối WebSocket trực tiếp tới Chrome
+- [sendCDPCommand()](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/browserRelay.ts#461-498) - Route command: CDP Direct → Extension (fallback)
+
+**Ưu tiên kết nối:**
+1. **CDP Direct** (port 9222) - Mũi nhọn
+2. **Extension** (port 18792) - Hậu phương
+
+**Ưu tiên target:**
+1. Tabs có type `page`
+2. Không phải `chrome://` hoặc `chrome-extension://`
+3. Tab đầu tiên (thường là active)
+
+---
+
+### [MODIFY] [StatusBar.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/StatusBar.tsx)
+
+**Thay đổi UI:**
+- Thêm trạng thái `cdp_direct`
+- Badge: **🎯 CDP Direct** (màu xanh)
+- Tooltip hiển thị title và URL của tab đang kết nối
+- Hint: "Start Chrome with --remote-debugging-port=9222"
+
+---
+
+## Hướng dẫn sử dụng
+
+### Option 1: Dùng Script Launcher (KHUYẾN KHÍCH)
+
+Đã tạo sẵn file **[Start-Chrome-Debug.bat](file:///f:/Python/OpenSSH/clawdbot-client/Start-Chrome-Debug.bat)** trong folder `clawdbot-client/`
+
+**Cách dùng:**
+1. Double-click file [Start-Chrome-Debug.bat](file:///f:/Python/OpenSSH/clawdbot-client/Start-Chrome-Debug.bat)
+2. Script tự động:
+   - Đóng tất cả Chrome cũ
+   - Mở Chrome mới với debugging
+3. StatusBar tự động hiện 🟢 **🎯 CDP Direct**
+
+**Ghim ra Desktop:**
+- Kéo file [.bat](file:///f:/Python/OpenSSH/clawdbot-client/Start-Chrome-Debug.bat) ra Desktop tạo shortcut
+- Mỗi lần cần CDP Direct chỉ cần double-click!
+
+---
+
+### Option 2: Thêm flag vào Chrome shortcut (Nâng cao)
+
+> [!WARNING]
+> **Phải đóng TẤT CẢ Chrome cũ trước khi mở shortcut mới!**
+> Nếu Chrome đang chạy, click shortcut chỉ mở tab mới (không có debugging).
+
+**Windows:**
+
+1. Click chuột phải vào Chrome shortcut → **Properties**
+2. Trong ô **Target**, thêm vào cuối:
+   ```
+   --remote-debugging-port=9222
+   ```
+3. Kết quả:
+   ```
+   "C:\Program Files\Google\Chrome\Application\chrome.exe" --remote-debugging-port=9222
+   ```
+4. Click **OK**
+
+**Hoặc tạo shortcut mới:**
+1. Chuột phải trên Desktop → New → Shortcut
+2. Nhập:
+   ```
+   "C:\Program Files\Google\Chrome\Application\chrome.exe" --remote-debugging-port=9222
+   ```
+3. Đặt tên: **Chrome Debug**
+
+---
+
+### Bước 2: Khởi động
+
+1. **Đóng tất cả Chrome** (quan trọng!)
+2. **Mở Chrome bằng shortcut mới** (Chrome Debug)
+3. **Mở Clawdbot App Client**
+
+---
+
+### Bước 3: Kiểm tra
+
+**Console App Client sẽ hiển thị:**
+```
+🌐 [BrowserRelay] Starting CDP scanner (port 9222)...
+🌐 [BrowserRelay] 🎯 CDP target found: Google (https://www.google.com)
+🌐 [BrowserRelay] Connecting to CDP: ws://127.0.0.1:9222/devtools/page/ABC123
+🌐 [BrowserRelay] ✅ CDP Direct connected!
+```
+
+**StatusBar sẽ hiển thị:**
+- 🟢 **🎯 CDP Direct** (màu xanh)
+- Hover để xem title và URL
+
+---
+
+## Test CDP Commands
+
+### Qua SSH (File-based):
+
+```bash
+# Ghi lệnh
+echo '{"id":1,"method":"Page.navigate","params":{"url":"https://google.com"}}' > F:\Python\OpenSSH\clawdbot-client\src\cdp_inbound.json
+
+# Đợi 1s rồi đọc kết quả
+cat F:\Python\OpenSSH\clawdbot-client\src\cdp_outbound.json
+```
+
+### Các lệnh CDP phổ biến:
+
+```json
+// Điều hướng trang
+{"id":1,"method":"Page.navigate","params":{"url":"https://example.com"}}
+
+// Chụp screenshot
+{"id":2,"method":"Page.captureScreenshot"}
+
+// Lấy DOM
+{"id":3,"method":"DOM.getDocument"}
+
+// Evaluate JavaScript
+{"id":4,"method":"Runtime.evaluate","params":{"expression":"document.title"}}
+```
+
+---
+
+## Fallback Mode
+
+Nếu Chrome không mở với flag debugging:
+- CDP Scanner vẫn chạy nền (quét mỗi 3s)
+- Extension mode vẫn hoạt động bình thường
+- StatusBar hiển thị "CDP Off" hoặc "Ext Only"
+
+Khi Chrome debug được detect:
+- Tự động chuyển sang CDP Direct
+- Extension bị bypass (nhưng vẫn sẵn sàng làm backup)
+
+---
+
+## Lưu ý quan trọng
+
+> [!IMPORTANT]
+> **Phải đóng tất cả Chrome trước khi mở Chrome Debug!**
+> Chrome chỉ cho phép 1 instance chạy remote debugging.
+
+> [!TIP]
+> Để kiểm tra Chrome có đang chạy debug mode không:
+> Mở `http://localhost:9222/json` trong trình duyệt.
+> Nếu thấy JSON → Chrome debug đang hoạt động.
+
+---
+
+## Kết quả đạt được
+
+✅ **Mục tiêu Chopper:** "Anh Vũ mở Chrome + mở App là tôi có thể 'nhìn' thấy ngay"
+
+- Không cần cài Extension
+- Không cần click Attach
+- Tự động detect và kết nối
+- Fallback về Extension nếu cần

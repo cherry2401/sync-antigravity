@@ -1,0 +1,69 @@
+# Dual-Update System - Claude Manager
+
+## Tổng quan
+Hệ thống update 2 lớp độc lập:
+
+| Loại | Nguồn | Mục đích |
+|------|-------|----------|
+| **Server Update** | GitHub `Claude-Workspace/claude-ws` | Cập nhật backend/API mới từ cộng đồng |
+| **App Update** | Local folder hoặc GitHub riêng | Thêm tính năng UI của riêng bạn |
+
+---
+
+## 1. Server Update (claude-ws)
+
+**Cơ chế:** Check GitHub Releases của repo `Claude-Workspace/claude-ws`
+
+### Luồng hoạt động:
+1. App gọi GitHub API lấy latest release
+2. So sánh với version hiện tại trong [package.json](file:///I:/AIHub/claude-ws/package.json)
+3. Nếu có bản mới → Hiển thị "Server Update Available"
+4. User bấm Update → Chạy `git pull` hoặc download + extract
+
+### Files cần sửa:
+- [ ] [src/main/index.ts](file:///I:/AIHub/claude-manager/src/main/index.ts) - Thêm IPC handler `server:checkUpdate`
+- [ ] [src/renderer/src/App.tsx](file:///I:/AIHub/claude-manager/src/renderer/src/App.tsx) - Thêm UI hiển thị update
+
+---
+
+## 2. App Update (claude-manager)
+
+**Cơ chế:** Check từ local folder hoặc GitHub riêng
+
+### Luồng hoạt động:
+1. Check file `latest.yml` trong thư mục update
+2. So sánh version với app hiện tại
+3. Nếu có bản mới → Download [.exe](file:///I:/AIHub/claude-ws/cloudflared.exe) mới và replace
+
+### Files cần sửa:
+- [ ] `electron-builder.yml` - Cấu hình publish
+- [ ] [src/main/index.ts](file:///I:/AIHub/claude-manager/src/main/index.ts) - Tích hợp `electron-updater`
+
+---
+
+## UI Mockup
+
+```
+┌─────────────────────────────────────┐
+│ Settings                            │
+├─────────────────────────────────────┤
+│                                     │
+│ 🔄 Server (claude-ws)               │
+│    Current: v0.1.25                 │
+│    [Check Update]  🟢 Up to date    │
+│                                     │
+│ 📦 App (claude-manager)             │
+│    Current: v1.0.0                  │
+│    [Check Update]  🟡 v1.1.0 avail. │
+│    [Download & Install]             │
+│                                     │
+└─────────────────────────────────────┘
+```
+
+---
+
+## Câu hỏi cần xác nhận
+
+> [!IMPORTANT]
+> 1. **App Update:** Bạn muốn lưu file update ở đâu? Ví dụ: `I:\AIHub\claude-manager\updates\`
+> 2. **Server Update:** Bạn có muốn tự động `git pull` hay download file zip?

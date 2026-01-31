@@ -1,0 +1,35 @@
+# File Explorer UI & IPC Debugging Plan
+
+## Goal
+Simplify File Explorer UI by removing manual path input and "Go" button, relying on Drive selector. Resolving persistent `listDir is not a function` error.
+
+## User Review Required
+- [ ] Confirm if removing manual path input is acceptable (based on "Why is Go button still here?" comment).
+
+## Proposed Changes
+
+### UI Changes
+#### [MODIFY] [FileExplorer.tsx](file:///f:/Python/OpenSSH/clawdbot-client/src/components/FileExplorer.tsx)
+- Remove `input` field and "Go" button.
+- Remove `inputPath` state if redundant (or keep simpler state for internal logic).
+- Make Drive selector the primary header element.
+- Add debug logging: `console.log('Renderer electronAPI keys:', Object.keys(window.electronAPI))` inside [FileExplorer](file:///f:/Python/OpenSSH/clawdbot-client/src/components/FileExplorer.tsx#66-156).
+
+### Debugging Changes
+#### [MODIFY] [preload.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/preload.ts)
+- Add `console.log('Preload API keys:', Object.keys(api))` before exposing.
+
+## Verification Plan
+
+### Automated Tests
+- None.
+
+### Manual Verification
+1.  **Restart App**: Run `npm run electron:dev`.
+2.  **Check Console**:
+    - Look for "Preload API keys:" in terminal/console. Verify [listDir](file:///f:/Python/OpenSSH/clawdbot-client/electron/preload.ts#45-47) is present.
+    - Look for "Renderer electronAPI keys:" in DevTools console. Verify [listDir](file:///f:/Python/OpenSSH/clawdbot-client/electron/preload.ts#45-47) is present.
+3.  **UI Check**:
+    - Verify "Go" button and Input field are gone.
+    - Select a Drive (e.g., D:).
+    - Verify "Loading..." appears and then file tree populates.

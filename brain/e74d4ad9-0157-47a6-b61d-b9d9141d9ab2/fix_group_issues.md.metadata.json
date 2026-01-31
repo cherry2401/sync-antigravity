@@ -1,0 +1,6 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_OTHER",
+  "summary":  "Correct solution for Wait Group Delay based on actual workflow structure - use $input reference instead of named node",
+  "updatedAt":  "2026-01-03T06:30:36.654197500Z",
+  "version":  "2"
+}

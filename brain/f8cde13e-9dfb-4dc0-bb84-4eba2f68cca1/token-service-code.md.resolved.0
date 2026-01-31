@@ -1,0 +1,200 @@
+# VEO3 Token Service - Full Implementation
+
+## Setup Files
+
+### package.json
+```json
+{
+  "name": "veo-token-service",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "^4.18.2",
+    "puppeteer": "^21.6.0"
+  }
+}
+```
+
+### server.js
+```javascript
+const express = require('express');
+const puppeteer = require('puppeteer');
+const app = express();
+
+// Cache
+let cachedToken = null;
+let tokenExpiry = 0;
+let isGenerating = false;
+
+// Intercept network requests to capture recaptchaToken
+async function captureTokenFromVEO3() {
+  const browser = await puppeteer.launch({ 
+    headless: false, // Để xem browser hoạt động
+    args: ['--no-sandbox']
+  });
+  
+  const page = await browser.newPage();
+  let capturedToken = null;
+  
+  // Intercept requests
+  await page.setRequestInterception(true);
+  
+  page.on('request', request => {
+    request.continue();
+  });
+  
+  page.on('requestfinished', async request => {
+    const url = request.url();
+    
+    // Check if this is video generation request
+    if (url.includes('batchAsyncGenerateVideoText') || 
+        url.includes('batchAsyncGenerateVideoStartAndEndImage')) {
+      
+      const postData = request.postData();
+      if (postData) {
+        try {
+          const body = JSON.parse(postData);
+          if (body.clientContext?.recaptchaToken) {
+            console.log('✅ Captured recaptchaToken!');
+            capturedToken = body.clientContext.recaptchaToken;
+          }
+        } catch (e) {}
+      }
+    }
+  });
+  
+  console.log('Navigating to VEO3...');
+  await page.goto('https://labs.google/fx/tools/veo3', {
+    waitUntil: 'networkidle2',
+    timeout: 60000
+  });
+  
+  console.log('Page loaded. Waiting for user to create a video...');
+  console.log('NOTE: Bạn cần tạo 1 video bất kỳ trên browser để capture token!');
+  
+  // Wait for token to be captured (max 2 minutes)
+  const startTime = Date.now();
+  while (!capturedToken && (Date.now() - startTime < 120000)) {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+  
+  await browser.close();
+  
+  if (!capturedToken) {
+    throw new Error('No token captured. Did you create a video on the browser?');
+  }
+  
+  return capturedToken;
+}
+
+app.get('/get-token', async (req, res) => {
+  console.log('📥 Token requested...');
+  
+  // Check cache
+  if (cachedToken && Date.now() < tokenExpiry) {
+    const expiresIn = Math.floor((tokenExpiry - Date.now()) / 1000);
+    console.log(`✅ Returning cached token (expires in ${expiresIn}s)`);
+    return res.json({ 
+      token: cachedToken, 
+      from: 'cache',
+      expiresIn
+    });
+  }
+  
+  // Prevent concurrent token generation
+  if (isGenerating) {
+    return res.status(503).json({ 
+      error: 'Token generation in progress, please wait...' 
+    });
+  }
+  
+  isGenerating = true;
+  console.log('🔄 Fetching new token...');
+  
+  try {
+    const token = await captureTokenFromVEO3();
+    
+    // Cache for 3 minutes
+    cachedToken = token;
+    tokenExpiry = Date.now() + 3 * 60 * 1000;
+    
+    console.log('✅ New token cached');
+    
+    res.json({ 
+      token,
+      from: 'fresh',
+      expiresIn: 180
+    });
+    
+  } catch (error) {
+    console.error('❌ Error:', error.message);
+    res.status(500).json({ error: error.message });
+  } finally {
+    isGenerating = false;
+  }
+});
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'ok',
+    hasCache: !!cachedToken,
+    cacheExpiry: cachedToken ? new Date(tokenExpiry).toISOString() : null
+  });
+});
+
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Token service running on http://localhost:${PORT}`);
+  console.log(`📍 Endpoints:`);
+  console.log(`   - GET /get-token`);
+  console.log(`   - GET /health`);
+});
+```
+
+---
+
+## Cách Test
+
+### 1. Install & Run
+```bash
+npm install
+node server.js
+```
+
+### 2. Trigger Token Capture
+```bash
+# Trong terminal khác
+curl http://localhost:3000/get-token
+```
+
+**Browser sẽ mở** → Labs.google VEO3 loaded → **BẠN TẠO 1 VIDEO** → Token được capture tự động!
+
+### 3. Test Cache
+```bash
+# Gọi lại ngay
+curl http://localhost:3000/get-token
+# → Sẽ trả cached token (nhanh)
+```
+
+---
+
+## Workflow Integration
+
+**HTTP Request Node:**
+```
+Method: GET
+URL: http://localhost:3000/get-token
+Timeout: 60000 (vì lần đầu cần wait user tạo video)
+
+Response: 
+{
+  "token": "03AGdBq24...",
+  "from": "cache" hoặc "fresh",
+  "expiresIn": 180
+}
+```
+
+**Use Token:**
+```javascript
+{{ $json.token }}
+```

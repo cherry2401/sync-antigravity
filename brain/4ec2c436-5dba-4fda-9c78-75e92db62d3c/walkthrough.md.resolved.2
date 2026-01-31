@@ -1,0 +1,89 @@
+# MCP Bridge Integration - Walkthrough
+
+## Summary
+
+Đã tích hợp **MCP Client Bridge** vào Clawdbot Desktop Client, cho phép Gateway gọi các tools chạy trực tiếp trên máy local.
+
+---
+
+## Files Created
+
+| File | Purpose |
+|------|---------|
+| [mcpTransport.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/mcpTransport.ts) | WebSocket transport với Bearer token auth, auto-reconnect |
+| [mcpTools.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/mcpTools.ts) | Registry 9 tools: shell, file ops, automation, screen capture |
+| [mcpBridge.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/mcpBridge.ts) | Main orchestrator xử lý JSON-RPC messages |
+| [localMcpProvider.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/localMcpProvider.ts) | Local provider cho internal app usage |
+
+---
+
+## Files Modified
+
+| File | Changes |
+|------|---------|
+| [main.ts](file:///f:/Python/OpenSSH/clawdbot-client/electron/main.ts) | Import + Initialize MCPBridge và LocalMcpProvider |
+| [package.json](file:///f:/Python/OpenSSH/clawdbot-client/package.json) | Added [ws](file:///f:/Python/OpenSSH/clawdbot-client/electron/services/automation.ts#39-56), `zod`, `@types/ws` |
+
+---
+
+## MCP Tools Registered
+
+```
+1. shell_execute      - Execute shell command
+2. read_file          - Read file contents
+3. write_file         - Write content to file
+4. delete_file        - Delete file/directory
+5. rename_file        - Rename/move file
+6. list_directory     - List directory contents
+7. get_system_info    - Get CPU, memory, uptime
+8. browser_automation - Puppeteer actions
+9. screen_capture     - Desktop screenshot
+```
+
+---
+
+## Architecture
+
+```
+Gateway (MCP Client)  ──WebSocket──▶  Desktop (MCP Server)
+        │                                      │
+        │                              ┌───────┴───────┐
+        │                              │  MCPBridge    │
+        │                              │  (JSON-RPC)   │
+        │                              └───────┬───────┘
+        │                                      │
+        │                              ┌───────┴───────┐
+        │                              │  Tool Handlers │
+        │                              │  (9 tools)     │
+        │                              └───────┬───────┘
+        │                                      │
+        │                              ┌───────┴───────┐
+        │                              │ CommandExecutor│
+        │                              │ (existing)     │
+        │                              └───────────────┘
+        │                                      
+   ◀───HTTP Polling (fallback)────────────────┘
+```
+
+---
+
+## Verification Results
+
+| Check | Result |
+|-------|--------|
+| MCP Bridge init | ✅ 9 tools registered |
+| LocalMcpProvider init | ✅ Working |
+| WebSocket /mcp/ws | ⚠️ 404 (expected - Gateway needs update) |
+| HTTP Polling fallback | ✅ 200 OK, commands: 0 |
+
+---
+
+## Next Steps
+
+1. **Update Gateway** to add `/mcp/ws` WebSocket endpoint
+2. Implement MCP Client on Gateway to call tools
+3. Test end-to-end tool execution
+
+---
+
+*Generated: 2026-01-18*

@@ -1,0 +1,49 @@
+# Product Detail Page Upgrade - Walkthrough
+
+## Changes Made
+
+### 1. Product Accordion Component
+Created [ProductAccordion.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/product/ProductAccordion.tsx) with 3 collapsible sections:
+- **Mô tả chi tiết** (open by default)
+- **Thành phần (Ingredients)** - detailed table
+- **Hướng dẫn sử dụng** - step-by-step guide
+
+![Accordion Demo](file:///C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/pdp_accordion.png)
+
+---
+
+### 2. Sticky Bottom Bar (Mobile)
+Created [StickyBottomBar.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/product/StickyBottomBar.tsx):
+- Fixed position at bottom on mobile only
+- Chat button + "Mua ngay" with price
+- Slides up when user scrolls > 200px
+
+---
+
+### 3. Section Reordering
+- **Before:** Product → Reviews → Related Products
+- **After:** Product → **Related Products → Reviews**
+
+---
+
+### 4. Reviews Pagination
+- Limited to 3 reviews per page
+- Added page numbers (1, 2, 3...)
+- Arrow navigation buttons
+
+---
+
+## Files Changed
+
+| File | Change |
+|------|--------|
+| [ProductAccordion.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/product/ProductAccordion.tsx) | NEW |
+| [StickyBottomBar.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/product/StickyBottomBar.tsx) | NEW |
+| [page.tsx](file:///i:/Website/MyphamHaKi/app-src/src/app/san-pham/[slug]/page.tsx) | MODIFIED |
+| [ProductReviews.tsx](file:///i:/Website/MyphamHaKi/app-src/src/components/product/ProductReviews.tsx) | MODIFIED |
+
+---
+
+## Demo Recording
+![PDP Upgrade Demo](file:///C:/Users/Cherry/.gemini/antigravity/brain/56f7e608-2b93-426a-8c26-b1e3590ff6f1/pdp_upgrade_test_1768249441549.webp)
+
