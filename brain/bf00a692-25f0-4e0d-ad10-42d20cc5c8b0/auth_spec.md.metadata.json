@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Complete specification for adding authentication (register/login via username, email, phone), user balance management, and secure BaoStar API proxying to the Auto-Like reseller web application. Covers database schema, API design, purchase flow with balance checks, protected routes, backend architecture (Express.js + SQLite), pricing model, and deployment considerations.",
+  "updatedAt": "2026-02-08T19:47:40.391357500Z"
+}
