@@ -1,0 +1,79 @@
+# Auth + Balance System — Walkthrough
+
+## Tổng quan
+Đã triển khai hệ thống xác thực, quản lý số dư, và admin panel cho Auto-Like. API key BaoStar đã được chuyển hoàn toàn ra khỏi frontend.
+
+## Files tạo mới
+
+### Backend (`server/`)
+
+| File | Mô tả |
+|------|--------|
+| [index.ts](file:///I:/Website/Auto-like/server/index.ts) | Express entry: CORS, routes, health check |
+| [config.ts](file:///I:/Website/Auto-like/server/config.ts) | Env config (JWT, BaoStar, DB) |
+| [database/index.ts](file:///I:/Website/Auto-like/server/database/index.ts) | SQLite schema: users, transactions, orders, pricing_config |
+| [database/seed.ts](file:///I:/Website/Auto-like/server/database/seed.ts) | Seed admin + default markup (Like ×1.5, VIP ×1.25) |
+| [middleware/auth.ts](file:///I:/Website/Auto-like/server/middleware/auth.ts) | JWT verify + admin guard middleware |
+| [routes/auth.ts](file:///I:/Website/Auto-like/server/routes/auth.ts) | POST /auth/register, POST /auth/login, GET /auth/me |
+| [routes/services.ts](file:///I:/Website/Auto-like/server/routes/services.ts) | GET /api/prices, POST /api/convert-uid (BaoStar proxy) |
+| [routes/orders.ts](file:///I:/Website/Auto-like/server/routes/orders.ts) | POST /api/orders (balance check + buy + auto-refund) |
+| [routes/admin.ts](file:///I:/Website/Auto-like/server/routes/admin.ts) | Admin: stats, users, deposit, pricing, orders |
+
+### Frontend
+
+| File | Mô tả |
+|------|--------|
+| [AuthContext.tsx](file:///I:/Website/Auto-like/src/contexts/AuthContext.tsx) | React context: login/register/logout, JWT in localStorage |
+| [LoginPage.tsx](file:///I:/Website/Auto-like/src/pages/LoginPage.tsx) | Login bằng username/email/SĐT |
+| [RegisterPage.tsx](file:///I:/Website/Auto-like/src/pages/RegisterPage.tsx) | Đăng ký với 3 tab (Username/Email/SĐT) |
+| [DepositPage.tsx](file:///I:/Website/Auto-like/src/pages/DepositPage.tsx) | QR code + thông tin ACB + lịch sử giao dịch |
+
+## Files đã sửa
+
+| File | Thay đổi |
+|------|----------|
+| [vite.config.ts](file:///I:/Website/Auto-like/vite.config.ts) | Proxy → `localhost:3001` thay vì BaoStar trực tiếp |
+| [api.ts](file:///I:/Website/Auto-like/src/services/api.ts) | Xóa API key, thêm JWT interceptor, [buyService](file:///I:/Website/Auto-like/src/services/api.ts#24-37) → backend |
+| [App.tsx](file:///I:/Website/Auto-like/src/App.tsx) | AuthProvider wrapper + routes login/register/deposit |
+| [Header.tsx](file:///I:/Website/Auto-like/src/components/Header.tsx) | Hiện số dư + username khi đã đăng nhập |
+| [Sidebar.tsx](file:///I:/Website/Auto-like/src/components/Sidebar.tsx) | Links: Nạp tiền, Admin, Đăng xuất |
+| [ServicePage.tsx](file:///I:/Website/Auto-like/src/pages/ServicePage.tsx) | Auth guard: redirect login trước khi mua |
+| [index.css](file:///I:/Website/Auto-like/src/index.css) | +450 dòng CSS cho auth/deposit/header |
+
+## Verification
+
+| Test | Kết quả |
+|------|---------|
+| `npx tsc --noEmit` | ✅ Exit code 0 (no errors) |
+| `GET /health` | ✅ `{"status":"ok"}` |
+| `POST /auth/login` (admin) | ✅ JWT token + user data trả về |
+| Backend server | ✅ Running at `:3001` |
+| Frontend dev | ✅ Running at `:5173` |
+
+## Cách sử dụng
+
+```bash
+# Terminal 1 — Backend
+cd server
+npm run dev        # → http://localhost:3001
+
+# Terminal 2 — Frontend
+npm run dev        # → http://localhost:5173
+```
+
+**Admin mặc định:** [admin](file:///I:/Website/Auto-like/server/middleware/auth.ts#45-55) / `Admin@123456`
+
+## Luồng hoạt động
+
+```mermaid
+sequenceDiagram
+    User->>Frontend: Đăng nhập
+    Frontend->>Backend: POST /auth/login
+    Backend->>Frontend: JWT token
+    User->>Frontend: Mua dịch vụ
+    Frontend->>Backend: POST /api/orders (Bearer token)
+    Backend->>Backend: Check balance, tính giá
+    Backend->>BaoStar: POST /api/.../buy (API key)
+    BaoStar-->>Backend: OK/Fail
+    Backend-->>Frontend: Kết quả (hoàn tiền nếu lỗi)
+```
