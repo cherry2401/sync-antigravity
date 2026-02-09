@@ -1,0 +1,95 @@
+# Admin Panel Pricing Enhancement
+
+Nâng cấp Admin Panel với cấu hình giá trực quan và quản lý hiển thị gói dịch vụ.
+
+## Proposed Changes
+
+### 1. Database — Package Visibility Table
+
+#### [MODIFY] [index.ts](file:///I:/Website/Auto-like/server/database/index.ts)
+
+Thêm bảng `hidden_packages` để lưu các gói bị ẩn:
+
+```sql
+CREATE TABLE IF NOT EXISTS hidden_packages (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    service_id   TEXT NOT NULL,
+    package_name TEXT NOT NULL,
+    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(service_id, package_name)
+);
+```
+
+---
+
+### 2. Backend API — Enhanced Pricing + Package Toggle
+
+#### [MODIFY] [admin.ts](file:///I:/Website/Auto-like/server/routes/admin.ts)
+
+**GET /admin/pricing-detail** — Trả về giá BaoStar gốc + markup + giá bán cho MỖI package:
+
+```
+Response: {
+  success: true,
+  data: [{
+    service_id: "like",
+    service_name: "Tăng Like Bài Viết",
+    markup: 1.5,
+    packages: [{
+      package_name: "S1 Like bấm tay",
+      original_price: 29,       // ← giá gốc BaoStar  
+      sell_price: 43.5,          // ← original × markup
+      min: 50, max: 100000,
+      hidden: false              // ← toggle ẩn/hiện
+    }, ...]
+  }]
+}
+```
+
+**POST /admin/toggle-package** — Ẩn/hiện gói cụ thể:
+```
+Body: { service_id, package_name, hidden: true/false }
+```
+
+---
+
+### 3. Frontend — Pricing Tab Redesign
+
+#### [MODIFY] [AdminPage.tsx](file:///I:/Website/Auto-like/src/pages/AdminPage.tsx)
+
+Thay bảng pricing cũ bằng giao diện card-based:
+
+| Thành phần | Mô tả |
+|---|---|
+| **Service Card** | Mỗi dịch vụ (like, follow…) = 1 card collapsible |
+| **Markup Slider** | Input + slider cho hệ số nhân (1.0 → 3.0) |
+| **Package Table** | Bảng chi tiết mỗi gói: Tên gói · Giá gốc · Giá bán · Min/Max · Toggle ẩn/hiện |
+| **Price Preview** | Cột "Giá bán" tính tự động = giá gốc × markup |
+
+---
+
+### 4. User-facing — Filter Hidden Packages
+
+#### [MODIFY] [orders.ts](file:///I:/Website/Auto-like/server/routes/orders.ts) (or services proxy)
+
+Khi trả về danh sách packages cho user, lọc bỏ các gói đã bị ẩn trong `hidden_packages`.
+
+---
+
+## Data Flow
+
+```mermaid
+graph LR
+    A[BaoStar API] -->|GET /api/prices| B[Backend Proxy]
+    B -->|original_price| C[Admin Panel]
+    C -->|set markup + toggle| D[SQLite DB]
+    B -->|filter hidden + apply markup| E[User Frontend]
+```
+
+## Verification Plan
+
+### Manual
+- Admin mở tab Cấu hình giá → thấy giá gốc BaoStar realtime
+- Thay đổi markup → giá bán tự động cập nhật
+- Toggle ẩn 1 gói → user không thấy gói đó nữa
+- Toggle hiện lại → user thấy lại gói
