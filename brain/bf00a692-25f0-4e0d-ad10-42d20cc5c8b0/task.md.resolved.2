@@ -1,0 +1,33 @@
+# Auth + Balance + Admin System
+
+## Phase 1: Backend Foundation
+- [ ] Init `server/` with Express + TypeScript + SQLite
+- [ ] Database schema + seed admin user
+- [ ] Config env vars + BaoStar proxy setup
+
+## Phase 2: Auth System
+- [ ] Register endpoint (username/email/phone)
+- [ ] Login endpoint (auto-detect identifier)
+- [ ] JWT middleware + GET /auth/me
+
+## Phase 3: Purchase Flow
+- [ ] Proxy /api/prices + /api/convert-uid (public)
+- [ ] POST /api/orders (auth + balance + BaoStar proxy + refund)
+- [ ] GET /api/orders (user's orders)
+
+## Phase 4: Frontend Auth
+- [ ] AuthContext + useAuth hook
+- [ ] Login + Register pages
+- [ ] Deposit page (QR + bank info)
+- [ ] Protected ServicePage (login + balance check)
+- [ ] Header/Sidebar auth integration
+
+## Phase 5: Admin Dashboard
+- [ ] Admin layout + routes
+- [ ] User management + deposit
+- [ ] Pricing management (markup editor)
+- [ ] Order history viewer
+
+## Phase 6: Security & Deploy
+- [ ] Remove API key from frontend
+- [ ] Production build config

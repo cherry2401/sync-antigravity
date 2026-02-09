@@ -1,0 +1,312 @@
+# 🔐 Implementation Plan: Auth + Balance + Admin System
+
+## Tổng quan
+
+Thêm backend Express.js vào dự án Auto-Like để:
+- Bảo vệ BaoStar API key (hiện đang lộ ở frontend)
+- Quản lý tài khoản người dùng & đăng nhập
+- Quản lý số dư & thanh toán
+- Trang Admin quản lý users/tiền/giá
+
+---
+
+## Kiến trúc
+
+```mermaid
+flowchart LR
+    subgraph FE["Frontend — Vite React"]
+        A[Login/Register] --> B[AuthContext]
+        B --> C[Protected Routes]
+        C --> D[Service Pages]
+        D --> E[Deposit Page]
+    end
+
+    subgraph BE["Backend — Express.js"]
+        F[Auth Routes] --> G[JWT Middleware]
+        G --> H[Orders API]
+        G --> I[Balance API]
+        G --> J[Admin API]
+        H --> K[BaoStar Proxy]
+    end
+
+    subgraph DB["Database — SQLite"]
+        L[(users)]
+        M[(transactions)]
+        N[(orders)]
+        O[(pricing_config)]
+    end
+
+    FE -->|JWT Token| BE
+    BE --> DB
+    K -->|Hidden API Key| P[BaoStar API]
+```
+
+---
+
+## Pricing Model
+
+| Nhóm dịch vụ | Giá gốc BaoStar | Hệ số | Giá bán | VD 100 like |
+|---|---|---|---|---|
+| **Like thường** (like-gia-re, like-chat-luong, like-comment, comment, share, mat-live, mem-group) | `price_per` | **×1.5** (lời 50%) | `price_per × 1.5` | 54đ → **81đ** |
+| **VIP Like** (vip) | `price_per` | **×1.25** (lời 25%) | `price_per × 1.25` | 2,200đ → **2,750đ** |
+| **Follow/Page** (follow, like-page) | `price_per` | **×1.5** | `price_per × 1.5` | — |
+
+Admin có thể thay đổi hệ số từng dịch vụ qua Admin Dashboard.
+
+---
+
+## Database Schema
+
+```sql
+-- Users
+CREATE TABLE users (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    username      TEXT UNIQUE NOT NULL,
+    email         TEXT UNIQUE,
+    phone         TEXT UNIQUE,
+    password_hash TEXT NOT NULL,
+    display_name  TEXT,
+    balance       INTEGER DEFAULT 0,
+    role          TEXT DEFAULT 'user',  -- 'user' | 'admin'
+    is_active     BOOLEAN DEFAULT 1,
+    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Transactions (nạp/mua/hoàn)
+CREATE TABLE transactions (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id       INTEGER NOT NULL REFERENCES users(id),
+    type          TEXT NOT NULL,        -- 'deposit' | 'purchase' | 'refund'
+    amount        INTEGER NOT NULL,
+    balance_after INTEGER NOT NULL,
+    description   TEXT,
+    metadata      TEXT,                 -- JSON
+    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Orders
+CREATE TABLE orders (
+    id               INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id          INTEGER NOT NULL REFERENCES users(id),
+    baostar_order_id INTEGER,
+    service_id       TEXT NOT NULL,
+    package_name     TEXT NOT NULL,
+    object_id        TEXT NOT NULL,
+    quantity         INTEGER,
+    sell_price       INTEGER NOT NULL,  -- Giá bán (trừ user)
+    cost_price       INTEGER NOT NULL,  -- Giá gốc BaoStar
+    profit           INTEGER NOT NULL,  -- sell - cost
+    status           TEXT DEFAULT 'processing',
+    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Pricing Config (admin set)
+CREATE TABLE pricing_config (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    service_id  TEXT UNIQUE NOT NULL,
+    markup      REAL NOT NULL DEFAULT 1.5,  -- Hệ số nhân
+    updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+---
+
+## Thông tin nạp tiền
+
+- **Ngân hàng:** ACB
+- **Chủ TK:** Trần Ngọc Thu
+- **STK:** 15732191
+- **Chi nhánh:** Ngân hàng Á Châu ACB Buôn Mê Thuật
+- **Nội dung CK:** `NAPTIEN <username>`
+- Hiển thị cả **QR code** + thông tin tài khoản
+
+---
+
+## Proposed Changes
+
+### Phase 1: Backend Foundation
+
+#### [NEW] server/package.json
+- Express.js, better-sqlite3, bcrypt, jsonwebtoken, cors, dotenv
+
+#### [NEW] server/index.ts
+- Express server, CORS config, routes mount, error handler
+
+#### [NEW] server/database/schema.sql
+- Tạo 4 bảng: users, transactions, orders, pricing_config
+- Seed admin user + pricing defaults
+
+#### [NEW] server/config.ts
+- Env vars: JWT_SECRET, BAOSTAR_API_KEY, PORT, DB_PATH
+
+---
+
+### Phase 2: Auth System
+
+#### [NEW] server/routes/auth.ts
+
+| Endpoint | Method | Body | Response |
+|---|---|---|---|
+| `/auth/register` | POST | `{username, password, email?, phone?}` | `{user, token}` |
+| `/auth/login` | POST | `{identifier, password}` | `{user, token}` |
+| `/auth/me` | GET | — (JWT header) | `{user}` |
+
+- `identifier` = username HOẶC email HOẶC SĐT → auto-detect
+
+#### [NEW] server/middleware/auth.ts
+- Verify JWT → attach `req.user`
+- Admin check middleware
+
+---
+
+### Phase 3: Purchase Flow (Proxy BaoStar)
+
+#### [NEW] server/routes/orders.ts
+
+| Endpoint | Method | Auth | Logic |
+|---|---|---|---|
+| `/api/orders` | POST | ✅ | Check balance → Trừ tiền → Gọi BaoStar → Lưu order |
+| `/api/orders` | GET | ✅ | Lấy danh sách đơn hàng user |
+
+- Nếu BaoStar lỗi → **auto refund** + ghi transaction
+- Giá bán = giá gốc × markup từ `pricing_config`
+
+#### [MODIFY] server/routes/services.ts
+- Proxy `/api/prices` và `/api/convert-uid` đến BaoStar (public, no auth)
+
+---
+
+### Phase 4: Frontend Auth Integration
+
+#### [NEW] src/contexts/AuthContext.tsx
+- `AuthProvider`: quản lý JWT, user state, login/logout
+- `useAuth()` hook: `{ user, login, register, logout, isAuthenticated }`
+
+#### [NEW] src/pages/LoginPage.tsx
+- Form đăng nhập (username/email/SĐT + MK)
+- Link sang trang đăng ký
+
+#### [NEW] src/pages/RegisterPage.tsx
+- 3 tab: Username / Email / SĐT
+- Form fields + validation
+
+#### [NEW] src/pages/DepositPage.tsx
+- Hiển thị QR code + thông tin TK ngân hàng
+- Nội dung CK: `NAPTIEN <username>`
+- Lịch sử nạp tiền
+
+#### [MODIFY] src/pages/ServicePage.tsx
+- Submit → check `isAuthenticated` → redirect login nếu chưa
+- Check `balance >= totalPrice` → báo lỗi nếu thiếu
+- Hiển thị giá bán (đã markup) thay vì giá gốc
+- Call backend `/api/orders` thay vì trực tiếp BaoStar
+
+#### [MODIFY] src/components/Header.tsx
+- Hiển thị số dư + avatar/username nếu đã login
+- Nút "Đăng nhập" nếu chưa login
+
+#### [MODIFY] src/components/Sidebar.tsx
+- Thêm links: "Nạp tiền", "Đăng xuất"
+- Ẩn "Admin" nếu không phải admin
+
+#### [MODIFY] src/App.tsx
+- Wrap `<AuthProvider>`
+- Thêm routes: `/login`, `/register`, `/deposit`, `/admin/*`
+
+---
+
+### Phase 5: Admin Dashboard
+
+#### [NEW] src/pages/admin/AdminDashboard.tsx
+- Tổng quan: số user, doanh thu, lợi nhuận
+
+#### [NEW] src/pages/admin/AdminUsers.tsx
+- Danh sách users + search
+- Cộng tiền cho user
+- Bật/tắt tài khoản
+
+#### [NEW] src/pages/admin/AdminPricing.tsx
+- Bảng giá từng dịch vụ: giá gốc BaoStar | hệ số | giá bán
+- Edit markup từng dịch vụ
+- Preview giá bán realtime
+
+#### [NEW] src/pages/admin/AdminOrders.tsx
+- Tất cả đơn hàng, filter theo user/dịch vụ/trạng thái
+
+#### [NEW] server/routes/admin.ts
+- CRUD users, deposit, pricing config, orders list
+
+---
+
+### Phase 6: Security & Deploy
+
+#### [MODIFY] vite.config.ts
+- Dev proxy trỏ đến local backend (`http://localhost:3001`)
+
+#### [DELETE] VITE_API_KEY from .env
+- API key chỉ lưu ở backend [.env](file:///I:/Website/Auto-like/.env)
+
+#### [NEW] server/.env
+- `JWT_SECRET`, `BAOSTAR_API_KEY`, `PORT=3001`
+
+---
+
+## Build Checklist
+
+```
+Phase 1: Backend Foundation
+  [ ] Init server/ với Express + TypeScript + SQLite
+  [ ] Tạo database schema + seed admin
+  [ ] Config env vars
+
+Phase 2: Auth System
+  [ ] Register endpoint (username/email/phone)
+  [ ] Login endpoint (auto-detect identifier)
+  [ ] JWT middleware
+  [ ] GET /auth/me
+
+Phase 3: Purchase Flow
+  [ ] Proxy /api/prices (public)
+  [ ] Proxy /api/convert-uid (public)
+  [ ] POST /api/orders (auth + balance check + BaoStar proxy + refund)
+  [ ] GET /api/orders (user's orders)
+
+Phase 4: Frontend Auth
+  [ ] AuthContext + useAuth hook
+  [ ] Login page
+  [ ] Register page (3 tabs)
+  [ ] Deposit page (QR + bank info)
+  [ ] Protected ServicePage (check login + balance)
+  [ ] Header: balance + user info
+  [ ] Sidebar: deposit + logout links
+
+Phase 5: Admin Dashboard
+  [ ] Admin layout + routes
+  [ ] User management + deposit
+  [ ] Pricing management (markup editor)
+  [ ] Order history viewer
+
+Phase 6: Security & Deploy
+  [ ] Remove API key from frontend
+  [ ] Production build config
+  [ ] Deploy frontend + backend
+```
+
+---
+
+## Verification Plan
+
+### Automated
+- `npm run build` — TypeScript compile check
+- Test auth flow: register → login → get profile
+- Test purchase: insufficient balance → error, sufficient → success → BaoStar called
+
+### Manual
+- Đăng ký 3 cách (username, email, SĐT)
+- Đăng nhập → xem số dư
+- Admin cộng tiền → user thấy
+- Mua dịch vụ đủ tiền → thành công
+- Mua thiếu tiền → báo lỗi
+- Chưa login bấm mua → redirect
+- Admin thay đổi markup → giá cập nhật
