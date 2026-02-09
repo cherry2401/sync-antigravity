@@ -1,0 +1,53 @@
+# Trang Quản Lý Tài Khoản (Account Page)
+
+Thêm trang `/account` cho user đã đăng nhập, gồm 3 tab tương tự BaoStar (bỏ tab Bảo mật vì không có 2FA/Telegram).
+
+## Proposed Changes
+
+### Backend — API Endpoints
+
+#### [MODIFY] [auth.ts](file:///I:/Website/Auto-like/server/routes/auth.ts)
+
+Thêm 2 endpoint mới:
+
+| Method | Path | Chức năng |
+|--------|------|-----------|
+| `PUT` | `/auth/profile` | Cập nhật display_name, email, phone |
+| `PUT` | `/auth/password` | Đổi mật khẩu (cần current_password) |
+
+#### [MODIFY] [orders.ts](file:///I:/Website/Auto-like/server/routes/orders.ts)
+
+Thêm endpoint thống kê:
+
+| Method | Path | Chức năng |
+|--------|------|-----------|
+| `GET` | `/api/orders/stats` | Tổng đơn, tổng nạp, tổng chi, đơn lỗi |
+
+---
+
+### Frontend — Account Page
+
+#### [NEW] [AccountPage.tsx](file:///I:/Website/Auto-like/src/pages/AccountPage.tsx)
+
+3 tabs:
+
+| Tab | Nội dung |
+|-----|----------|
+| **Thông tin tài khoản** | Form cập nhật (tên, email, SĐT) + Card thông tin (avatar, tên, role, balance, tổng nạp, email, ngày tham gia) |
+| **Đổi mật khẩu** | Form: mật khẩu hiện tại → mật khẩu mới → xác nhận |
+| **Thống kê** | 4 stat cards (tổng đơn, tổng nạp, đơn lỗi, hoàn tiền) + bảng thống kê dịch vụ |
+
+#### [MODIFY] [App.tsx](file:///I:/Website/Auto-like/src/App.tsx)
+- Thêm route `/account` (protected)
+
+#### [MODIFY] [Header.tsx](file:///I:/Website/Auto-like/src/components/Header.tsx)
+- Thêm link "Tài khoản" vào dropdown menu
+
+#### [MODIFY] [index.css](file:///I:/Website/Auto-like/src/index.css)
+- CSS cho account page: tabs, profile form, info card, stats, password form
+
+## Verification Plan
+
+### Automated
+- `npx tsc --noEmit` — 0 errors
+- Kiểm tra trên browser: login → dropdown → Tài khoản → 3 tabs hoạt động
