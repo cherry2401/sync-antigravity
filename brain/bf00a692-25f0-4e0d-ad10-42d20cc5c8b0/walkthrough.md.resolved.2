@@ -1,0 +1,39 @@
+# Auth & Admin System — Walkthrough
+
+## Completed Tasks
+
+### Phase 1-3: Backend Foundation
+- Express.js + SQLite + JWT auth + BaoStar proxy
+- Register/Login/Admin seeding
+- Purchase flow with auto-refund
+
+### Phase 4: Frontend Auth
+- [AuthContext.tsx](file:///I:/Website/Auto-like/src/contexts/AuthContext.tsx) — Global auth state with JWT
+- [LoginPage.tsx](file:///I:/Website/Auto-like/src/pages/LoginPage.tsx) — Login with ← Trang chủ back link
+- [RegisterPage.tsx](file:///I:/Website/Auto-like/src/pages/RegisterPage.tsx) — Register (username/email/phone) with back link
+- [DepositPage.tsx](file:///I:/Website/Auto-like/src/pages/DepositPage.tsx) — Balance + bank info + QR
+- [Header.tsx](file:///I:/Website/Auto-like/src/components/Header.tsx) — Đăng nhập/Đăng ký buttons for guests
+- [Sidebar.tsx](file:///I:/Website/Auto-like/src/components/Sidebar.tsx) — Auth-aware nav links
+
+### Phase 5: Admin Dashboard
+- [AdminPage.tsx](file:///I:/Website/Auto-like/src/pages/AdminPage.tsx) — 4 tabs: Stats, Users, Pricing, Orders
+- Deposit modal, inline markup editor, user lock/unlock
+
+### Order History & Protected Routes
+- [OrderHistory.tsx](file:///I:/Website/Auto-like/src/pages/OrderHistory.tsx) — Fetches user's orders from backend API with search
+- [ProtectedRoute.tsx](file:///I:/Website/Auto-like/src/components/ProtectedRoute.tsx) — Redirects to login or home based on auth/role
+- `/deposit`, `/order-history` require login; `/admin` requires admin role
+
+### Security Hardening
+- `helmet` — HTTP security headers
+- `express-rate-limit` — 100 req/15min general, 10/15min for auth
+- JSON body size limit: 1MB
+- Auth rate limiter prevents brute-force login
+
+## Verification
+- TypeScript compilation: **0 errors** (exit code 0)
+- Both servers running: Vite (5173), Backend (3001)
+
+## Admin Credentials
+- **Username**: [admin](file:///I:/Website/Auto-like/server/middleware/auth.ts#45-55)
+- **Password**: `Admin@123456`
