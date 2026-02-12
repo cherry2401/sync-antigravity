@@ -1,68 +1,24 @@
-# Auto-Like — Walkthrough
+# Walkthrough: Server Restart
 
-## Tổng quan
-Đã hoàn thành xây dựng web app **Auto-Like** tích hợp BaoStar API cho dịch vụ Facebook, sử dụng **Vite + React + TypeScript**.
+Đã khởi động lại thành công hệ thống Auto-Like.
 
-## Tech Stack
-| Layer | Thư viện |
-|-------|----------|
-| Framework | Vite 7 + React 19 + TypeScript |
-| Routing | React Router DOM |
-| HTTP Client | Axios |
-| Icons | Lucide React |
-| Notifications | React Hot Toast |
-| Theme | Custom Dark Theme (CSS Variables + Glassmorphism) |
+## Các bước đã thực hiện
 
-## Cấu trúc dự án
+1.  **Restart Frontend (Vite):**
+    - Chạy `npm run dev` tại thư mục gốc.
+    - Frontend hiện đang chạy tại [http://localhost:5173](http://localhost:5173).
 
-```
-src/
-├── components/
-│   ├── Layout.tsx       ← Sidebar + Header + Content
-│   ├── Sidebar.tsx      ← Navigation (Dashboard, 10 FB services)
-│   └── Header.tsx       ← Page title + API status badge
-├── pages/
-│   ├── Dashboard.tsx    ← Stats cards + Service grid
-│   ├── ServicePage.tsx  ← Reusable order form (package selector + dynamic fields)
-│   └── OrderHistory.tsx ← Order tracking with search + table
-├── services/
-│   └── api.ts           ← Axios instance, buyService(), getPackages(), getOrderLogs()
-├── config/
-│   └── services.ts      ← 10 Facebook service configs (endpoints, fields, colors)
-├── types/
-│   └── index.ts         ← All TypeScript interfaces
-├── App.tsx              ← Router setup
-├── main.tsx             ← Entry point
-└── index.css            ← Dark theme design system
+2.  **Restart Backend (Express):**
+    - Chạy `npx tsx index.ts` tại thư mục `server`.
+    - Đã xác minh backend hoạt động bình thường qua health check.
+    - Backend hiện đang chạy tại [http://localhost:3001](http://localhost:3001).
+
+## Kết quả kiểm tra (Verification)
+
+### Backend Health Check
+```bash
+curl.exe -s http://localhost:3001/health
+{"status":"ok","time":"2026-02-12T06:42:07.941Z"}
 ```
 
-## Tính năng đã xây dựng
-
-### Dashboard
-- 4 stat cards (tổng đơn, hoàn thành, đang xử lý, dịch vụ)
-- Grid 10 service cards với icon + color riêng biệt, click để đặt đơn
-
-### 10 Dịch vụ Facebook
-Tất cả dùng chung `ServicePage` component:
-- Like Giá Rẻ, Like Chất Lượng, Like Bình Luận
-- Tăng Bình Luận, Follow, Like Page
-- Mem Group, Mắt Live, Share, VIP Like Tháng
-
-Mỗi trang có: **Package selector** → **Dynamic form fields** → **Submit với loading state** → **Result notification**
-
-### Nhật ký đơn hàng
-- Tìm kiếm theo loại dịch vụ + ID đơn
-- Bảng kết quả với status badges (done/processing/canceled/error)
-
-## Build Verification
-```
-✓ TypeScript compilation — 0 errors
-✓ Vite build — 2.32s
-✓ Output: 12.74KB CSS + 302KB JS (gzip ~104KB)
-✓ Dev server running at http://localhost:5173/
-```
-
-## Cách sử dụng
-1. Cập nhật file `.env` với API domain và key từ BaoStar
-2. Chạy `npm run dev` → mở `http://localhost:5173`
-3. Chọn dịch vụ → Chọn gói → Nhập thông tin → Tạo đơn
+Cả hai server đều đã sẵn sàng phục vụ.
