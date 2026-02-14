@@ -1,20 +1,11 @@
-# Session Tasks: TikTok Services Integration
+# Task: Instagram Services Integration
 
-## TikTok Services + Collapsible Sidebar
-- [x] Add `tiktokServices` to `services.ts` (8 services)
-- [x] Add TikTok entries to backend `serviceMap`
-- [x] Refactor Sidebar with collapsible sections (Facebook expanded, TikTok collapsed)
-- [x] Add TikTok route to `App.tsx`
-- [x] Update `ServicePage.tsx` to find services from both arrays
-- [x] Add collapsible CSS styles
-- [x] Restart backend + verify
-
-## Admin Panel - TikTok Configuration
-- [x] Add TikTok entries to admin `pricing-detail` serviceMap
-- [x] Add platform sub-tabs (Tất cả, Facebook, TikTok) to pricing config
-- [x] Implement service grouping with section headers in "Tất cả" view
-- [x] Fix invisible active tab bug (undefined `--accent-primary`)
-
-## Environment & Tooling
-- [x] Debug browser tool failure
-- [x] Fix missing `HOME` environment variable via `setx`
+- [/] Add `instagramServices` to `src/config/services.ts`
+- [ ] Add backend serviceMap entries (`server/routes/services.ts`)
+- [ ] Add admin serviceMap entries (`server/routes/admin.ts`)
+- [ ] Add Instagram route to `src/App.tsx`
+- [ ] Update `ServicePage.tsx` to include Instagram
+- [ ] Add Instagram section to `Sidebar.tsx`
+- [ ] Add Instagram section to `Dashboard.tsx`
+- [ ] Add Instagram platform tab to `AdminPage.tsx`
+- [ ] Restart backend & verify

@@ -1,6 +1,6 @@
 {
   "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary": "Plan to add TikTok services to the Auto-Like platform. Covers service config, sidebar navigation, routing, and backend serviceMap. Lists all 8 TikTok services from BaoStar API with their endpoints and field configurations.",
-  "updatedAt": "2026-02-14T04:22:39.447112Z",
-  "version": "6"
+  "summary": "Plan to add 6 Instagram services from BaoStar API, with changes to frontend config, sidebar, routing, service page, dashboard, admin pricing, and backend service maps.",
+  "updatedAt": "2026-02-14T06:51:07.062283700Z",
+  "version": "7"
 }

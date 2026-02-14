@@ -1,53 +1,70 @@
-# Thêm TikTok Services
+# Instagram Services Integration
 
-Thêm nền tảng TikTok vào Auto-Like, sử dụng các endpoint có sẵn từ BaoStar API.
+Add 6 Instagram services from BaoStar API with full integration across all components.
 
-## BaoStar TikTok Endpoints (từ `/api/prices`)
+## BaoStar Instagram Services
 
-| Path | Tên | Loại |
-|------|-----|------|
-| `/tiktok-like` | Tăng like tiktok | like |
-| `/tiktok-follow` | Tăng follow tiktok | follow |
-| `/tiktok-view` | Tăng view tiktok | view |
-| `/tiktok-save` | Tăng save Tiktok | save |
-| `/tiktok-comment` | Tăng comment tiktok | comment |
-| `/tiktok-share` | Tăng share tiktok | share |
-| `/tiktok-live` | Tăng mắt live tiktok | live |
-| `/tiktok-vip-mat` | Vip mắt tiktok | vip |
-
-> **Bỏ qua:** `tiktok-vip-binh-luan` (VIP phức tạp), `tiktok-free` (miễn phí)
+| Path | Service Name | Fields |
+|------|-------------|--------|
+| `/instagram-like` | Tăng Like | Link bài viết, Số lượng |
+| `/instagram-follow` | Tăng Follow | Link profile, Số lượng |
+| `/instagram-comment` | Tăng Bình Luận | Link bài viết, Nội dung |
+| `/instagram-view` | Tăng View + Live | Link video/live, Số lượng |
+| `/instagram-view-story` | Tăng View Story | Link story, Số lượng |
+| `/instagram-vip-like` | VIP Like | Link profile, Số ngày |
 
 ## Proposed Changes
 
-### Frontend
-
+### Frontend Config
 #### [MODIFY] [services.ts](file:///I:/Website/Auto-like/src/config/services.ts)
-- Thêm `tiktokServices` array (8 services) với fields tương ứng
-- Export `serviceCategories` gồm cả facebook + tiktok
+- Add `instagramServices: ServiceConfig[]` array with 6 services
+- Update `serviceCategories` to include `instagram`
 
+---
+
+### Navigation
 #### [MODIFY] [Sidebar.tsx](file:///I:/Website/Auto-like/src/components/Sidebar.tsx)
-- Import `tiktokServices` + TikTok icon
-- Thêm section "TIKTOK" tương tự section "FACEBOOK"
-- Link: `/tiktok/:serviceId`
+- Add Instagram `ServiceSection` (collapsed by default, pink/gradient icon)
+- Import `Instagram` icon from lucide-react
 
 #### [MODIFY] [App.tsx](file:///I:/Website/Auto-like/src/App.tsx)
-- Thêm route: `<Route path="tiktok/:serviceId" element={<ServicePage />} />`
+- Add route `<Route path="instagram/:serviceId" element={<ServicePage />} />`
 
 #### [MODIFY] [ServicePage.tsx](file:///I:/Website/Auto-like/src/pages/ServicePage.tsx)
-- Tìm service từ cả `facebookServices` + `tiktokServices`
+- Add `instagramServices` to `allServices` array
+
+---
+
+### Dashboard
+#### [MODIFY] [Dashboard.tsx](file:///I:/Website/Auto-like/src/pages/Dashboard.tsx)
+- Add Instagram services grid section
+- Update service count: `facebookServices.length + tiktokServices.length + instagramServices.length`
+- Import `Instagram` icon and `instagramServices`
+
+---
+
+### Admin Panel
+#### [MODIFY] [AdminPage.tsx](file:///I:/Website/Auto-like/src/pages/AdminPage.tsx)
+- Add "Instagram" platform sub-tab button
+- Update filter/grouping logic to handle `instagram` platform
+- Update `pricingPlatform` type to include `'instagram'`
 
 ---
 
 ### Backend
-
 #### [MODIFY] [services.ts](file:///I:/Website/Auto-like/server/routes/services.ts)
-- Thêm 8 TikTok entries vào `serviceMap`:
-  ```
-  '/tiktok-like': 'tiktok-like',
-  '/tiktok-follow': 'tiktok-follow', ...
-  ```
+- Add 6 Instagram entries to `serviceMap`
 
-## Verification
-- Sidebar hiện section TikTok
-- Vào dịch vụ TikTok → thấy packages từ BaoStar
-- Mua dịch vụ → tạo đơn hàng đúng
+#### [MODIFY] [admin.ts](file:///I:/Website/Auto-like/server/routes/admin.ts)
+- Add 6 Instagram entries to pricing-detail `serviceMap`
+
+---
+
+### Styles
+#### [MODIFY] [index.css](file:///I:/Website/Auto-like/src/index.css)
+- No changes needed (reuses existing service card + sidebar styles)
+
+## Verification Plan
+- Visual check via browser tool: Dashboard shows updated count + Instagram grid
+- Admin → Cấu hình giá → Instagram tab shows services
+- Sidebar shows Instagram section
