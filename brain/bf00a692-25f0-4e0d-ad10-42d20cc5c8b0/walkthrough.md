@@ -97,7 +97,26 @@ Added order history tab to ServicePage for tracking service-specific purchases:
 - **Dashboard**: Verified new services appear and stats are correct.
 - **Admin Pricing**: Confirmed Instagram tab shows all 6 services with configurable prices.
 
-![Admin Pricing Configuration - Instagram Tab](admin_pricing_instagram_final_1771055331761.png)
+### 4. UI Refinements
+- **Sidebar Titles**: Standardized display for all providers (Facebook, TikTok, Instagram).
+    - Titles are now **Uppercase** (FACEBOOK, TIKTOK, INSTAGRAM).
+    - Font size increased to **13px** (Extra Bold) for better visibility in the sidebar.
+- **Dashboard**: Reverted service section titles to original style (Title Case, 18px).
+
+![Sidebar UI Refinement](sidebar_titles_refinement_1771056243753.png)
+
+### 5. Branding Updates
+- **TikTok Icon**: Replaced standard Music icon with custom `tiktok.png` logo.
+    - Implemented `TikTokIcon` component to wrap the image.
+    - Updated Sidebar and Dashboard to use the new component.
+    - Preserved Lucide-compatible props (size, style) for seamless integration.
+
+![TikTok Icon Verification](tiktok_icons_verification_1771056523565.png)
+
+### 6. Admin Panel UI Refinements
+- **Statistics Icons**: Increased size from 24px to **40px** for better visibility in the analytics cards.
+
+![Admin Stats Verification](admin_stats_icons_verified_1771056864684.png)
 
 ---
 

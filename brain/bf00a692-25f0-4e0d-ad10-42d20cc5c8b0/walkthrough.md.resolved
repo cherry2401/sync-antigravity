@@ -28,7 +28,7 @@ Added comprehensive TikTok service support via BaoStar API:
 Refactored sidebar to support multiple platforms with expand/collapse functionality:
 
 **Key Features:**
-- ✅ Reusable [ServiceSection](file:///I:/Website/Auto-like/src/components/Sidebar.tsx#30-68) component
+- ✅ Reusable [ServiceSection](file:///I:/Website/Auto-like/src/components/Sidebar.tsx#31-69) component
 - ✅ Facebook expanded by default, TikTok collapsed
 - ✅ Smooth CSS transitions (max-height + chevron rotation)
 - ✅ Auto-expand when navigating to service within collapsed section
@@ -89,7 +89,7 @@ Added order history tab to ServicePage for tracking service-specific purchases:
 - **Backend**: Updated `serviceMap` in [server/routes/services.ts](file:///I:/Website/Auto-like/server/routes/services.ts) and [server/routes/admin.ts](file:///I:/Website/Auto-like/server/routes/admin.ts).
 - **Frontend**:
     - [App.tsx](file:///I:/Website/Auto-like/src/App.tsx): Added `instagram/:serviceId` route.
-    - [Sidebar.tsx](file:///I:/Website/Auto-like/src/components/Sidebar.tsx): Added [ServiceSection](file:///I:/Website/Auto-like/src/components/Sidebar.tsx#30-68) for Instagram.
+    - [Sidebar.tsx](file:///I:/Website/Auto-like/src/components/Sidebar.tsx): Added [ServiceSection](file:///I:/Website/Auto-like/src/components/Sidebar.tsx#31-69) for Instagram.
     - [Dashboard.tsx](file:///I:/Website/Auto-like/src/pages/Dashboard.tsx): Added Instagram grid & updated stats.
     - [AdminPage.tsx](file:///I:/Website/Auto-like/src/pages/AdminPage.tsx): Added Instagram platform filtering.
 
@@ -97,7 +97,26 @@ Added order history tab to ServicePage for tracking service-specific purchases:
 - **Dashboard**: Verified new services appear and stats are correct.
 - **Admin Pricing**: Confirmed Instagram tab shows all 6 services with configurable prices.
 
-![Admin Pricing Configuration - Instagram Tab](admin_pricing_instagram_final_1771055331761.png)
+### 4. UI Refinements
+- **Sidebar Titles**: Standardized display for all providers (Facebook, TikTok, Instagram).
+    - Titles are now **Uppercase** (FACEBOOK, TIKTOK, INSTAGRAM).
+    - Font size increased to **13px** (Extra Bold) for better visibility in the sidebar.
+- **Dashboard**: Reverted service section titles to original style (Title Case, 18px).
+
+![Sidebar UI Refinement](sidebar_titles_refinement_1771056243753.png)
+
+### 5. Branding Updates
+- **TikTok Icon**: Replaced standard Music icon with custom [tiktok.png](file:///I:/Website/Auto-like/tiktok.png) logo.
+    - Implemented [TikTokIcon](file:///I:/Website/Auto-like/src/components/TikTokIcon.tsx#9-21) component to wrap the image.
+    - Updated Sidebar and Dashboard to use the new component.
+    - Preserved Lucide-compatible props (size, style) for seamless integration.
+
+![TikTok Icon Verification](tiktok_icons_verification_1771056523565.png)
+
+### 6. Admin Panel UI Refinements
+- **Statistics Icons**: Increased size from 24px to **40px** for better visibility in the analytics cards.
+
+![Admin Stats Verification](admin_stats_icons_verified_1771056864684.png)
 
 ---
 
