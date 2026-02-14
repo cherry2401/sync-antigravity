@@ -1,24 +1,37 @@
-# Walkthrough: Server Restart
+# Walkthrough: Lịch sử đơn hàng — Service Page Tab
 
-Đã khởi động lại thành công hệ thống Auto-Like.
+## Tổng quan
+Thêm tab **"Lịch sử đơn"** bên cạnh tab **"Chọn gói dịch vụ"** trong trang Service Page, cho phép user xem đơn hàng đã mua cho dịch vụ đang xem.
 
-## Các bước đã thực hiện
+## Các thay đổi
 
-1.  **Restart Frontend (Vite):**
-    - Chạy `npm run dev` tại thư mục gốc.
-    - Frontend hiện đang chạy tại [http://localhost:5173](http://localhost:5173).
+### 1. Backend — Filter orders by service
+**File:** [orders.ts](file:///I:/Website/Auto-like/server/routes/orders.ts)
 
-2.  **Restart Backend (Express):**
-    - Chạy `npx tsx index.ts` tại thư mục `server`.
-    - Đã xác minh backend hoạt động bình thường qua health check.
-    - Backend hiện đang chạy tại [http://localhost:3001](http://localhost:3001).
+- `GET /api/orders` hỗ trợ query param `?service_id=xxx`
+- Khi có `service_id` → chỉ trả đơn hàng của dịch vụ đó
+- Không có → trả tất cả (backward compatible)
 
-## Kết quả kiểm tra (Verification)
+### 2. Frontend — Tab UI + Order History
+**File:** [ServicePage.tsx](file:///I:/Website/Auto-like/src/pages/ServicePage.tsx)
 
-### Backend Health Check
-```bash
-curl.exe -s http://localhost:3001/health
-{"status":"ok","time":"2026-02-12T06:42:07.941Z"}
-```
+- **State mới:** `activeTab`, `serviceOrders`, `loadingOrders`
+- **Tab bar** thay thế label "Chọn gói dịch vụ":
+  - 📦 Chọn gói dịch vụ (mặc định)
+  - 📋 Lịch sử đơn (chỉ hiện khi đăng nhập, kèm badge số đơn)
+- **Order history table** gồm: Mã đơn, Gói, UID, SL, Giá, Trạng thái, Thời gian
+- **Status badges:** Đang chạy (vàng), Hoàn thành (xanh), Thất bại (đỏ)
+- **Empty state** với icon khi chưa có đơn
+- Auto-fetch khi chuyển sang tab history
 
-Cả hai server đều đã sẵn sàng phục vụ.
+### 3. CSS
+**File:** [index.css](file:///I:/Website/Auto-like/src/index.css)
+
+- `.service-tabs` / `.service-tab` — tab bar với active underline
+- `.order-history-table` — compact table với hover, scrollable trên mobile
+- `.order-status-badge` — 3 trạng thái: processing/completed/failed
+- `.tab-badge` — counter nhỏ trên tab
+
+## Verification
+- Frontend (`localhost:5173`) và Backend (`localhost:3001`) đều running OK
+- Health check: `{"status":"ok"}`

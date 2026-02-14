@@ -1,0 +1,8 @@
+# Task: Service Order History Tab
+
+- [x] Backend: Add `service_id` filter to `GET /api/orders`
+- [x] Frontend: Add tab state + order history fetch logic to [ServicePage.tsx](file:///I:/Website/Auto-like/src/pages/ServicePage.tsx)
+- [x] Frontend: Add tab bar UI replacing "Chọn gói dịch vụ" label
+- [x] Frontend: Render order history table in second tab
+- [x] CSS: Tab bar + order table + status badge styles
+- [x] Verify: Both servers running, frontend serving OK

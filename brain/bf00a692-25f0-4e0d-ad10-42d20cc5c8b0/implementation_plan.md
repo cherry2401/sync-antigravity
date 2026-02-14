@@ -1,98 +1,64 @@
-# Auto-Like: BaoStar Facebook Services Web App
+# Thêm Tab "Lịch sử đơn hàng" trong Service Page
 
-Xây dựng web app React TypeScript tích hợp API BaoStar để cung cấp dịch vụ tăng tương tác Facebook. Giao diện dark theme, hiện đại, premium.
+Thêm tab "Lịch sử đơn hàng" bên cạnh tab "Chọn gói dịch vụ" trong trang đặt dịch vụ. Tab này hiển thị các đơn hàng đã mua cho dịch vụ hiện tại.
 
 ## Proposed Changes
 
-### Project Initialization
+### Backend — Filter orders by service
 
-#### [NEW] Vite + React + TypeScript Project
-- Khởi tạo bằng `npx create-vite@latest ./ --template react-ts`
-- Cài thêm: `react-router-dom`, `axios`, `react-hot-toast`, `lucide-react`
+#### [MODIFY] [orders.ts](file:///I:/Website/Auto-like/server/routes/orders.ts)
 
----
+Thêm query param `service_id` vào `GET /api/orders`:
 
-### Config & Environment
-
-#### [NEW] [.env.example](file:///I:/Website/Auto-like/.env.example)
-```
-VITE_API_DOMAIN=https://your-domain.com
-VITE_API_KEY=your-api-key-here
+```diff
+- FROM orders WHERE user_id = ?
++ FROM orders WHERE user_id = ? AND (? IS NULL OR service_id = ?)
 ```
 
-#### [NEW] [.gitignore](file:///I:/Website/Auto-like/.gitignore)
-Standard Vite/Node gitignore
+Khi gọi `/api/orders?service_id=like-bai-viet` → chỉ trả về đơn hàng của dịch vụ đó.
 
 ---
 
-### API Service Layer
+### Frontend — Tab UI + Order History Table
 
-#### [NEW] [api.ts](file:///I:/Website/Auto-like/src/services/api.ts)
-- Axios instance với `baseURL` và `api-key` header từ env
-- Hàm `buyService(endpoint, body)` - gọi POST mua dịch vụ
-- Hàm `getPackages()` - GET `/api/prices` lấy danh sách gói
-- Hàm `getOrderLogs(type, ids)` - POST `/api/logs-order`
+#### [MODIFY] [ServicePage.tsx](file:///I:/Website/Auto-like/src/pages/ServicePage.tsx)
 
-#### [NEW] [types.ts](file:///I:/Website/Auto-like/src/types/index.ts)
-- `Package`, `ServiceCategory`, `OrderResponse`, `OrderLog`, `BuyRequest`
+1. **Thêm state:**
+   - `activeTab: 'packages' | 'history'`
+   - `serviceOrders: Order[]`
+   - `loadingOrders: boolean`
 
----
+2. **Thêm tab bar** thay thế label "Chọn gói dịch vụ":
+   ```
+   ┌─────────────────┬──────────────────┐
+   │ 📦 Chọn gói DV  │ 📋 Lịch sử đơn  │
+   └─────────────────┴──────────────────┘
+   ```
 
-### UI Components & Pages
+3. **Tab "Lịch sử đơn"** hiển thị bảng:
+   - Cột: Mã đơn | Gói | UID | Số lượng | Giá | Trạng thái | Thời gian
+   - Status badges: `processing` (vàng), `completed` (xanh), `failed` (đỏ)
+   - Empty state nếu chưa có đơn
+   - Chỉ hiển thị khi đã đăng nhập
 
-#### [NEW] [App.tsx](file:///I:/Website/Auto-like/src/App.tsx)
-- React Router setup với tất cả routes
-
-#### [NEW] [Layout.tsx](file:///I:/Website/Auto-like/src/components/Layout.tsx)
-- Dark theme sidebar + header + main content area
-- Sidebar chứa menu Facebook services
-- Header hiển thị tên app + thông tin
-
-#### [NEW] [ServicePage.tsx](file:///I:/Website/Auto-like/src/components/ServicePage.tsx)
-- Component tái sử dụng cho mọi trang dịch vụ Facebook
-- Chọn gói → Nhập object_id + quantity → Submit
-- Hiển thị kết quả + toast notification
-
-#### [NEW] [Dashboard.tsx](file:///I:/Website/Auto-like/src/pages/Dashboard.tsx)
-- Trang tổng quan với thống kê, các dịch vụ nổi bật
-
-#### [NEW] [OrderHistory.tsx](file:///I:/Website/Auto-like/src/pages/OrderHistory.tsx)
-- Xem nhật ký đơn hàng từ `/api/logs-order`
-
-#### [NEW] [index.css](file:///I:/Website/Auto-like/src/index.css)
-- Dark theme design system: CSS variables, gradients, glassmorphism
-- Responsive layout, animations, hover effects
+4. **Fetch orders** khi chuyển sang tab history hoặc khi mua thành công
 
 ---
 
-### Facebook Service Routes
-Tất cả dùng chung `ServicePage` component, khác nhau ở `endpoint` và `packages`:
+### CSS — Tab & Table Styles
 
-| Route | Endpoint API |
-|-------|-------------|
-| `/like-gia-re` | `/api/facebook-like-gia-re/buy` |
-| `/like-chat-luong` | `/api/facebook-like-chat-luong/buy` |
-| `/like-comment` | `/api/facebook-like-binh-luan/buy` |
-| `/comment` | `/api/facebook-binh-luan/buy` |
-| `/follow` | `/api/facebook-follow/buy` |
-| `/like-page` | `/api/facebook-like-page/buy` |
-| `/mem-group` | `/api/facebook-mem-group/buy` |
-| `/mat-live` | `/api/facebook-eyes/buy` |
-| `/share` | `/api/facebook-share/buy` |
-| `/vip` | `/api/facebook-vip-clone/buy` |
+#### [MODIFY] [index.css](file:///I:/Website/Auto-like/src/index.css)
 
----
+- `.service-tabs` — flexbox tab bar với border-bottom
+- `.service-tab` — tab button với active state underline
+- `.order-history-table` — compact table phù hợp với form card
+- `.order-status-badge` — badge cho processing/completed/failed
+- Mobile responsive cho table (horizontal scroll)
 
 ## Verification Plan
 
-### Automated
-```bash
-npm run build
-```
-- Build phải pass không lỗi TypeScript
-
-### Manual (Browser)
-1. Chạy `npm run dev`
-2. Mở `http://localhost:5173`
-3. Kiểm tra: Sidebar hiển thị đủ menu → Click từng item → Form hiển thị đúng
-4. Kiểm tra responsive trên mobile viewport
+### Manual
+- Chuyển qua lại giữa 2 tab
+- Mua đơn hàng → chuyển sang tab history → thấy đơn mới
+- Khi chưa đăng nhập → tab history ẩn hoặc hiện thông báo
+- Kiểm tra mobile responsive
