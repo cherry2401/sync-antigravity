@@ -1,5 +1,6 @@
-# Task: TikTok Services + Collapsible Sidebar
+# Session Tasks: TikTok Services Integration
 
+## TikTok Services + Collapsible Sidebar
 - [x] Add `tiktokServices` to `services.ts` (8 services)
 - [x] Add TikTok entries to backend `serviceMap`
 - [x] Refactor Sidebar with collapsible sections (Facebook expanded, TikTok collapsed)
@@ -7,3 +8,13 @@
 - [x] Update `ServicePage.tsx` to find services from both arrays
 - [x] Add collapsible CSS styles
 - [x] Restart backend + verify
+
+## Admin Panel - TikTok Configuration
+- [x] Add TikTok entries to admin `pricing-detail` serviceMap
+- [x] Add platform sub-tabs (Tất cả, Facebook, TikTok) to pricing config
+- [x] Implement service grouping with section headers in "Tất cả" view
+- [x] Fix invisible active tab bug (undefined `--accent-primary`)
+
+## Environment & Tooling
+- [x] Debug browser tool failure
+- [x] Fix missing `HOME` environment variable via `setx`

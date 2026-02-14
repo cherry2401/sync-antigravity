@@ -1,6 +1,6 @@
 {
   "artifactType": "ARTIFACT_TYPE_WALKTHROUGH",
-  "summary": "Walkthrough documenting the Order History tab feature implementation - backend filter, frontend tabs, CSS styles.",
-  "updatedAt": "2026-02-14T04:09:19.508985300Z",
-  "version": "4"
+  "summary": "Comprehensive walkthrough of TikTok services integration including collapsible sidebar, admin platform filtering, order history tabs, and bug fixes. Documents all code changes, CSS updates, and environment fixes.",
+  "updatedAt": "2026-02-14T04:59:23.076346100Z",
+  "version": "5"
 }
