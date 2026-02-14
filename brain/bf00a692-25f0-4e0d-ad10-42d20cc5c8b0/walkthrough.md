@@ -72,6 +72,35 @@ Added order history tab to ServicePage for tracking service-specific purchases:
 - [ServicePage.tsx](file:///I:/Website/Auto-like/src/pages/ServicePage.tsx) — Added tab state, order fetching, and table rendering
 - [index.css](file:///I:/Website/Auto-like/src/index.css) — Added `.service-tabs`, `.order-history-table`, status badge styles
 
+### Project Walkthrough - Auto-Like Platform
+
+## 📅 2026-02-14: Instagram Services Integration
+**Goal**: Integrate 6 Instagram services from BaoStar API (Like, Follow, Comment, View, View Story, VIP Like) into the platform.
+
+### 1. Key Features Added
+- **Instagram Service Support**: Fully integrated 6 new services.
+- **Sidebar Update**: Added "Instagram" section (collapsed by default) with gradient pink icon.
+- **Dashboard Update**: Added Instagram services grid and updated "Dịch vụ khả dụng" count (Total: 24).
+- **Admin Panel**: Added "Instagram" tab in Pricing Configuration for managing markups/visibility.
+- **Backend Routing**: Mapped 6 new BaoStar endpoints to local service IDs.
+
+### 2. Changes Implemented
+- **Config**: Added `instagramServices` to `src/config/services.ts`.
+- **Backend**: Updated `serviceMap` in `server/routes/services.ts` and `server/routes/admin.ts`.
+- **Frontend**:
+    - `App.tsx`: Added `instagram/:serviceId` route.
+    - `Sidebar.tsx`: Added `ServiceSection` for Instagram.
+    - `Dashboard.tsx`: Added Instagram grid & updated stats.
+    - `AdminPage.tsx`: Added Instagram platform filtering.
+
+### 3. Verification
+- **Dashboard**: Verified new services appear and stats are correct.
+- **Admin Pricing**: Confirmed Instagram tab shows all 6 services with configurable prices.
+
+![Admin Pricing Configuration - Instagram Tab](admin_pricing_instagram_final_1771055331761.png)
+
+---
+
 ### 5. Routing & Multi-Platform Support
 Updated routing to handle both Facebook and TikTok services:
 

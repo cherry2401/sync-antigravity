@@ -1,11 +1,11 @@
 # Task: Instagram Services Integration
 
-- [/] Add `instagramServices` to [src/config/services.ts](file:///I:/Website/Auto-like/src/config/services.ts)
-- [ ] Add backend serviceMap entries ([server/routes/services.ts](file:///I:/Website/Auto-like/server/routes/services.ts))
-- [ ] Add admin serviceMap entries ([server/routes/admin.ts](file:///I:/Website/Auto-like/server/routes/admin.ts))
-- [ ] Add Instagram route to [src/App.tsx](file:///I:/Website/Auto-like/src/App.tsx)
-- [ ] Update [ServicePage.tsx](file:///I:/Website/Auto-like/src/pages/ServicePage.tsx) to include Instagram
-- [ ] Add Instagram section to [Sidebar.tsx](file:///I:/Website/Auto-like/src/components/Sidebar.tsx)
-- [ ] Add Instagram section to [Dashboard.tsx](file:///I:/Website/Auto-like/src/pages/Dashboard.tsx)
-- [ ] Add Instagram platform tab to [AdminPage.tsx](file:///I:/Website/Auto-like/src/pages/AdminPage.tsx)
-- [ ] Restart backend & verify
+- [x] Add `instagramServices` to [src/config/services.ts](file:///I:/Website/Auto-like/src/config/services.ts)
+- [x] Add backend serviceMap entries ([server/routes/services.ts](file:///I:/Website/Auto-like/server/routes/services.ts))
+- [x] Add admin serviceMap entries ([server/routes/admin.ts](file:///I:/Website/Auto-like/server/routes/admin.ts))
+- [x] Add Instagram route to [src/App.tsx](file:///I:/Website/Auto-like/src/App.tsx)
+- [x] Update [ServicePage.tsx](file:///I:/Website/Auto-like/src/pages/ServicePage.tsx) to include Instagram
+- [x] Add Instagram section to [Sidebar.tsx](file:///I:/Website/Auto-like/src/components/Sidebar.tsx)
+- [x] Add Instagram section to [Dashboard.tsx](file:///I:/Website/Auto-like/src/pages/Dashboard.tsx)
+- [x] Add Instagram platform tab to [AdminPage.tsx](file:///I:/Website/Auto-like/src/pages/AdminPage.tsx)
+- [x] Restart backend & verify
