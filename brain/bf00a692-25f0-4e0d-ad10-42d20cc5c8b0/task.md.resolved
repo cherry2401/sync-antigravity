@@ -3,4 +3,5 @@
 - [x] Backend: Add `GET /admin/deposit-history` endpoint
 - [x] Frontend: Add "Lịch sử nạp" tab to [AdminPage.tsx](file:///I:/Website/Auto-like/src/pages/AdminPage.tsx)
 - [x] Frontend: Implement deposit history table with pagination/filtering
+- [x] Frontend: Refactor [DepositPage](file:///I:/Website/Auto-like/src/pages/DepositPage.tsx#7-175) to use tabs (Transfer / History)
 - [ ] Verification: Verify data display and layout matching screenshot
