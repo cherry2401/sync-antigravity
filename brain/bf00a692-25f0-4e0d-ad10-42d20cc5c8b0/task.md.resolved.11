@@ -1,0 +1,9 @@
+# Task: TikTok Services + Collapsible Sidebar
+
+- [ ] Add `tiktokServices` to [services.ts](file:///I:/Website/Auto-like/src/config/services.ts)
+- [ ] Add TikTok entries to backend `serviceMap`
+- [ ] Refactor Sidebar with collapsible sections (Facebook expanded, TikTok collapsed)
+- [ ] Add TikTok route to [App.tsx](file:///I:/Website/Auto-like/src/App.tsx)
+- [ ] Update [ServicePage.tsx](file:///I:/Website/Auto-like/src/pages/ServicePage.tsx) to find services from both arrays
+- [ ] Add collapsible CSS styles
+- [ ] Restart backend + verify

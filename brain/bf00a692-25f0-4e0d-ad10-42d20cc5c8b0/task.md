@@ -1,8 +1,9 @@
-# Task: Service Order History Tab
+# Task: TikTok Services + Collapsible Sidebar
 
-- [x] Backend: Add `service_id` filter to `GET /api/orders`
-- [x] Frontend: Add tab state + order history fetch logic to `ServicePage.tsx`
-- [x] Frontend: Add tab bar UI replacing "Chọn gói dịch vụ" label
-- [x] Frontend: Render order history table in second tab
-- [x] CSS: Tab bar + order table + status badge styles
-- [x] Verify: Both servers running, frontend serving OK
+- [x] Add `tiktokServices` to `services.ts` (8 services)
+- [x] Add TikTok entries to backend `serviceMap`
+- [x] Refactor Sidebar with collapsible sections (Facebook expanded, TikTok collapsed)
+- [x] Add TikTok route to `App.tsx`
+- [x] Update `ServicePage.tsx` to find services from both arrays
+- [x] Add collapsible CSS styles
+- [x] Restart backend + verify

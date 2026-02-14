@@ -1,64 +1,53 @@
-# Thêm Tab "Lịch sử đơn hàng" trong Service Page
+# Thêm TikTok Services
 
-Thêm tab "Lịch sử đơn hàng" bên cạnh tab "Chọn gói dịch vụ" trong trang đặt dịch vụ. Tab này hiển thị các đơn hàng đã mua cho dịch vụ hiện tại.
+Thêm nền tảng TikTok vào Auto-Like, sử dụng các endpoint có sẵn từ BaoStar API.
+
+## BaoStar TikTok Endpoints (từ `/api/prices`)
+
+| Path | Tên | Loại |
+|------|-----|------|
+| `/tiktok-like` | Tăng like tiktok | like |
+| `/tiktok-follow` | Tăng follow tiktok | follow |
+| `/tiktok-view` | Tăng view tiktok | view |
+| `/tiktok-save` | Tăng save Tiktok | save |
+| `/tiktok-comment` | Tăng comment tiktok | comment |
+| `/tiktok-share` | Tăng share tiktok | share |
+| `/tiktok-live` | Tăng mắt live tiktok | live |
+| `/tiktok-vip-mat` | Vip mắt tiktok | vip |
+
+> **Bỏ qua:** `tiktok-vip-binh-luan` (VIP phức tạp), `tiktok-free` (miễn phí)
 
 ## Proposed Changes
 
-### Backend — Filter orders by service
+### Frontend
 
-#### [MODIFY] [orders.ts](file:///I:/Website/Auto-like/server/routes/orders.ts)
+#### [MODIFY] [services.ts](file:///I:/Website/Auto-like/src/config/services.ts)
+- Thêm `tiktokServices` array (8 services) với fields tương ứng
+- Export `serviceCategories` gồm cả facebook + tiktok
 
-Thêm query param `service_id` vào `GET /api/orders`:
+#### [MODIFY] [Sidebar.tsx](file:///I:/Website/Auto-like/src/components/Sidebar.tsx)
+- Import `tiktokServices` + TikTok icon
+- Thêm section "TIKTOK" tương tự section "FACEBOOK"
+- Link: `/tiktok/:serviceId`
 
-```diff
-- FROM orders WHERE user_id = ?
-+ FROM orders WHERE user_id = ? AND (? IS NULL OR service_id = ?)
-```
-
-Khi gọi `/api/orders?service_id=like-bai-viet` → chỉ trả về đơn hàng của dịch vụ đó.
-
----
-
-### Frontend — Tab UI + Order History Table
+#### [MODIFY] [App.tsx](file:///I:/Website/Auto-like/src/App.tsx)
+- Thêm route: `<Route path="tiktok/:serviceId" element={<ServicePage />} />`
 
 #### [MODIFY] [ServicePage.tsx](file:///I:/Website/Auto-like/src/pages/ServicePage.tsx)
-
-1. **Thêm state:**
-   - `activeTab: 'packages' | 'history'`
-   - `serviceOrders: Order[]`
-   - `loadingOrders: boolean`
-
-2. **Thêm tab bar** thay thế label "Chọn gói dịch vụ":
-   ```
-   ┌─────────────────┬──────────────────┐
-   │ 📦 Chọn gói DV  │ 📋 Lịch sử đơn  │
-   └─────────────────┴──────────────────┘
-   ```
-
-3. **Tab "Lịch sử đơn"** hiển thị bảng:
-   - Cột: Mã đơn | Gói | UID | Số lượng | Giá | Trạng thái | Thời gian
-   - Status badges: `processing` (vàng), `completed` (xanh), `failed` (đỏ)
-   - Empty state nếu chưa có đơn
-   - Chỉ hiển thị khi đã đăng nhập
-
-4. **Fetch orders** khi chuyển sang tab history hoặc khi mua thành công
+- Tìm service từ cả `facebookServices` + `tiktokServices`
 
 ---
 
-### CSS — Tab & Table Styles
+### Backend
 
-#### [MODIFY] [index.css](file:///I:/Website/Auto-like/src/index.css)
+#### [MODIFY] [services.ts](file:///I:/Website/Auto-like/server/routes/services.ts)
+- Thêm 8 TikTok entries vào `serviceMap`:
+  ```
+  '/tiktok-like': 'tiktok-like',
+  '/tiktok-follow': 'tiktok-follow', ...
+  ```
 
-- `.service-tabs` — flexbox tab bar với border-bottom
-- `.service-tab` — tab button với active state underline
-- `.order-history-table` — compact table phù hợp với form card
-- `.order-status-badge` — badge cho processing/completed/failed
-- Mobile responsive cho table (horizontal scroll)
-
-## Verification Plan
-
-### Manual
-- Chuyển qua lại giữa 2 tab
-- Mua đơn hàng → chuyển sang tab history → thấy đơn mới
-- Khi chưa đăng nhập → tab history ẩn hoặc hiện thông báo
-- Kiểm tra mobile responsive
+## Verification
+- Sidebar hiện section TikTok
+- Vào dịch vụ TikTok → thấy packages từ BaoStar
+- Mua dịch vụ → tạo đơn hàng đúng
