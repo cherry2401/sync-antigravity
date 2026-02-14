@@ -1,6 +1,6 @@
 {
   "artifactType": "ARTIFACT_TYPE_TASK",
-  "summary": "Checklist for Instagram services integration across frontend config, routing, sidebar, dashboard, admin panel, and backend service maps.",
-  "updatedAt": "2026-02-14T06:54:03.104399700Z",
-  "version": "14"
+  "summary": "Checklist for implementing Admin Deposit History (Backend API, Frontend Tab, Table View).",
+  "updatedAt": "2026-02-14T08:31:32.716506100Z",
+  "version": "16"
 }

@@ -1,0 +1,6 @@
+# Task: Admin Deposit History
+
+- [ ] Backend: Add `GET /admin/deposit-history` endpoint
+- [ ] Frontend: Add "Lịch sử nạp" tab to [AdminPage.tsx](file:///I:/Website/Auto-like/src/pages/AdminPage.tsx)
+- [ ] Frontend: Implement deposit history table with pagination/filtering
+- [ ] Verification: Verify data display and layout matching screenshot

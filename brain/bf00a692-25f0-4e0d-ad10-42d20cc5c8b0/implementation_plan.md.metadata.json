@@ -1,6 +1,6 @@
 {
   "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary": "Plan to add 6 Instagram services from BaoStar API, with changes to frontend config, sidebar, routing, service page, dashboard, admin pricing, and backend service maps.",
-  "updatedAt": "2026-02-14T06:51:07.062283700Z",
-  "version": "7"
+  "summary": "Plan for implementing Admin Deposit History feature. Includes Backend API changes and Frontend UI updates for AdminPage.tsx.",
+  "updatedAt": "2026-02-14T08:31:32.857864500Z",
+  "version": "8"
 }

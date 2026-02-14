@@ -118,6 +118,26 @@ Added order history tab to ServicePage for tracking service-specific purchases:
 
 ![Admin Stats Verification](admin_stats_icons_verified_1771056864684.png)
 
+### 7. Admin Deposit History
+- **New Feature**: Added "Lịch sử nạp" tab to view deposit transactions.
+- **Table Columns**: ID, User, Date, Action, Amount, Description.
+
+![Deposit History](admin_panel_deposit_history_width_check_1771058284523.png)
+
+### 8. Admin Layout Fix
+- **Full Width**: Removed max-width restriction to allow the Admin Panel to stretch across the full screen.
+
+![Full Width Admin](admin_panel_full_width_check_1771058280695.png)
+
+### 9. Deposit Page Layout Refinement
+- **Compact Design**: Reduced the padding and size of the "Balance Card" to make it more proportionate and less "huge", while keeping the layout full width.
+
+![Deposit Page Improved](deposit_compact_card_check_1771059194955.png)
+
+---
+
+### 5. Routing & Multi-Platform Support
+
 ---
 
 ### 5. Routing & Multi-Platform Support

@@ -1,11 +1,6 @@
-# Task: Instagram Services Integration
+# Task: Admin Deposit History
 
-- [x] Add `instagramServices` to `src/config/services.ts`
-- [x] Add backend serviceMap entries (`server/routes/services.ts`)
-- [x] Add admin serviceMap entries (`server/routes/admin.ts`)
-- [x] Add Instagram route to `src/App.tsx`
-- [x] Update `ServicePage.tsx` to include Instagram
-- [x] Add Instagram section to `Sidebar.tsx`
-- [x] Add Instagram section to `Dashboard.tsx`
-- [x] Add Instagram platform tab to `AdminPage.tsx`
-- [x] Restart backend & verify
+- [x] Backend: Add `GET /admin/deposit-history` endpoint
+- [x] Frontend: Add "Lịch sử nạp" tab to `AdminPage.tsx`
+- [x] Frontend: Implement deposit history table with pagination/filtering
+- [ ] Verification: Verify data display and layout matching screenshot

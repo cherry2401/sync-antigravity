@@ -1,70 +1,26 @@
-# Instagram Services Integration
+# Admin Deposit History Implementation Plan
 
-Add 6 Instagram services from BaoStar API with full integration across all components.
-
-## BaoStar Instagram Services
-
-| Path | Service Name | Fields |
-|------|-------------|--------|
-| `/instagram-like` | Tăng Like | Link bài viết, Số lượng |
-| `/instagram-follow` | Tăng Follow | Link profile, Số lượng |
-| `/instagram-comment` | Tăng Bình Luận | Link bài viết, Nội dung |
-| `/instagram-view` | Tăng View + Live | Link video/live, Số lượng |
-| `/instagram-view-story` | Tăng View Story | Link story, Số lượng |
-| `/instagram-vip-like` | VIP Like | Link profile, Số ngày |
+## Goal
+Add a dedicated "Deposit History" (Lịch sử nạp) tab to the Admin Panel to view all user deposit transactions.
 
 ## Proposed Changes
 
-### Frontend Config
-#### [MODIFY] [services.ts](file:///I:/Website/Auto-like/src/config/services.ts)
-- Add `instagramServices: ServiceConfig[]` array with 6 services
-- Update `serviceCategories` to include `instagram`
-
----
-
-### Navigation
-#### [MODIFY] [Sidebar.tsx](file:///I:/Website/Auto-like/src/components/Sidebar.tsx)
-- Add Instagram `ServiceSection` (collapsed by default, pink/gradient icon)
-- Import `Instagram` icon from lucide-react
-
-#### [MODIFY] [App.tsx](file:///I:/Website/Auto-like/src/App.tsx)
-- Add route `<Route path="instagram/:serviceId" element={<ServicePage />} />`
-
-#### [MODIFY] [ServicePage.tsx](file:///I:/Website/Auto-like/src/pages/ServicePage.tsx)
-- Add `instagramServices` to `allServices` array
-
----
-
-### Dashboard
-#### [MODIFY] [Dashboard.tsx](file:///I:/Website/Auto-like/src/pages/Dashboard.tsx)
-- Add Instagram services grid section
-- Update service count: `facebookServices.length + tiktokServices.length + instagramServices.length`
-- Import `Instagram` icon and `instagramServices`
-
----
-
-### Admin Panel
-#### [MODIFY] [AdminPage.tsx](file:///I:/Website/Auto-like/src/pages/AdminPage.tsx)
-- Add "Instagram" platform sub-tab button
-- Update filter/grouping logic to handle `instagram` platform
-- Update `pricingPlatform` type to include `'instagram'`
-
----
-
 ### Backend
-#### [MODIFY] [services.ts](file:///I:/Website/Auto-like/server/routes/services.ts)
-- Add 6 Instagram entries to `serviceMap`
-
 #### [MODIFY] [admin.ts](file:///I:/Website/Auto-like/server/routes/admin.ts)
-- Add 6 Instagram entries to pricing-detail `serviceMap`
+- Add `GET /admin/deposit-history` endpoint.
+- Query `transactions` table filtering by `type = 'deposit'`.
+- Join with `users` table to get username (or rely on `user_id` if username is not needed, but screenshot shows "Mã đơn" which might be transaction ID, and maybe user info is implicit or needed). Screenshot shows "Diễn tả" (Description) which often contains "Hệ thống ACB nạp...".
+- Return fields: `id`, `created_at`, `amount`, `balance_after`, `description` (and maybe `user_id`/`username`).
 
----
-
-### Styles
-#### [MODIFY] [index.css](file:///I:/Website/Auto-like/src/index.css)
-- No changes needed (reuses existing service card + sidebar styles)
+### Frontend
+#### [MODIFY] [AdminPage.tsx](file:///I:/Website/Auto-like/src/pages/AdminPage.tsx)
+- Add new tab `deposits` ("Lịch sử nạp") to `tabs` array.
+- Create `DepositHistory` component or render logic within `AdminPage`.
+- Fetch data from `/admin/deposit-history` when tab is active.
+- Render table with columns: `#` (ID), `Mã đơn` (maybe transaction ID), `Ngày tạo`, `Hành động` (defaults to "Nạp ngân hàng ..."), `Số tiền` (Amount + Balance calculation), `Diễn tả`.
 
 ## Verification Plan
-- Visual check via browser tool: Dashboard shows updated count + Instagram grid
-- Admin → Cấu hình giá → Instagram tab shows services
-- Sidebar shows Instagram section
+1. Open Admin Panel.
+2. Click "Lịch sử nạp" tab.
+3. Verify table displays deposit transactions.
+4. Compare with screenshot (layout and data columns).
