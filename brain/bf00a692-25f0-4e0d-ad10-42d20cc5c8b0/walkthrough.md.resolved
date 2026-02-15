@@ -103,7 +103,7 @@ Added order history tab to ServicePage for tracking service-specific purchases:
     - Font size increased to **13px** (Extra Bold) for better visibility in the sidebar.
 - **Dashboard**: Reverted service section titles to original style (Title Case, 18px).
 
-![Sidebar UI Refinement](sidebar_titles_refinement_1771056243753.png)
+![Sidebar UI Refinement](/C:/Users/Cherry/.gemini/antigravity/brain/bf00a692-25f0-4e0d-ad10-42d20cc5c8b0/sidebar_titles_refinement_1771056243753.png)
 
 ### 5. Branding Updates
 - **TikTok Icon**: Replaced standard Music icon with custom [tiktok.png](file:///I:/Website/Auto-like/tiktok.png) logo.
@@ -111,36 +111,39 @@ Added order history tab to ServicePage for tracking service-specific purchases:
     - Updated Sidebar and Dashboard to use the new component.
     - Preserved Lucide-compatible props (size, style) for seamless integration.
 
-![TikTok Icon Verification](tiktok_icons_verification_1771056523565.png)
+![TikTok Icon Verification](/C:/Users/Cherry/.gemini/antigravity/brain/bf00a692-25f0-4e0d-ad10-42d20cc5c8b0/tiktok_icons_verification_1771056523565.png)
 
 ### 6. Admin Panel UI Refinements
-- **Statistics Icons**: Increased size from 24px to **40px** for better visibility in the analytics cards.
-
-![Admin Stats Verification](admin_stats_icons_verified_1771056864684.png)
-
 ### 7. Admin Deposit History
 - **New Feature**: Added "Lịch sử nạp" tab to view deposit transactions.
 - **Table Columns**: ID, User, Date, Action, Amount, Description.
 
-![Deposit History](admin_panel_deposit_history_width_check_1771058284523.png)
-
 ### 8. Admin Layout Fix
 - **Full Width**: Removed max-width restriction to allow the Admin Panel to stretch across the full screen.
-
-![Full Width Admin](admin_panel_full_width_check_1771058280695.png)
 
 ### 9. Deposit Page Layout Refinement
 - **Compact Design**: Reduced the padding and size of the "Balance Card" to make it more proportionate and less "huge", while keeping the layout full width.
 
-![Deposit Page Improved](deposit_compact_card_check_1771059194955.png)
+### 10. Auth Pages UI Refinement
+- **Icon Removal**: Removed the bolt icon (`⚡`) from both Login and Register pages for a cleaner design.
+- **Remember Me**: Added a "Ghi nhớ đăng nhập" checkbox to the Login page.
+
+#### [MODIFY] [LoginPage.tsx](file:///I:/Website/Auto-like/src/pages/LoginPage.tsx)
+```diff
+- <div className="auth-logo">⚡</div>
++ {/* Removed auth-logo */}
+...
++ <div className="auth-remember">
++     <label className="remember-label">
++         <input type="checkbox" ... />
++         <span>Ghi nhớ đăng nhập</span>
++     </label>
++ </div>
+```
 
 ---
 
-### 5. Routing & Multi-Platform Support
-
----
-
-### 5. Routing & Multi-Platform Support
+### 11. Routing & Multi-Platform Support
 Updated routing to handle both Facebook and TikTok services:
 
 **Changes:**

@@ -1,26 +1,26 @@
-# Admin Deposit History Implementation Plan
+# Refining Auth Pages UI
 
-## Goal
-Add a dedicated "Deposit History" (Lịch sử nạp) tab to the Admin Panel to view all user deposit transactions.
+The user wants to remove the bolt icon from the login and register pages for a cleaner look. Additionally, a "Remember Me" checkbox needs to be added to the login page to improve user experience.
 
 ## Proposed Changes
 
-### Backend
-#### [MODIFY] [admin.ts](file:///I:/Website/Auto-like/server/routes/admin.ts)
-- Add `GET /admin/deposit-history` endpoint.
-- Query `transactions` table filtering by `type = 'deposit'`.
-- Join with `users` table to get username (or rely on `user_id` if username is not needed, but screenshot shows "Mã đơn" which might be transaction ID, and maybe user info is implicit or needed). Screenshot shows "Diễn tả" (Description) which often contains "Hệ thống ACB nạp...".
-- Return fields: `id`, `created_at`, `amount`, `balance_after`, `description` (and maybe `user_id`/`username`).
+### Auth Component Refinement
 
-### Frontend
-#### [MODIFY] [AdminPage.tsx](file:///I:/Website/Auto-like/src/pages/AdminPage.tsx)
-- Add new tab `deposits` ("Lịch sử nạp") to `tabs` array.
-- Create `DepositHistory` component or render logic within `AdminPage`.
-- Fetch data from `/admin/deposit-history` when tab is active.
-- Render table with columns: `#` (ID), `Mã đơn` (maybe transaction ID), `Ngày tạo`, `Hành động` (defaults to "Nạp ngân hàng ..."), `Số tiền` (Amount + Balance calculation), `Diễn tả`.
+#### [MODIFY] [LoginPage.tsx](file:///I:/Website/Auto-like/src/pages/LoginPage.tsx)
+- Remove the `<div className="auth-logo">⚡</div>` element.
+- Add a "Ghi nhớ đăng nhập" checkbox section between the password field and the submit button.
+
+#### [MODIFY] [RegisterPage.tsx](file:///I:/Website/Auto-like/src/pages/RegisterPage.tsx)
+- Remove the `<div className="auth-logo">⚡</div>` element.
+
+#### [MODIFY] [index.css](file:///I:/Website/Auto-like/src/index.css)
+- Add styles for the "Remember Me" checkbox to ensure it fits the premium dark theme.
 
 ## Verification Plan
-1. Open Admin Panel.
-2. Click "Lịch sử nạp" tab.
-3. Verify table displays deposit transactions.
-4. Compare with screenshot (layout and data columns).
+
+### Manual Verification
+- Navigate to the login page and verify that:
+    - The bolt icon is gone.
+    - The "Remember Me" checkbox is present and correctly styled.
+- Navigate to the register page and verify that:
+    - The bolt icon is gone.

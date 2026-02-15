@@ -1,6 +1,6 @@
 {
   "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary": "Plan for implementing Admin Deposit History feature. Includes Backend API changes and Frontend UI updates for AdminPage.tsx.",
-  "updatedAt": "2026-02-14T08:31:32.857864500Z",
-  "version": "8"
+  "summary": "Implementation plan for removing icons from auth pages and adding a 'Remember Me' checkbox to the login page.",
+  "updatedAt": "2026-02-15T09:07:25.596506800Z",
+  "version": "9"
 }
