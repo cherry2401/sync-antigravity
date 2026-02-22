@@ -1,10 +1,8 @@
-# Task: Admin Deposit History
+# Task: Full Audit - Auto-like Project
 
-- [x] Backend: Add `GET /admin/deposit-history` endpoint
-- [x] Frontend: Add "Lịch sử nạp" tab to `AdminPage.tsx`
-- [x] Frontend: Implement deposit history table with pagination/filtering
-- [x] Frontend: Refactor `DepositPage` to use tabs (Transfer / History)
-- [x] UI: Remove bolt icon from LoginPage and RegisterPage
-- [x] UI: Add "Remember Me" checkbox to LoginPage
-- [x] CSS: Style the "Remember Me" checkbox
-- [x] Verification: Verify auth pages UI changes
+- [x] Security Audit (Auth, Input Validation, Secrets)
+- [x] Code Quality Audit (Dead code, Duplication, Complexity)
+- [x] Performance Audit (DB, Frontend, API)
+- [x] Dependencies Audit (Outdated, Vulnerabilities, Unused)
+- [x] Documentation Audit (README, API docs, Comments)
+- [x] Generate Report at `docs/reports/audit_2026-02-22.md`

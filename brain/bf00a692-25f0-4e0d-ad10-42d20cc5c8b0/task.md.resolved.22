@@ -1,0 +1,8 @@
+# Task: Full Audit - Auto-like Project
+
+- [/] Security Audit (Auth, Input Validation, Secrets)
+- [ ] Code Quality Audit (Dead code, Duplication, Complexity)
+- [ ] Performance Audit (DB, Frontend, API)
+- [ ] Dependencies Audit (Outdated, Vulnerabilities, Unused)
+- [ ] Documentation Audit (README, API docs, Comments)
+- [ ] Generate Report at `docs/reports/audit_2026-02-22.md`
