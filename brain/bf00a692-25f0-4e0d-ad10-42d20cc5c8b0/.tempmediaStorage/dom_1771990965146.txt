@@ -1,0 +1,131 @@
+<current_dom_explanation>
+This is a temporary snapshot of the current page's DOM structure. The DOM will change if you navigate to or interact with another page. Use a tool like browser_get_dom to capture and preserve the DOM in your trajectory if needed for later reference.
+</current_dom_explanation>
+<current_dom>
+[0] (500,500)<div  />
+	Auto Like
+	BaoStar Services
+	Tổng quan
+	[1] (68,147)<a class='sidebar-link ' href='/'>Dashboard />
+	[2] (68,186)<a class='sidebar-link ' href='/order-history'>Nhật ký đơn hàng />
+	[3] (68,224)<a class='sidebar-link ' href='/deposit'>Nạp tiền />
+	[4] (68,277)<button class='sidebar-section-toggle expanded' />
+		[5] (35,277)<span >Facebook />
+	[6] (68,312)<a class='sidebar-link active' href='/facebook/like-gia-re'>Tăng Like Bài Viết />
+	[7] (68,351)<a class='sidebar-link ' href='/facebook/like-chat-luong'>Like Bài Viết Sale />
+	[8] (68,390)<a class='sidebar-link ' href='/facebook/like-comment'>Like Bình Luận />
+	[9] (68,429)<a class='sidebar-link ' href='/facebook/comment'>Tăng Bình Luận />
+	[10] (68,468)<a class='sidebar-link ' href='/facebook/follow'>Tăng Follow />
+	[11] (68,507)<a class='sidebar-link ' href='/facebook/like-page'>Like + Follow Page />
+	[12] (68,545)<a class='sidebar-link ' href='/facebook/mem-group'>Tăng Mem Group />
+	[13] (68,584)<a class='sidebar-link ' href='/facebook/mat-live'>Tăng Mắt Live />
+	[14] (68,623)<a class='sidebar-link ' href='/facebook/share'>Tăng Share />
+	[15] (68,662)<a class='sidebar-link ' href='/facebook/vip'>VIP Like Tháng />
+	[16] (68,715)<button class='sidebar-section-toggle ' />
+		[17] (29,715)<span >TikTok />
+			[18] (15,715)<img  />
+	Tăng Like
+	Tăng Follow
+	Tăng View
+	Tăng Save
+	Tăng Comment
+	Tăng Share
+	Tăng Mắt Live
+	[19] (68,765)<button class='sidebar-section-toggle ' />
+		[20] (37,765)<span >Instagram />
+	Tăng Like
+	Tăng Follow
+	Tăng Bình Luận
+	Tăng View + Live
+	Tăng View Story
+	VIP Like
+	Tài khoản
+	[21] (68,937)<a class='sidebar-link ' href='/admin'>Admin Panel />
+	[22] (68,975)<button class='sidebar-link logout-link'>Đăng xuất />
+	Tăng Like Bài Viết
+	Tăng like bài viết với nhiều gói dịch vụ, hỗ trợ chọn cảm xúc
+	[23] (938,32)<button class='theme-toggle' title='Chế độ tối' />
+	[24] (969,32)<button class='header-avatar-btn' />
+		[25] (964,32)<div >A />
+	[26] (204,132)<button class='service-tab active'>Chọn gói dịch vụ />
+	[27] (275,132)<button class='service-tab '>Lịch sử đơn />
+	[28] (470,286)<div class='package-list' scrollable='true' />
+		[29] (468,180)<button class='package-item selected' />
+			[30] (456,180)<span >S1 Like bấm tay />
+			[31] (754,180)<span >29đ/1 />
+		[32] (468,224)<button class='package-item ' />
+			[33] (454,224)<span >S2  Like clone nhanh />
+			[34] (752,224)<span >10.5đ/1 />
+		[35] (468,268)<button class='package-item ' />
+			[36] (453,268)<span >S2 Like siêu nhanh />
+			[37] (751,268)<span >20.5đ/1 />
+		[38] (468,313)<button class='package-item ' />
+			[39] (453,313)<span >S3 -  clone TÂY -  siêu rẻ - Không bảo hành - Bắt đầu chạy sau vài giờ />
+			[40] (751,313)<span >3.46đ/1 />
+		[41] (468,357)<button class='package-item ' />
+			[42] (457,357)<span >S2 Like post dự phòng />
+			[43] (755,357)<span >21đ/1 />
+		[44] (468,401)<button class='package-item ' />
+			[45] (454,401)<span >Like clone high />
+			[46] (752,401)<span >10.8đ/1 />
+		S1 Like clone xịn
+		31đ/1
+		S3 Like clone xịn
+		51đ/1
+		like post vip sale
+		11đ/1
+	[47] (365,442)<label class='form-label'>ID bài viết />
+	[48] (365,483)<input class='form-input' placeholder='Nhập link Facebook hoặc ID bài viết' />
+	[49] (675,442)<label class='form-label'>Số lượng />
+	[50] (675,483)<input class='form-input' placeholder='Nhập số lượng like' />
+	[51] (470,522)<label class='form-label'>Chọn cảm xúc />
+	[52] (182,579)<button class='reaction-btn ' title='Like' />
+		[53] (182,570)<span >👍 />
+		[54] (182,596)<span >Like />
+	[55] (222,579)<button class='reaction-btn ' title='Love' />
+		[56] (222,570)<span >❤️ />
+		[57] (222,596)<span >Love />
+	[58] (262,579)<button class='reaction-btn ' title='Haha' />
+		[59] (262,570)<span >😆 />
+		[60] (262,596)<span >Haha />
+	[61] (303,579)<button class='reaction-btn ' title='Wow' />
+		[62] (303,570)<span >😮 />
+		[63] (303,596)<span >Wow />
+	[64] (344,579)<button class='reaction-btn ' title='Care' />
+		[65] (344,570)<span >🥰 />
+		[66] (344,596)<span >Care />
+	[67] (384,579)<button class='reaction-btn ' title='Sad' />
+		[68] (384,570)<span >😢 />
+		[69] (384,596)<span >Sad />
+	[70] (425,579)<button class='reaction-btn ' title='Angry' />
+		[71] (425,570)<span >😡 />
+		[72] (425,596)<span >Angry />
+	Có thể chọn nhiều cảm xúc
+	[73] (470,672)<label class='form-label'>Ghi chú />
+	[74] (470,725)<textarea class='form-input' placeholder='Ghi chú (không bắt buộc)' />
+	[75] (470,793)<button class='btn btn-primary btn-lg btn-full'>Mua dịch vụ />
+	Thông tin tài khoản
+	A
+	Admin
+	Quản trị viên
+	Số dư:
+	1,050
+	đ
+	Tổng nạp:
+	1,050
+	đ
+	[76] (848,301)<button class='sidebar-action-btn'>Nạp tiền />
+	[77] (935,301)<button class='sidebar-action-btn'>Đơn hàng />
+	Ghi chú gói dịch vụ
+	S1 Like bấm tay
+	Tốc độ
+	500->2k/1 ngày
+	Nhập id bài viết
+	Chất lượng cao
+	Like theo hình thức bấm tay
+	Min:
+	10
+	— Max:
+	100,000
+
+</current_dom>

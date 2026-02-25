@@ -1,0 +1,130 @@
+<current_dom_explanation>
+This is a temporary snapshot of the current page's DOM structure. The DOM will change if you navigate to or interact with another page. Use a tool like browser_get_dom to capture and preserve the DOM in your trajectory if needed for later reference.
+</current_dom_explanation>
+<current_dom>
+[0] (500,718)<div  />
+	Auto Like
+	BaoStar Services
+	Tổng quan
+	[1] (68,147)<a class='sidebar-link active' href='/'>Dashboard />
+	[2] (68,186)<a class='sidebar-link ' href='/order-history'>Nhật ký đơn hàng />
+	[3] (68,238)<button class='sidebar-section-toggle expanded' />
+		[4] (35,238)<span >Facebook />
+	[5] (68,273)<a class='sidebar-link ' href='/facebook/like-gia-re'>Tăng Like Bài Viết />
+	[6] (68,312)<a class='sidebar-link ' href='/facebook/like-chat-luong'>Like Bài Viết Sale />
+	[7] (68,351)<a class='sidebar-link ' href='/facebook/like-comment'>Like Bình Luận />
+	[8] (68,390)<a class='sidebar-link ' href='/facebook/comment'>Tăng Bình Luận />
+	[9] (68,429)<a class='sidebar-link ' href='/facebook/follow'>Tăng Follow />
+	[10] (68,468)<a class='sidebar-link ' href='/facebook/like-page'>Like + Follow Page />
+	[11] (68,507)<a class='sidebar-link ' href='/facebook/mem-group'>Tăng Mem Group />
+	[12] (68,545)<a class='sidebar-link ' href='/facebook/mat-live'>Tăng Mắt Live />
+	[13] (68,584)<a class='sidebar-link ' href='/facebook/share'>Tăng Share />
+	[14] (68,623)<a class='sidebar-link ' href='/facebook/vip'>VIP Like Tháng />
+	[15] (68,676)<button class='sidebar-section-toggle ' />
+		[16] (29,676)<span >TikTok />
+			[17] (15,676)<img  />
+	Tăng Like
+	Tăng Follow
+	Tăng View
+	Tăng Save
+	Tăng Comment
+	Tăng Share
+	Tăng Mắt Live
+	VIP Mắt TikTok
+	[18] (68,726)<button class='sidebar-section-toggle ' />
+		[19] (37,726)<span >Instagram />
+	Tăng Like
+	Tăng Follow
+	Tăng Bình Luận
+	Tăng View + Live
+	Tăng View Story
+	VIP Like
+	Dashboard
+	Tổng quan dịch vụ
+	[20] (849,32)<button class='theme-toggle' title='Chế độ tối' />
+	[21] (895,32)<a class='header-login-btn' href='/login'>Đăng nhập />
+	[22] (957,32)<a class='header-register-btn' href='/register'>Đăng ký />
+	0
+	Tổng đơn hàng
+	0
+	Đơn hoàn thành
+	0
+	Đang xử lý
+	24
+	Dịch vụ khả dụng
+	Dịch vụ Facebook
+	[23] (232,405)<button class='service-card' />
+		[24] (176,369)<div  />
+		[25] (232,413)<div >Tăng Like Bài Viết />
+		[26] (232,445)<div >Tăng like bài viết với nhiều gói dịch vụ, hỗ trợ chọn cảm xúc />
+	[27] (400,405)<button class='service-card' />
+		[28] (344,378)<div  />
+		[29] (400,422)<div >Like Bài Viết Sale />
+		[30] (400,445)<div >Like bài viết giá sale, tiết kiệm chi phí />
+	[31] (568,405)<button class='service-card' />
+		[32] (512,378)<div  />
+		[33] (568,422)<div >Like Bình Luận />
+		[34] (568,445)<div >Tăng like cho bình luận trên bài viết />
+	[35] (736,405)<button class='service-card' />
+		[36] (680,378)<div  />
+		[37] (736,422)<div >Tăng Bình Luận />
+		[38] (736,445)<div >Buff bình luận tùy chỉnh nội dung cho bài viết />
+	[39] (904,405)<button class='service-card' />
+		[40] (848,378)<div  />
+		[41] (904,422)<div >Tăng Follow />
+		[42] (904,445)<div >Tăng người theo dõi cho trang cá nhân />
+	[43] (232,569)<button class='service-card' />
+		[44] (176,542)<div  />
+		[45] (232,586)<div >Like + Follow Page />
+		[46] (232,609)<div >Tăng like và follow cho Fanpage />
+	[47] (400,569)<button class='service-card' />
+		[48] (344,542)<div  />
+		[49] (400,586)<div >Tăng Mem Group />
+		[50] (400,609)<div >Thêm thành viên vào nhóm Facebook />
+	[51] (568,569)<button class='service-card' />
+		[52] (512,542)<div  />
+		[53] (568,586)<div >Tăng Mắt Live />
+		[54] (568,609)<div >Tăng người xem livestream trực tiếp />
+	[55] (736,569)<button class='service-card' />
+		[56] (680,542)<div  />
+		[57] (736,586)<div >Tăng Share />
+		[58] (736,609)<div >Chia sẻ bài viết ra nhiều tài khoản />
+	[59] (904,569)<button class='service-card' />
+		[60] (848,542)<div  />
+		[61] (904,586)<div >VIP Like Tháng />
+		[62] (904,609)<div >Auto like hàng ngày trong thời gian dài />
+	Dịch vụ TikTok
+	[63] (232,783)<button class='service-card' />
+		[64] (176,756)<div  />
+		[65] (232,800)<div >Tăng Like />
+		[66] (232,823)<div >Tăng like cho video TikTok />
+	[67] (400,783)<button class='service-card' />
+		[68] (344,756)<div  />
+		[69] (400,800)<div >Tăng Follow />
+		[70] (400,823)<div >Tăng người theo dõi TikTok />
+	[71] (568,783)<button class='service-card' />
+		[72] (512,756)<div  />
+		[73] (568,800)<div >Tăng View />
+		[74] (568,823)<div >Tăng lượt xem video TikTok />
+	[75] (736,783)<button class='service-card' />
+		[76] (680,756)<div  />
+		[77] (736,800)<div >Tăng Save />
+		[78] (736,823)<div >Tăng lượt lưu video TikTok />
+	[79] (904,783)<button class='service-card' />
+		[80] (848,756)<div  />
+		[81] (904,800)<div >Tăng Comment />
+		[82] (904,823)<div >Buff bình luận cho video TikTok />
+	[83] (232,939)<button class='service-card' />
+		[84] (176,912)<div  />
+		[85] (232,956)<div >Tăng Share />
+		[86] (232,979)<div >Tăng lượt chia sẻ video TikTok />
+	[87] (400,939)<button class='service-card' />
+		[88] (344,912)<div  />
+		[89] (400,956)<div >Tăng Mắt Live />
+		[90] (400,979)<div >Tăng người xem livestream TikTok />
+	[91] (568,939)<button class='service-card' />
+		[92] (512,912)<div  />
+		[93] (568,956)<div >VIP Mắt TikTok />
+		[94] (568,979)<div >Dịch vụ VIP mắt livestream TikTok />
+
+</current_dom>
