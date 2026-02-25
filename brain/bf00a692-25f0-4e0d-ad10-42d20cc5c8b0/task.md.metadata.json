@@ -1,6 +1,6 @@
 {
-  "artifactType": "ARTIFACT_TYPE_TASK",
-  "summary": "Checklist for full audit of Auto-like project covering security, code quality, performance, dependencies, and documentation.",
-  "updatedAt": "2026-02-22T11:50:42.221598100Z",
-  "version": "22"
+  "artifactType":  "ARTIFACT_TYPE_TASK",
+  "summary":  "Re-audit checklist before production deployment. Tracks previously fixed issues and current audit areas.",
+  "updatedAt":  "2026-02-25T06:37:06.363292300Z",
+  "version":  "26"
 }
