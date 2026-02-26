@@ -1,6 +1,6 @@
 {
   "artifactType": "ARTIFACT_TYPE_WALKTHROUGH",
-  "summary": "Comprehensive walkthrough of TikTok services integration including collapsible sidebar, admin platform filtering, order history tabs, and bug fixes. Documents all code changes, CSS updates, and environment fixes.",
-  "updatedAt": "2026-02-14T04:59:23.076346100Z",
-  "version": "5"
+  "summary": "Walkthrough of the AdminPage modularization and security audit improvements. Covers the new component structure and finalized security checks.",
+  "updatedAt": "2026-02-26T12:00:14.303076900Z",
+  "version": "19"
 }
