@@ -1,18 +1,20 @@
-# Task: Re-Audit Before Deployment
+# Task: Split AdminPage into Sub-Components
 
-## Previous Fixes (Done)
-- [x] Remove `VITE_API_KEY` from frontend `.env`
-- [x] Generate strong JWT_SECRET
-- [x] Remove hardcoded admin password fallback in `config.ts`
-- [x] Update bcrypt to fix dependency vulnerabilities
-- [x] Add email/phone validation in registration
-- [x] Fix CORS config for production
-- [x] Sanitize `object_id` in orders and `link` in convert-uid
-- [x] Add price caching for BaoStar API
+## Planning
+- [x] Read and analyze full AdminPage.tsx (908 lines)
+- [x] Create implementation plan with component boundaries
+- [x] Get user approval on plan
 
-## Current Re-Audit
-- [/] Security scan (remaining gaps)
-- [/] Code quality & maintainability
-- [/] Performance & UX
-- [/] Production readiness checklist
-- [ ] Generate updated audit report
+## Execution
+- [/] Extract shared types to `src/types/admin.ts`
+- [/] Create `AdminDashboard` component
+- [/] Create `AdminUsers` component
+- [/] Create `AdminOrders` component
+- [/] Create `AdminPricing` component
+- [/] Create `AdminDeposits` component
+- [ ] Refactor `AdminPage.tsx` as tab-router shell
+
+## Verification
+- [ ] Verify TypeScript compiles with no errors
+- [ ] Verify all 5 tabs render correctly in browser
+- [ ] Verify data loading and interactions work

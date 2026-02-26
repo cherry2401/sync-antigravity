@@ -1,6 +1,6 @@
 {
   "artifactType":  "ARTIFACT_TYPE_TASK",
-  "summary":  "Re-audit checklist before production deployment. Tracks previously fixed issues and current audit areas.",
-  "updatedAt":  "2026-02-25T06:37:06.363292300Z",
-  "version":  "26"
+  "summary":  "Task checklist for splitting AdminPage.tsx. Planning completed, execution in progress.",
+  "updatedAt":  "2026-02-26T11:12:55.511982800Z",
+  "version":  "28"
 }
