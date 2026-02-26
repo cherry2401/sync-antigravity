@@ -1,0 +1,20 @@
+# Task: Split AdminPage into Sub-Components
+
+## Planning
+- [x] Read and analyze full AdminPage.tsx (908 lines)
+- [x] Create implementation plan with component boundaries
+- [x] Get user approval on plan
+
+## Execution
+- [x] Extract shared types to [src/types/admin.ts](file:///I:/Website/Auto-like/src/types/admin.ts)
+- [x] Create [AdminDashboard](file:///I:/Website/Auto-like/src/pages/admin/AdminDashboard.tsx#10-111) component
+- [x] Create [AdminUsers](file:///I:/Website/Auto-like/src/pages/admin/AdminUsers.tsx#7-225) component
+- [x] Create [AdminOrders](file:///I:/Website/Auto-like/src/pages/admin/AdminOrders.tsx#7-97) component
+- [x] Create [AdminPricing](file:///I:/Website/Auto-like/src/pages/admin/AdminPricing.tsx#9-310) component
+- [x] Create [AdminDeposits](file:///I:/Website/Auto-like/src/pages/admin/AdminDeposits.tsx#7-94) component
+- [x] Refactor [AdminPage.tsx](file:///I:/Website/Auto-like/src/pages/AdminPage.tsx) as tab-router shell
+
+## Verification
+- [ ] Verify TypeScript compiles with no errors
+- [ ] Verify all 5 tabs render correctly in browser
+- [ ] Verify data loading and interactions work
