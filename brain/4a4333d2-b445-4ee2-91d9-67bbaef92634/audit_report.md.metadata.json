@@ -1,5 +1,6 @@
 {
   "artifactType": "ARTIFACT_TYPE_OTHER",
-  "summary": "Comprehensive audit report for the Scheduled_Group_Post_v5 n8n workflow. Identifies 3 critical bugs and 2 warnings that cause posts to only go to a few groups and Telegram to only notify for 1 page/group. Includes root cause analysis with Vietnamese explanations and a proposed fixed workflow.",
-  "updatedAt": "2026-02-27T02:48:41.478073100Z"
+  "summary": "Corrected audit report for Scheduled_Group_Post_v5. Properly traces all connections from JSON, identifies the real root cause: Post to Group/Page is inside the media upload loop causing duplicate posts per group (3 photos = 3 separate posts). This triggers Facebook spam detection, explaining why only a few groups receive posts. Proposes restructuring to upload all photos first, then post once per group.",
+  "updatedAt": "2026-02-27T03:22:46.364528400Z",
+  "version": "1"
 }
