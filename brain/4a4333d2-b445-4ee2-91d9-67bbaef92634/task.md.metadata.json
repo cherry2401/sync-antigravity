@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_TASK",
+  "summary": "Task tracking for auditing the Scheduled_Group_Post_v5 n8n workflow to fix group posting loop and Telegram notification issues.",
+  "updatedAt": "2026-02-27T02:47:24.819897400Z"
+}

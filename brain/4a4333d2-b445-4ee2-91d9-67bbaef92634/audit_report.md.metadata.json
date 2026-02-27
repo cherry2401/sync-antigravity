@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "Comprehensive audit report for the Scheduled_Group_Post_v5 n8n workflow. Identifies 3 critical bugs and 2 warnings that cause posts to only go to a few groups and Telegram to only notify for 1 page/group. Includes root cause analysis with Vietnamese explanations and a proposed fixed workflow.",
+  "updatedAt": "2026-02-27T02:48:41.478073100Z"
+}
