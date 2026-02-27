@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary": "Walkthrough for the rebuilt XEDUADON247 image generator web app. Now uses the original PDF template (template_2.png) as background with text overlays for the schedule section. Includes screenshots comparing original vs generated output, and instructions for fine-tuning text positions.",
+  "updatedAt": "2026-02-27T08:21:59.514469900Z",
+  "version": "1"
+}

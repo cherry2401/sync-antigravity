@@ -1,0 +1,38 @@
+# 🖼️ Image Generator — XEDUADON247
+
+## Kết quả
+
+![App screenshot](C:/Users/Cherry/.gemini/antigravity/brain/4a4333d2-b445-4ee2-91d9-67bbaef92634/image_generator_overview_1772178150830.png)
+
+## Cấu trúc file
+
+```
+i:\Workflow\n8n\Workflow\New\image-generator\
+├── index.html     # Trang chính
+├── style.css      # CSS template
+├── script.js      # Logic form + export
+└── assets/
+    └── car.png    # Ảnh xe Honda CR-V
+```
+
+## Tính năng
+
+| Tính năng | Mô tả |
+|-----------|-------|
+| **Form nhập lịch trình** | 2 dòng route, mỗi dòng có: Thứ, Ngày, Giờ đi/đến, Điểm đi/đến |
+| **Preview real-time** | Template cập nhật ngay khi gõ |
+| **Export PNG** | Download ảnh chất lượng cao (2x scale) via html2canvas |
+| **Lịch sử** | Tự lưu các lịch trình đã export, click để load lại |
+| **Reset** | Xóa form, tự điền ngày hiện tại |
+
+## Cách sử dụng
+
+1. Mở [index.html](file:///i:/Workflow/n8n/Workflow/New/image-generator/index.html) trong browser
+2. Nhập thông tin lịch trình bên sidebar trái
+3. Preview bên phải cập nhật real-time
+4. Bấm **Export PNG** để download ảnh
+5. Gửi ảnh qua Telegram → n8n workflow tự đăng groups
+
+## Demo
+
+![App recording](C:/Users/Cherry/.gemini/antigravity/brain/4a4333d2-b445-4ee2-91d9-67bbaef92634/testing_image_gen_1772177929512.webp)

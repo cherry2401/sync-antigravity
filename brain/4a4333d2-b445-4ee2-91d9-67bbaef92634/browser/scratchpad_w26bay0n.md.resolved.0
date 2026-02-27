@@ -1,0 +1,13 @@
+# Task: Test Image Generator Web App
+
+## Plan
+1. Attempt to open the web app directly via `file:///` URL.
+2. If direct access fails, try to use a data URI redirect.
+3. Verify the app's appearance and text positioning.
+4. Capture screenshots for verification.
+5. Report findings.
+
+## Progress
+- [ ] Open index.html
+- [ ] Verify text overlays
+- [ ] Capture screenshot

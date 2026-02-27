@@ -1,0 +1,35 @@
+# 🖼️ Image Generator — XEDUADON247
+
+## Cách hoạt động
+
+Dùng **template gốc** ([template_2.png](file:///i:/Workflow/n8n/Workflow/New/template_2.png)) làm background, chỉ **chồng text** lịch trình lên đúng vị trí.
+
+## So sánh
+
+````carousel
+![Template gốc (có text)](i:/Workflow/n8n/Workflow/New/image-generator/assets/template_1.png)
+<!-- slide -->
+![App preview](C:/Users/Cherry/.gemini/antigravity/brain/4a4333d2-b445-4ee2-91d9-67bbaef92634/image_generator_v2_check_1772180398891.png)
+````
+
+## Cấu trúc file
+
+| File | Mô tả |
+|------|-------|
+| [index.html](file:///i:/Workflow/n8n/Workflow/New/image-generator/index.html) | Form + preview canvas |
+| [style.css](file:///i:/Workflow/n8n/Workflow/New/image-generator/style.css) | Vị trí text overlay (dễ chỉnh) |
+| [script.js](file:///i:/Workflow/n8n/Workflow/New/image-generator/script.js) | Logic form, export PNG, history |
+| [template_2.png](file:///i:/Workflow/n8n/Workflow/New/image-generator/assets/template_2.png) | Template gốc (background) |
+
+## Chỉnh vị trí text
+
+Mở [style.css](file:///i:/Workflow/n8n/Workflow/New/image-generator/style.css), sửa các giá trị `top` / `left` trong phần Route 1 & Route 2:
+
+```css
+.r1-day  { top: 71.5%; left: 17%; }  /* Thứ + ngày route 1 */
+.r1-time { top: 74.3%; left: 17%; }  /* Giờ route 1 */
+.r1-from { top: 71.5%; left: 70%; }  /* Điểm đi route 1 */
+.r1-to   { top: 74.3%; left: 70%; }  /* Điểm đến route 1 */
+```
+
+Tăng `top` = dịch xuống, tăng `left` = dịch sang phải.

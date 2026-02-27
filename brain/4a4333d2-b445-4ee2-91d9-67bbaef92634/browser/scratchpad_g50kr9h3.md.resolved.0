@@ -1,0 +1,11 @@
+# Task: Capture PDF Template Screenshot
+
+## Plan
+- [ ] Navigate to `file:///i:/Workflow/n8n/Workflow/New/final.pdf` (Already open, need to verify)
+- [ ] Resize window to roughly 750x1100
+- [ ] Inject JS to hide toolbars and zoom PDF to fit viewport
+- [ ] Take a clean screenshot of the PDF content
+- [ ] Save screenshot and return path
+
+## Notes
+- Current Page ID: `17578734863AF4D0E3AD302CA95A94AE`

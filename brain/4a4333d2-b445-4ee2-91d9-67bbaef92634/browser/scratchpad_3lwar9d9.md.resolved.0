@@ -1,0 +1,14 @@
+# Task: Test Drag and Drop for Image Generator
+
+## Status
+- [x] Open web app
+- [x] Reload page
+- [x] Get coordinates of draggable groups
+- [ ] Drag "THỨ 6 (27/02) 13H30 - 15H00" to the right
+- [ ] Take screenshot and verify
+
+## Findings
+- Draggable groups identified: `group-r1-time`, `group-r1-dest`, `group-r2-time`, `group-r2-dest`.
+- Group 1 Time Coords: (585, 655).
+- Dashed outlines are visible in the preview area.
+- Form inputs are pre-filled with data.

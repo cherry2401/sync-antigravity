@@ -1,0 +1,50 @@
+🖼️ Image Generator
+XEDUADON247
+📅 Lịch trình 1
+[0] (143,120)<label >Thứ />
+[1] (143,144)<select id='day1' />
+[2] (143,172)<label >Ngày/Tháng />
+[3] (143,196)<input id='date1' placeholder='27/02' />
+[4] (85,224)<label >Giờ đi />
+[5] (85,247)<input id='timeStart1' placeholder='13H30' />
+[6] (201,224)<label >Giờ đến />
+[7] (201,247)<input id='timeEnd1' placeholder='15H00' />
+[8] (85,275)<label >Điểm đi />
+[9] (85,298)<input id='from1' placeholder='ĐÔNG HÀ' />
+[10] (201,275)<label >Điểm đến />
+[11] (201,298)<input id='to1' placeholder='SB HUẾ' />
+📅 Lịch trình 2
+[12] (143,394)<label >Thứ />
+[13] (143,418)<select id='day2' />
+[14] (143,447)<label >Ngày/Tháng />
+[15] (143,470)<input id='date2' placeholder='27/02' />
+[16] (85,498)<label >Giờ đi />
+[17] (85,521)<input id='timeStart2' placeholder='18H00' />
+[18] (201,498)<label >Giờ đến />
+[19] (201,521)<input id='timeEnd2' placeholder='19H00' />
+[20] (85,549)<label >Điểm đi />
+[21] (85,572)<input id='from2' placeholder='SB HUẾ' />
+[22] (201,549)<label >Điểm đến />
+[23] (201,572)<input id='to2' placeholder='QUẢNG TRỊ
+GIO LINH' />
+[24] (103,641)<button class='btn-primary' id='btnExport'>📥 Export PNG />
+[25] (233,641)<button class='btn-secondary' id='btnReset'>🔄 Reset />
+[26] (62,684)<label class='toggle-label' />
+	[27] (23,684)<input id='dragMode' />
+	[28] (71,684)<span >🖐️ Kéo thả vị trí />
+[29] (148,684)<button class='btn-small' id='btnSavePos'>💾 Lưu vị trí />
+[30] (229,684)<button class='btn-small btn-small-danger' id='btnResetPos'>↩️ Reset vị trí />
+📋 Lịch sử
+Chưa có lịch sử
+Preview
+— Kéo thả để chỉnh vị trí
+THỨ 6 (27/02)
+13H30 - 15H00
+[31] (793,621)<div >ĐÔNG HÀ />
+	ĐÔNG HÀ
+	[32] (793,621)<span >SB HUẾ />
+THỨ 6 (27/02)
+18H00 - 19H00
+[33] (841,696)<div >SB HUẾ />
+	SB HUẾ
+	[34] (841,696)<span >QUẢNG TRỊGIO LINH />

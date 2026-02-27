@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Plan for building an image generator tool that uses the XEDUADON247 car service PDF template. The tool replaces the schedule section (date, time, routes) while keeping the rest of the design fixed. Two approaches proposed: Web App (HTML/CSS/JS with form and export) or n8n Workflow (automated with external screenshot API). Web App is recommended for its visual preview and ease of use.",
+  "updatedAt": "2026-02-27T07:33:24.598630Z"
+}

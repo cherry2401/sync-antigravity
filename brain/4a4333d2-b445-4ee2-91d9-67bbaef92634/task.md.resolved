@@ -1,8 +1,18 @@
-# Audit: Scheduled_Group_Post_v5 - Loop & Notification Issues
+# Tasks
 
-- [x] Read and analyze workflow JSON
-- [x] Identify root causes of group posting loop bug
-- [x] Identify root causes of Telegram notification bug
-- [/] Write audit report with fixes
-- [ ] Get user approval on fix plan
-- [ ] Implement fixes in workflow JSON
+## Workflow Fix (Completed)
+- [x] Audit workflow V5
+- [x] Fix loop & notification issues
+- [x] Verify V5_FIX connections
+- [x] Fix SplitInBatches nested loop issue
+- [x] Remove SplitInBatches, use linear flow
+
+## Image Generator Web App
+- [x] Create project structure
+- [x] Build HTML with original template as background
+- [x] Style with CSS (overlay positioning)
+- [x] Implement form inputs for schedule data
+- [x] Add real-time preview
+- [x] Implement PNG export (html2canvas)
+- [x] Add drag-and-drop positioning
+- [x] Test and verify
